@@ -143,14 +143,14 @@ export default function Hero() {
                 <div className="relative z-10 h-full flex items-center justify-center px-6">
                   <div className="max-w-3xl text-center text-white">
                     <div className="text-sm md:text-base font-semibold opacity-90 mb-2">{banner.title}</div>
-                    <h2 className="text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">{banner.subtitle}</h2>
+                    {/* <h2 className="text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">{banner.subtitle}</h2> */}
                     {banner.discount && (
                       <div className="mb-6">
-                        <span className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-md font-bold">{banner.discount}</span>
+                        {/* <span className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-md font-bold">{banner.discount}</span> */}
                       </div>
                     )}
                     <div>
-                      <button
+                      {/* <button
                         onClick={(e) => {
                           e.stopPropagation();
                           if (banner.redirect_url) window.location.href = banner.redirect_url;
@@ -159,7 +159,7 @@ export default function Hero() {
                       >
                         {banner.buttonText || "Shop"}
                         <ChevronRight className="h-4 w-4" />
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>

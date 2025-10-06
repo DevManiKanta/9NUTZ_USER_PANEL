@@ -62,6 +62,8 @@ export const loginAPI = (payload: { email: string; password: string }) =>
 export const meAPI = (token?: string) =>
   request('/api/auth/me', { token, credentials: 'include' });
 
+
+
 /* -------------------
    PRODUCTS (public)
    ------------------- */

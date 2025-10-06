@@ -191,7 +191,7 @@
 "use client";
 
 import { ShoppingCart } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AccountDropdown from "./AccountDropdown";
 import Link from "next/link";
 import Image from "next/image";
@@ -214,14 +214,38 @@ export default function Header({
 }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
+  // read token from localStorage to determine login state
+  const [hasToken, setHasToken] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean(localStorage.getItem("token"));
+  });
+
+  useEffect(() => {
+    // update if other tab changes localStorage
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "token") {
+        setHasToken(Boolean(e.newValue));
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  // also allow manual refresh of state when some auth flow sets token in same tab
+  useEffect(() => {
+    const onFocus = () => setHasToken(Boolean(localStorage.getItem("token")));
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, []);
+
   const tabs = [
-    { href: "/about", label: "About" },
-    { href: "/our-journey", label: "Our Journey" },
-    { href: "/shop", label: "Shop" },
-    { href: "/shipping-methods", label: "Shipping Methods" },
-    { href: "/franchise", label: "Franchise With Us" },
-    { href: "/brochure", label: "Brochure" },
-    { href: "/contact", label: "Contact" },
+    { href: "/comingsoon", label: "About" },
+    { href: "/comingsoon", label: "Our Journey" },
+    { href: "/", label: "Shop" },
+    { href: "/comingsoon", label: "Shipping Methods" },
+    { href: "/comingsoon", label: "Franchise With Us" },
+    { href: "/comingsoon", label: "Brochure" },
+    { href: "/comingsoon", label: "Contact" },
   ];
 
   return (
@@ -259,9 +283,20 @@ export default function Header({
           {/* center spacer */}
           <div className="flex-1" />
 
-          {/* Right: account dropdown and cart icon only */}
+          {/* Right: account (or logged-in text) + cart icon */}
           <div className="flex items-center space-x-3 relative">
-            <AccountDropdown onLoginClick={onLoginClick} />
+            {/* If token exists show simple logged-in text, otherwise show AccountDropdown */}
+            {hasToken ? (
+              <div
+                className="px-3 py-1 rounded-md bg-green-100 text-green-800 text-sm font-medium"
+                title="You are logged in"
+                aria-live="polite"
+              >
+                You're logged in
+              </div>
+            ) : (
+              <AccountDropdown onLoginClick={onLoginClick} />
+            )}
 
             {/* Cart button with badge */}
             <button
@@ -340,3 +375,4 @@ export default function Header({
     </header>
   );
 }
+

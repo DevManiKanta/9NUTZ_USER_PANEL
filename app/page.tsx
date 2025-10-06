@@ -17,6 +17,7 @@ import LocationModal from "@/components/LocationModal";
 import CartSidebar from "@/components/CartSidebar";
 
 
+
 /**
  * Types used in this page
  */
