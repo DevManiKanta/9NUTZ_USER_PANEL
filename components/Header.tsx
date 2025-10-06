@@ -1,13 +1,13 @@
+
+
 // "use client";
 
-// import { Search, MapPin, ShoppingCart, ChevronDown, ChevronRight } from 'lucide-react';
-// import { useState, useRef, useEffect } from 'react';
-// import AccountDropdown from './AccountDropdown';
-// import { categories, searchProducts, getCategorySuggestions } from '@/lib/categories';
-// import Link from 'next/link';
-// import Logo from '../assests/LOGO.jpg';
-
-
+// import { ShoppingCart } from "lucide-react";
+// import { useState, useEffect } from "react";
+// import AccountDropdown from "./AccountDropdown";
+// import Link from "next/link";
+// import Image from "next/image";
+// import Logo from "../assests/LOGO.jpg";
 
 // interface HeaderProps {
 //   onLoginClick: () => void;
@@ -22,176 +22,175 @@
 //   onLocationClick,
 //   onCartClick,
 //   cartItemCount,
-//   cartTotal
+//   cartTotal,
 // }: HeaderProps) {
-//   const [searchQuery, setSearchQuery] = useState('');
-//   const [selectedCategory, setSelectedCategory] = useState('all');
-//   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-//   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-//   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
-//   const [searchSuggestions, setSearchSuggestions] = useState<any[]>([]);
-//   const [showSuggestions, setShowSuggestions] = useState(false);
-  
-//   const dropdownRef = useRef<HTMLDivElement>(null);
-//   const categoryDropdownRef = useRef<HTMLDivElement>(null);
-//   const searchRef = useRef<HTMLDivElement>(null);
+//   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-//   // Handle search input changes
-//   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const query = e.target.value;
-//     setSearchQuery(query);
-    
-//     if (query.length > 1) {
-//       const productResults = searchProducts(query);
-//       const categoryResults = getCategorySuggestions(query);
-      
-//       const suggestions = [
-//         ...categoryResults.map(cat => ({ type: 'category', ...cat })),
-//         ...productResults.slice(0, 5).map(product => ({ type: 'product', ...product }))
-//       ];
-      
-//       setSearchSuggestions(suggestions);
-//       setShowSuggestions(true);
-//     } else {
-//       setShowSuggestions(false);
-//     }
-//   };
+//   // read token from localStorage to determine login state
+//   const [hasToken, setHasToken] = useState<boolean>(() => {
+//     if (typeof window === "undefined") return false;
+//     return Boolean(localStorage.getItem("token"));
+//   });
 
-//   // Close dropdowns when clicking outside
 //   useEffect(() => {
-//     const handleClickOutside = (event: MouseEvent) => {
-//       if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
-//         setIsCategoryDropdownOpen(false);
-//         setHoveredCategory(null);
-//       }
-//       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-//         setShowSuggestions(false);
+//     // update if other tab changes localStorage
+//     const onStorage = (e: StorageEvent) => {
+//       if (e.key === "token") {
+//         setHasToken(Boolean(e.newValue));
 //       }
 //     };
-
-//     document.addEventListener('mousedown', handleClickOutside);
-//     return () => document.removeEventListener('mousedown', handleClickOutside);
+//     window.addEventListener("storage", onStorage);
+//     return () => window.removeEventListener("storage", onStorage);
 //   }, []);
 
-//   // Handle search submission
-//   const handleSearchSubmit = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     if (searchQuery.trim()) {
-//       // Navigate to search results page
-//       window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
-//     }
-//   };
+//   // also allow manual refresh of state when some auth flow sets token in same tab
+//   useEffect(() => {
+//     const onFocus = () => setHasToken(Boolean(localStorage.getItem("token")));
+//     window.addEventListener("focus", onFocus);
+//     return () => window.removeEventListener("focus", onFocus);
+//   }, []);
+
+//   const tabs = [
+//     { href: "/comingsoon", label: "Our Journey" },
+//     { href: "/", label: "Shop" },
+//     { href: "/comingsoon", label: "Packages" },
+//     { href: "/comingsoon", label: "Shipping Methods" },
+//     { href: "/comingsoon", label: "Franchise With Us" },
+//     { href: "/comingsoon", label: "Brochure" },
+//     { href: "/comingsoon", label: "Contact" },
+//   ];
 
 //   return (
-//     <header className="fixed top-0 left-0 right-0 bg-white shadow-sm z-40 border-b border-gray-100">
+//     <header className="sticky top-0 left-0 right-0 bg-white z-50 shadow-sm border-b border-gray-100">
+//       {/* Top row: logo + tabs (left) | spacer | account + cart (right) */}
 //       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 //         <div className="flex items-center justify-between h-16">
-//           {/* Left Section - Logo and Categories */}
-//         <div className="flex items-center space-x-6">
-//   {/* Logo */}
-//   <Link href="/" className="flex items-center space-x-2">
-//     <img
-//       src="Logo"
-//       alt="9NUTZ"
-//       className="h-8 w-auto object-contain" // Adjust height as needed
-//     />
-//   </Link>
-
-//   {/* Location - Desktop Only */}
-//   <button
-//     onClick={onLocationClick}
-//     className="hidden lg:flex items-center space-x-2 text-sm text-gray-700 hover:text-gray-900 transition-colors"
-//     aria-label="Change delivery location"
-//   >
-//   </button>
-// </div>
-
-//           {/* Search Bar */}
-//           <div className="flex-1 max-w-3xl mx-6 relative" ref={searchRef}>
-//             <form onSubmit={handleSearchSubmit}>
-//               {/* Search Input - Full Width */}
-//               <div className="relative">
-//                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-//                 <input
-//                   type="text"
-//                   placeholder="Search for products..."
-//                   value={searchQuery}
-//                   onChange={handleSearchChange}
-//                   className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-//                   aria-label="Search products"
-//                 />
-                  
-//                 {/* Search Suggestions */}
-//                 {showSuggestions && searchSuggestions.length > 0 && (
-//                   <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 mt-1 max-h-64 overflow-y-auto">
-//                     {searchSuggestions.map((suggestion, index) => (
-//                       <Link
-//                         key={`${suggestion.type}-${suggestion.id || index}`}
-//                         href={
-//                           suggestion.type === 'category' 
-//                             ? `/category/${suggestion.slug}`
-//                             : `/product/${suggestion.id}`
-//                         }
-//                         className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
-//                         onClick={() => setShowSuggestions(false)}
-//                       >
-//                         {suggestion.image && (
-//                           <img
-//                             src={suggestion.image}
-//                             alt={suggestion.name}
-//                             className="w-8 h-8 rounded object-cover flex-shrink-0"
-//                           />
-//                         )}
-//                         <div className="flex-1 min-w-0">
-//                           <div className="font-medium text-sm text-gray-900 truncate">
-//                             {suggestion.name}
-//                           </div>
-//                           <div className="text-xs text-gray-500">
-//                             {suggestion.type === 'category' ? 'Category' : `${suggestion.brand} • ${suggestion.weight}`}
-//                           </div>
-//                         </div>
-//                         {suggestion.type === 'product' && (
-//                           <div className="text-sm font-semibold text-green-600">
-//                             ₹{suggestion.price}
-//                           </div>
-//                         )}
-//                       </Link>
-//                     ))}
-//                   </div>
-//                 )}
-//               </div>
-//             </form>
-//           </div>
+//           {/* Left: Logo + Tabs */}
 //           <div className="flex items-center space-x-6">
-//             <AccountDropdown onLoginClick={onLoginClick} />
+//             <Link href="/" className="flex items-center" aria-label="Home">
+//               <Image
+//                 src={Logo}
+//                 alt="9NUTZ"
+//                 width={150}
+//                 height={40}
+//                 className="object-contain"
+//                 priority
+//               />
+//             </Link>
+
+//             {/* Tabs visible on md and up, placed beside logo */}
+//             <nav className="hidden md:flex items-center space-x-4">
+//               {tabs.map((t) => (
+//                 <Link
+//                   key={t.href}
+//                   href={t.href}
+//                   className="text-sm text-gray-700 hover:text-gray-900 px-2 py-1 rounded-md"
+//                 >
+//                   {t.label}
+//                 </Link>
+//               ))}
+//             </nav>
+//           </div>
+
+//           {/* center spacer */}
+//           <div className="flex-1" />
+
+//           {/* Right: account (or logged-in text) + cart icon */}
+//           <div className="flex items-center space-x-3 relative">
+//             {/* If token exists show simple logged-in text, otherwise show AccountDropdown */}
+//             {hasToken ? (
+//               <div
+//                 className="px-3 py-1 rounded-md bg-green-100 text-green-800 text-sm font-medium"
+//                 title="You are logged in"
+//                 aria-live="polite"
+//               >
+//                 You're logged in
+//               </div>
+//             ) : (
+//               <AccountDropdown onLoginClick={onLoginClick} />
+//             )}
+
+//             {/* Cart button with badge */}
 //             <button
 //               onClick={onCartClick}
-//               className="relative bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl flex items-center space-x-3 transition-all shadow-lg hover:shadow-xl"
-//               aria-label={`Shopping cart with ${cartItemCount} items`}
+//               aria-label="Open cart"
+//               className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
 //             >
-//               <ShoppingCart className="h-5 w-5" />
-//               <span className="hidden sm:inline">
-//                 {cartItemCount} item{cartItemCount !== 1 ? 's' : ''}
-//               </span>
-//               <span className="font-semibold">₹{cartTotal}</span>
+//               <ShoppingCart className="h-6 w-6 text-gray-700" />
 //               {cartItemCount > 0 && (
-//                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
-//                   {cartItemCount}
+//                 <span
+//                   className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center"
+//                   aria-label={`${cartItemCount} items in cart`}
+//                 >
+//                   {cartItemCount > 9 ? "9+" : cartItemCount}
 //                 </span>
 //               )}
 //             </button>
+
+//             {/* Mobile nav toggle */}
+//             <button
+//               className="ml-1 p-2 rounded-md md:hidden hover:bg-gray-100 transition-colors"
+//               onClick={() => setMobileNavOpen((s) => !s)}
+//               aria-expanded={mobileNavOpen}
+//               aria-label="Toggle navigation"
+//             >
+//               <svg
+//                 className="h-6 w-6 text-gray-700"
+//                 viewBox="0 0 24 24"
+//                 fill="none"
+//                 stroke="currentColor"
+//               >
+//                 <path
+//                   strokeWidth="2"
+//                   strokeLinecap="round"
+//                   strokeLinejoin="round"
+//                   d="M4 6h16M4 12h16M4 18h16"
+//                 />
+//               </svg>
+//             </button>
 //           </div>
 //         </div>
-        
 //       </div>
+
+//       {/* Mobile nav: when toggled show tabs stacked under header */}
+//       {mobileNavOpen && (
+//         <div className="md:hidden border-t border-gray-100 bg-white">
+//           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+//             <ul className="space-y-2">
+//               {tabs.map((t) => (
+//                 <li key={`mob-${t.href}`}>
+//                   <Link
+//                     href={t.href}
+//                     className="block text-sm text-gray-700 hover:text-gray-900 py-2"
+//                     onClick={() => setMobileNavOpen(false)}
+//                   >
+//                     {t.label}
+//                   </Link>
+//                 </li>
+//               ))}
+//               {/* Optional login link inside mobile nav for convenience */}
+//               <li>
+//                 <button
+//                   onClick={() => {
+//                     setMobileNavOpen(false);
+//                     onLoginClick();
+//                   }}
+//                   className="w-full text-left text-sm text-gray-700 hover:text-gray-900 py-2"
+//                 >
+//                   Login
+//                 </button>
+//               </li>
+//             </ul>
+//           </div>
+//         </div>
+//       )}
 //     </header>
 //   );
 // }
-
 "use client";
 
+import React, { useState, useEffect, useRef } from "react";
 import { ShoppingCart } from "lucide-react";
-import { useState, useEffect } from "react";
 import AccountDropdown from "./AccountDropdown";
 import Link from "next/link";
 import Image from "next/image";
@@ -238,19 +237,43 @@ export default function Header({
     return () => window.removeEventListener("focus", onFocus);
   }, []);
 
+  // Tabs — removed Brochure and Contact; added About Us (tooltip handled separately)
   const tabs = [
-    { href: "/comingsoon", label: "About" },
-    { href: "/comingsoon", label: "Our Journey" },
+    // { href: "/comingsoon", label: "Our Journey" }, // keep for direct link if needed
     { href: "/", label: "Shop" },
+    { href: "/comingsoon", label: "Packages" },
     { href: "/comingsoon", label: "Shipping Methods" },
     { href: "/comingsoon", label: "Franchise With Us" },
-    { href: "/comingsoon", label: "Brochure" },
-    { href: "/comingsoon", label: "Contact" },
+    // About Us handled as hover tooltip (we'll still render a focusable item for accessibility)
   ];
+
+  // Search state
+  const [query, setQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Tooltip visibility (for keyboard focus + hover)
+  const [aboutTooltipOpen, setAboutTooltipOpen] = useState(false);
+  const tooltipTimeoutRef = useRef<number | null>(null);
+
+  const showTooltip = () => {
+    if (tooltipTimeoutRef.current) window.clearTimeout(tooltipTimeoutRef.current);
+    setAboutTooltipOpen(true);
+  };
+  const hideTooltip = () => {
+    // small delay so tooltip doesn't flicker on quick mouse outs
+    tooltipTimeoutRef.current = window.setTimeout(() => setAboutTooltipOpen(false), 150);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // emit search event — replace with your real search handler
+    window.dispatchEvent(new CustomEvent("siteSearch", { detail: query }));
+    // optionally navigate or clear input:
+    // router.push(`/search?q=${encodeURIComponent(query)}`);
+  };
 
   return (
     <header className="sticky top-0 left-0 right-0 bg-white z-50 shadow-sm border-b border-gray-100">
-      {/* Top row: logo + tabs (left) | spacer | account + cart (right) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left: Logo + Tabs */}
@@ -266,26 +289,90 @@ export default function Header({
               />
             </Link>
 
-            {/* Tabs visible on md and up, placed beside logo */}
-            <nav className="hidden md:flex items-center space-x-4">
+            {/* Tabs visible on md and up */}
+            <nav className="hidden md:flex items-center space-x-2">
               {tabs.map((t) => (
                 <Link
-                  key={t.href}
+                  key={t.href + t.label}
                   href={t.href}
                   className="text-sm text-gray-700 hover:text-gray-900 px-2 py-1 rounded-md"
                 >
                   {t.label}
                 </Link>
               ))}
+
+              {/* About Us with hover tooltip */}
+              <div
+                className="relative"
+                onMouseEnter={showTooltip}
+                onMouseLeave={hideTooltip}
+              >
+                <button
+                  onFocus={showTooltip}
+                  onBlur={hideTooltip}
+                  aria-haspopup="true"
+                  aria-expanded={aboutTooltipOpen}
+                  className="text-sm text-gray-700 hover:text-gray-900 px-2 py-1 rounded-md"
+                >
+                  About Us
+                </button>
+
+                {/* Tooltip: visible on hover/focus (desktop) */}
+                <div
+                  role="tooltip"
+                  className={`absolute left-1/2 transform -translate-x-1/2 mt-2 w-64 md:w-80 p-3 rounded-lg shadow-lg text-sm bg-white border border-gray-100 transition-opacity duration-150 z-50 ${
+                    aboutTooltipOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+                  }`}
+                  onMouseEnter={showTooltip}
+                  onMouseLeave={hideTooltip}
+                >
+                  <h4 className="font-semibold text-gray-800">Our Journey</h4>
+                  <p className="mt-1 text-gray-600 text-xs leading-relaxed">
+                    From a small local shop to a nationwide brand — we started with a single
+                    idea: premium-quality nuts and snacks delivered with love. Today we
+                    combine traditional recipes with modern packaging to bring joy to your
+                    snacking moments.
+                  </p>
+                  <div className="mt-2 text-xs">
+                    <Link href="/about" className="underline text-sm text-indigo-600">
+                      Read full story
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </nav>
           </div>
 
-          {/* center spacer */}
-          <div className="flex-1" />
+          {/* Center: Search box (visible on md and up) */}
+          <div className="hidden md:flex flex-1 justify-center px-4">
+            <form
+              onSubmit={handleSearchSubmit}
+              className="w-full max-w-xl"
+              role="search"
+              aria-label="Site search"
+            >
+              <div className="relative">
+                <input
+                  ref={searchInputRef}
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search products, categories..."
+                  className="w-full border border-gray-200 rounded-full py-2 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                />
+                <button
+                  type="submit"
+                  aria-label="Search"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 rounded-full text-sm hover:bg-gray-100 transition"
+                >
+                  Search
+                </button>
+              </div>
+            </form>
+          </div>
 
-          {/* Right: account (or logged-in text) + cart icon */}
+          {/* Right: account (or logged-in text) + cart icon + mobile toggle */}
           <div className="flex items-center space-x-3 relative">
-            {/* If token exists show simple logged-in text, otherwise show AccountDropdown */}
             {hasToken ? (
               <div
                 className="px-3 py-1 rounded-md bg-green-100 text-green-800 text-sm font-medium"
@@ -344,9 +431,38 @@ export default function Header({
       {mobileNavOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            {/* Mobile: Search first */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent("siteSearch", { detail: query }));
+                setMobileNavOpen(false);
+              }}
+              className="mb-3"
+            >
+              <div className="relative">
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search products, categories..."
+                  className="w-full border border-gray-200 rounded-full py-2 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  aria-label="Search"
+                />
+                <button
+                  type="submit"
+                  aria-label="Search"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 rounded-full text-sm hover:bg-gray-100 transition"
+                >
+                  Search
+                </button>
+              </div>
+            </form>
+
             <ul className="space-y-2">
+              {/* Mobile tabs */}
               {tabs.map((t) => (
-                <li key={`mob-${t.href}`}>
+                <li key={`mob-${t.href}-${t.label}`}>
                   <Link
                     href={t.href}
                     className="block text-sm text-gray-700 hover:text-gray-900 py-2"
@@ -356,6 +472,31 @@ export default function Header({
                   </Link>
                 </li>
               ))}
+
+              {/* Mobile: About Us (show small summary inline rather than tooltip) */}
+              <li>
+                <details className="group">
+                  <summary className="list-none cursor-pointer text-sm text-gray-700 hover:text-gray-900 py-2">
+                    About Us
+                  </summary>
+                  <div className="mt-2 text-sm text-gray-600">
+                    <p className="text-xs leading-relaxed">
+                      From a small local shop to a nationwide brand — we started with a single
+                      idea: premium-quality nuts and snacks delivered with love.
+                    </p>
+                    <div className="mt-2">
+                      <Link
+                        href="/about"
+                        className="text-indigo-600 text-sm underline"
+                        onClick={() => setMobileNavOpen(false)}
+                      >
+                        Read full story
+                      </Link>
+                    </div>
+                  </div>
+                </details>
+              </li>
+
               {/* Optional login link inside mobile nav for convenience */}
               <li>
                 <button

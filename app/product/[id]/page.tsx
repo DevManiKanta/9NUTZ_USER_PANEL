@@ -293,11 +293,8 @@ export default function ProductPageClient({ params }: { params: { id: string } }
         cartItemCount={headerCartItemCount}
         cartTotal={headerCartTotal}
       />
-
-
       {/* Login modal controlled by this page */}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
-
       <CartSidebar
         isOpen={cartOpen}
         onClose={() => setCartOpen(false)}
@@ -306,7 +303,6 @@ export default function ProductPageClient({ params }: { params: { id: string } }
         isLoggedIn={false}
         onProceedToPay={handleProceedToPay}
       />
-
       <main className="max-w-6xl mx-auto p-6 pt-24 min-h-[60vh]">
         <div className="mb-4 flex items-center gap-3">
           <button

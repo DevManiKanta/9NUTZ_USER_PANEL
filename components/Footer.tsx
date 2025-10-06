@@ -277,16 +277,15 @@ export default function Footer() {
               <h4 className="text-[#0f6b4d] font-semibold text-sm mb-4">QUICK LINKS</h4>
               <ul className="space-y-3">
                 <li><Link href="/" className="text-base text-gray-700 hover:text-gray-900">Home</Link></li>
-                <li><Link href="/about" className="text-base text-gray-700 hover:text-gray-900">About</Link></li>
-                <li><Link href="/our-journey" className="text-base text-gray-700 hover:text-gray-900">Our Journey</Link></li>
-                <li><Link href="/shop" className="text-base text-gray-700 hover:text-gray-900">Shop</Link></li>
-                <li><Link href="/shipping-methods" className="text-base text-gray-700 hover:text-gray-900">Shipping Methods</Link></li>
-                <li><Link href="/franchise" className="text-base text-gray-700 hover:text-gray-900">Franchise With Us</Link></li>
-                <li><Link href="/brochure" className="text-base text-gray-700 hover:text-gray-900">Brochure</Link></li>
+                <li><Link href="/" className="text-base text-gray-700 hover:text-gray-900"></Link></li>
+                <li><Link href="/" className="text-base text-gray-700 hover:text-gray-900">Our Journey</Link></li>
+                <li><Link href="/" className="text-base text-gray-700 hover:text-gray-900">Shop</Link></li>
+                <li><Link href="/" className="text-base text-gray-700 hover:text-gray-900">Shipping Methods</Link></li>
+                <li><Link href="/" className="text-base text-gray-700 hover:text-gray-900">Franchise With Us</Link></li>
+                <li><Link href="/" className="text-base text-gray-700 hover:text-gray-900">Brochure</Link></li>
                 <li><Link href="/contact" className="text-base text-gray-700 hover:text-gray-900">Contact</Link></li>
               </ul>
             </div>
-
             {/* RIGHT: Useful Links and Store Location SIDE BY SIDE on md+, stacked on mobile */}
             <div className="flex flex-col md:items-end md:text-right">
               <div className="w-full">

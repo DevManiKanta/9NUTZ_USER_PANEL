@@ -140,7 +140,7 @@ export default function Home() {
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      <main className="pt-20">
+      <main>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Hero />
 

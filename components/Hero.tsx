@@ -110,9 +110,8 @@ export default function Hero() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [banners.length]);
-
   return (
-    <div className="mb-8">
+    <div className="mb-4">
       <div
         className="relative rounded-2xl overflow-hidden shadow-lg"
         onMouseEnter={() => (isHoveringRef.current = true)}
@@ -120,7 +119,7 @@ export default function Hero() {
       >
         <div
           className="flex transition-transform duration-700 ease-in-out"
-          style={{ transform: `translateX(-${currentBanner * 100}%)` }}
+          style={{ transform: `translateX(-${currentBanner * 100}%)`}}
         >
           {banners.map((banner) => (
             <div key={banner.id} className="w-full flex-shrink-0">
