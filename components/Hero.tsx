@@ -5,6 +5,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { API_BASE } from "@/lib/api"; // single source of truth for base URL
 import { useCategories } from "@/contexts/CategoryContext";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 type BannerItem = {
   id: number;
@@ -224,6 +227,24 @@ function DynamicCategoryGrid() {
     return () => window.removeEventListener("categoriesUpdated", handler);
   }, [getActiveCategories]);
 
+  const settings = {
+    dots: false,
+    infinite: true,
+    speed: 2000,
+    autoplay: true,
+    autoplaySpeed: 2500,
+    slidesToShow: 6,
+    slidesToScroll: 1,
+    arrows: false,
+    pauseOnHover: true,
+    responsive: [
+      { breakpoint: 1280, settings: { slidesToShow: 5 } },
+      { breakpoint: 1024, settings: { slidesToShow: 4 } },
+      { breakpoint: 768, settings: { slidesToShow: 3 } },
+      { breakpoint: 640, settings: { slidesToShow: 2 } },
+    ],
+  };
+
   return (
     <>
       <div className="flex items-center justify-between mb-4">
@@ -233,21 +254,34 @@ function DynamicCategoryGrid() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+     <div className="w-full overflow-hidden">
+      <Slider {...settings}>
         {categories.map((category) => (
-          <button
-            key={category.id}
-            onClick={() => window.dispatchEvent(new CustomEvent("categoryFilterChange", { detail: category.name }))}
-            className="group flex flex-col items-center justify-center p-0 rounded-xl overflow-hidden transform transition-all duration-200 hover:scale-105"
-          >
-            <div className="w-full h-20 md:h-24 lg:h-28 relative">
-              <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-black/20" />
-            </div>
-            <span className="text-xs md:text-sm font-medium text-center text-gray-700 py-2 w-full bg-white/0">{category.name}</span>
-          </button>
+          <div key={category.id} className="px-2">
+            <button
+              onClick={() =>
+                window.dispatchEvent(
+                  new CustomEvent("categoryFilterChange", { detail: category.name })
+                )
+              }
+              className="group flex flex-col items-center justify-center p-0 rounded-xl overflow-hidden transform transition-all duration-200 hover:scale-105"
+            >
+              <div className="w-full h-24 md:h-28 lg:h-32 relative">
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  className="w-full h-full object-cover rounded-xl"
+                />
+                <div className="absolute inset-0 bg-black/20 rounded-xl" />
+              </div>
+              <span className="text-xs md:text-sm font-medium text-center text-gray-700 py-2 w-full bg-white/0">
+                {category.name}
+              </span>
+            </button>
+          </div>
         ))}
-      </div>
+      </Slider>
+    </div>
     </>
   );
 }

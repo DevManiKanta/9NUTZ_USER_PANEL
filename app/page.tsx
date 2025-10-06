@@ -52,8 +52,6 @@ export default function Home() {
   const [isFilterAnimating, setIsFilterAnimating] = useState<boolean>(false);
 
   const { user } = useAuth();
-
-  // Simulate loading screen
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -63,6 +61,8 @@ export default function Home() {
 
   const handleProceedToPay = () => {
     setShowPaymentFlow(true);
+   
+    
   };
 
   const handlePaymentComplete = () => {
@@ -84,14 +84,12 @@ export default function Home() {
       return [...prev, { ...(product as Product), quantity: 1 }];
     });
   };
-
   // Calculate cart total (guard for missing fields)
   const cartTotal = cartItems.reduce((sum, item) => {
     const price = typeof item.price === "number" ? item.price : 0;
     const qty = typeof item.quantity === "number" ? item.quantity : 0;
     return sum + price * qty;
   }, 0);
-
   const updateQuantity = (id: number | string, quantity: number) => {
     if (quantity <= 0) {
       setCartItems((prev) => prev.filter((item) => item.id !== id));
@@ -130,7 +128,6 @@ export default function Home() {
   if (isLoading) {
     return <LoadingScreen />;
   }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
@@ -154,6 +151,7 @@ export default function Home() {
           />
 
           <FilterableProductGrid
+          //ts-ignore
             onAddToCart={addToCart}
             selectedCategory={selectedCategory}
             isAnimating={isFilterAnimating}
@@ -180,6 +178,7 @@ export default function Home() {
         onClose={() => setShowPaymentFlow(false)}
         cartTotal={cartTotal}
         onPaymentComplete={handlePaymentComplete}
+        cartItems={cartItems}
       />
     </div>
   );

@@ -137,7 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const resetPassword = async (email: string): Promise<boolean> => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
-      console.log(`Password reset requested for ${email}`);
+      // console.log(`Password reset requested for ${email}`);
       return true;
     } catch (err) {
       console.error("Password reset error:", err);

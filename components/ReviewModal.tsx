@@ -21,7 +21,7 @@ export default function ReviewModal({ isOpen, onClose, orderTotal }: ReviewModal
     
     // Simulate API call
     setTimeout(() => {
-      console.log('Review submitted:', { rating, review, orderTotal });
+      // console.log('Review submitted:', { rating, review, orderTotal });
       setIsSubmitting(false);
       onClose();
       // Reset form

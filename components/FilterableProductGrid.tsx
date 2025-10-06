@@ -318,12 +318,12 @@ export default function FilterableProductGrid({
                 </div>
 
                 {/* wishlist heart - top right */}
-                <button
+                {/* <button
                   aria-label="Add to wishlist"
                   className="absolute top-6 right-6 bg-white/90 backdrop-blur rounded-full p-2 shadow-sm hover:scale-105 transition-transform"
                 >
                   <Heart className="w-5 h-5 text-gray-700" />
-                </button>
+                </button> */}
               </div>
 
               {/* body */}

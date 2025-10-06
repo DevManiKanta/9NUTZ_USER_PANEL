@@ -316,8 +316,6 @@ export default function CartSidebar({
   };
 
   // ---------- Render ----------
-
-  console.log("HH",itemsWithPaise)
   return (
     <>
       {/* Backdrop */}
@@ -477,7 +475,7 @@ export default function CartSidebar({
               >
                 <span>{paiseToRupeesString(grandTotalPaise)}</span>
                 <div className="flex items-center space-x-1">
-                  <span>{user ? "Proceed to Pay" : "Login to Proceed"}</span>
+                  <span>{user ? "" : "Login to Proceed"}</span>
                   <span>→</span>
                 </div>
               </button>

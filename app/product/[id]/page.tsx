@@ -232,7 +232,6 @@ export default function ProductPageClient({ params }: { params: { id: string } }
   const handleLoginClick = () => setLoginOpen(true); ;
   const handleLocationClick = () => {
     // open location modal etc
-    console.log("Location click");
   };
   const handleCartClick = () => setCartOpen(true);
 

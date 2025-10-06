@@ -581,9 +581,10 @@ interface PaymentFlowProps {
   onClose: () => void;
   cartTotal: number;
   onPaymentComplete: () => void;
+  cartItems: [];
 }
 
-export default function PaymentFlow({ isOpen, onClose, cartTotal, onPaymentComplete }: PaymentFlowProps) {
+export default function PaymentFlow({ isOpen, onClose, cartTotal,cartItems, onPaymentComplete }: PaymentFlowProps) {
   // Start directly on payment step
   const [currentStep, setCurrentStep] = useState<'payment' | 'confirmation'>('payment');
   const [selectedPayment, setSelectedPayment] = useState('card');
@@ -593,34 +594,33 @@ export default function PaymentFlow({ isOpen, onClose, cartTotal, onPaymentCompl
   const [showReviewModal, setShowReviewModal] = useState(false);
 
   const { user } = useAuth();
-
   const deliveryCharge = 25;
   const handlingCharge = 2;
   const couponDiscount = appliedCoupon ? 
     (appliedCoupon.discountType === 'percentage' 
       ? Math.min((cartTotal * appliedCoupon.discountValue) / 100, appliedCoupon.maxDiscount || Infinity)
       : appliedCoupon.discountValue) : 0;
-  const grandTotal = cartTotal + deliveryCharge + handlingCharge - couponDiscount;
-
+  const grandTotal = cartTotal
   const paymentMethods = [
     {
       id: 'card',
-      name: 'Credit/Debit Card',
+      // name: 'Credit/Debit Card',
+      name:"Cash on Delivery",
       icon: CreditCard,
-      description: 'Pay securely with your card'
+      // description: 'Pay securely with your card'
     },
-    {
-      id: 'upi',
-      name: 'UPI Payment',
-      icon: Wallet,
-      description: 'Pay using UPI apps like GPay, PhonePe'
-    },
-    {
-      id: 'netbanking',
-      name: 'Net Banking',
-      icon: Building2,
-      description: 'Pay using your bank account'
-    }
+    // {
+    //   id: 'upi',
+    //   name: 'UPI Payment',
+    //   icon: Wallet,
+    //   description: 'Pay using UPI apps like GPay, PhonePe'
+    // },
+    // {
+    //   id: 'netbanking',
+    //   name: 'Net Banking',
+    //   icon: Building2,
+    //   description: 'Pay using your bank account'
+    // }
   ];
 
   const applyCoupon = () => {
@@ -670,6 +670,7 @@ export default function PaymentFlow({ isOpen, onClose, cartTotal, onPaymentCompl
     setTimeout(() => {
       setShowReviewModal(true);
     }, 2000);
+     console.log("USER",user,cartItems,cartTotal)
   };
 
   const handleReviewComplete = () => {
@@ -709,9 +710,9 @@ export default function PaymentFlow({ isOpen, onClose, cartTotal, onPaymentCompl
           {/* Payment Method Step */}
           {currentStep === 'payment' && (
             <div className="space-y-6">
-              <div className="text-sm text-gray-600 mb-4">
+              {/* <div className="text-sm text-gray-600 mb-4">
                 Choose your preferred payment method
-              </div>
+              </div> */}
 
               <div className="space-y-3">
                 {paymentMethods.map((method) => {
@@ -746,14 +747,14 @@ export default function PaymentFlow({ isOpen, onClose, cartTotal, onPaymentCompl
                     <span>Items Total</span>
                     <span>₹{cartTotal}</span>
                   </div>
-                  <div className="flex justify-between">
+                  {/* <div className="flex justify-between">
                     <span>Delivery Charge</span>
                     <span>₹{deliveryCharge}</span>
-                  </div>
-                  <div className="flex justify-between">
+                  </div> */}
+                  {/* <div className="flex justify-between">
                     <span>Handling Charge</span>
                     <span>₹{handlingCharge}</span>
-                  </div>
+                  </div> */}
                   {appliedCoupon && (
                     <div className="flex justify-between text-green-600">
                       <span>Coupon Discount ({appliedCoupon.code})</span>
@@ -770,7 +771,7 @@ export default function PaymentFlow({ isOpen, onClose, cartTotal, onPaymentCompl
               </div>
 
               {/* Coupon Section */}
-              <div className="bg-gray-50 p-4 rounded-lg">
+              {/* <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-gray-900 mb-3">Apply Coupon</h4>
                 {appliedCoupon ? (
                   <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
@@ -824,7 +825,7 @@ export default function PaymentFlow({ isOpen, onClose, cartTotal, onPaymentCompl
                     </div>
                   </div>
                 )}
-              </div>
+              </div> */}
 
               <button
                 onClick={handlePayment}
