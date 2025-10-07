@@ -72,7 +72,7 @@ export default function ProductGrid({ products: propProducts, onAddToCart, categ
       {(title || !categoryFilter) && (
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-gray-900">{title ?? "Products"}</h3>
-          <button className="text-green-600 hover:text-green-700 text-sm">see all</button>
+          {/* <button className="text-green-600 hover:text-green-700 text-sm">see all</button> */}
         </div>
       )}
 

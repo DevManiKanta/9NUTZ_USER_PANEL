@@ -82,7 +82,33 @@ export const adminGetUserOrdersAPI = (userId: string | number, token?: string) =
   request(`/api/admin/users/${userId}/orders`, { token });
 
 // Public
-export const getCategoriesPublicAPI = () => request('/api/categories');
+// export const getCategoriesPublicAPI = () => request('/api/categories');
+
+export const getCategoriesPublicAPI = async () => {
+  const API_URL = "https://9nutsapi.nearbydoctors.in/public/api/admin/categories/show";
+  const TOKEN =
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovLzludXRzYXBpLm5lYXJieWRvY3RvcnMuaW4vcHVibGljL2FwaS9sb2dpbiIsImlhdCI6MTc1OTczMDcxOSwiZXhwIjoxNzYwNTk0NzE5LCJuYmYiOjE3NTk3MzA3MTksImp0aSI6IjFPTEJ2S1FXdTRvRHl2MzEiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.Zj2GVNIBtVzDLhHi8hLLFZCW56iEnCCd1z6S-RmdkZk";
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${TOKEN}`,
+      },
+      cache: "no-store", // ensures fresh data each call (optional)
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
+};
 
 // Admin (token required)
 export const adminGetCategoriesAPI = (token?: string) =>

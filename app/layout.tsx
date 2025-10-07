@@ -6,6 +6,9 @@ import { AddressProvider } from '@/contexts/AddressContext';
 import { CategoryProvider } from '@/contexts/CategoryContext';
 import { ProductProvider } from '@/contexts/ProductContext';
 
+
+
+
 export const metadata: Metadata = {
   title: '9NUTZ',
   description: 'Grocery delivery in minutes. Order from thousands of products and get delivery within 8 minutes.',
@@ -20,7 +23,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          
           <CategoryProvider>
             <ProductProvider>
               <OrderProvider>
@@ -30,9 +32,9 @@ export default function RootLayout({
               </OrderProvider>
             </ProductProvider>
           </CategoryProvider>
-          
         </AuthProvider>
       </body>
     </html>
   );
 }
+

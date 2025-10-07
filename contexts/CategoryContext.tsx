@@ -63,7 +63,6 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const { token } = useAuth(); // if logged in, token may be present
   const { call } = useFetchAuth(); // wrapper to call admin endpoints (automatically appends token)
-
   // Load categories on mount from backend public endpoint; fall back to localStorage if network fails
   useEffect(() => {
     let cancelled = false;
