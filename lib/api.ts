@@ -96,19 +96,22 @@ export const getCategoriesPublicAPI = async () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${TOKEN}`,
       },
-      cache: "no-store", // ensures fresh data each call (optional)
+      cache: "no-store",
     });
-
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
     const data = await response.json();
-    return data;
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} - ${data.message || "Unknown error"}`);
+    }
+    if (data && data.status === true && Array.isArray(data.data)) {
+      return data.data; 
+    }
+    return data; 
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw error;
   }
 };
+
 
 // Admin (token required)
 export const adminGetCategoriesAPI = (token?: string) =>

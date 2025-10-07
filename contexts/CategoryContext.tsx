@@ -43,6 +43,8 @@ export const useCategories = () => {
   return context;
 };
 
+console.log("getCategoriesPublicAPI",getCategoriesPublicAPI());
+
 // --- helper to convert API row -> Category (frontend shape)
 function normalizeCategoryRow(row: any): Category {
   return {
