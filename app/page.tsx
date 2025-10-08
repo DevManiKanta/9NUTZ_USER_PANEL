@@ -15,7 +15,7 @@ import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
 import LocationModal from "@/components/LocationModal";
 import CartSidebar from "@/components/CartSidebar";
-
+import AllPackages from "@/components/allcombopacks/AllPackages"; 
 
 
 /**
@@ -158,11 +158,9 @@ export default function Home() {
           />
         </div>
       </main>
-
+      <AllPackages/>
       <Footer />
-
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
-
       <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
 
       <CartSidebar

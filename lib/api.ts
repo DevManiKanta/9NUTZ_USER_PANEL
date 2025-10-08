@@ -83,8 +83,12 @@ export const adminGetUserOrdersAPI = (userId: string | number, token?: string) =
 
 // Public
 // export const getCategoriesPublicAPI = () => request('/api/categories');
+ export const CATEGORIES_API_URL = "https://9nutsapi.nearbydoctors.in/public/api/category/show";
+  
+ 
+ export const PRODUCTS_URL = "https://9nutsapi.nearbydoctors.in/public/api/product/show";
 
-export const getCategoriesPublicAPI = async () => {
+ export const getCategoriesPublicAPI = async () => {
   const API_URL = "https://9nutsapi.nearbydoctors.in/public/api/admin/categories/show";
   const TOKEN =
     "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovLzludXRzYXBpLm5lYXJieWRvY3RvcnMuaW4vcHVibGljL2FwaS9sb2dpbiIsImlhdCI6MTc1OTczMDcxOSwiZXhwIjoxNzYwNTk0NzE5LCJuYmYiOjE3NTk3MzA3MTksImp0aSI6IjFPTEJ2S1FXdTRvRHl2MzEiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.Zj2GVNIBtVzDLhHi8hLLFZCW56iEnCCd1z6S-RmdkZk";
