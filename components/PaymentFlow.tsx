@@ -670,7 +670,6 @@ export default function PaymentFlow({ isOpen, onClose, cartTotal,cartItems, onPa
     setTimeout(() => {
       setShowReviewModal(true);
     }, 2000);
-     console.log("USER",user,cartItems,cartTotal)
   };
 
   const handleReviewComplete = () => {

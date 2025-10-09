@@ -42,9 +42,6 @@ export const useCategories = () => {
   }
   return context;
 };
-
-console.log("getCategoriesPublicAPI",getCategoriesPublicAPI());
-
 // --- helper to convert API row -> Category (frontend shape)
 function normalizeCategoryRow(row: any): Category {
   return {
@@ -57,7 +54,6 @@ function normalizeCategoryRow(row: any): Category {
     updatedAt: row.updated_at ? new Date(row.updated_at) : new Date()
   };
 }
-
 export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -130,7 +126,6 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setLoading(false);
     }
   }
-
   // ADMIN: Add category (calls protected API). Uses useFetchAuth.call
   async function addCategory(categoryData: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>): Promise<void> {
     // Try to call admin endpoint using token. If not logged in, throw so UI can handle it.
@@ -158,7 +153,6 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       throw err;
     }
   }
-
   // ADMIN: Update category
   async function updateCategory(id: string, categoryData: Partial<Category>): Promise<void> {
     try {

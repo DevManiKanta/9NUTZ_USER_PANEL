@@ -385,8 +385,6 @@
 //     </>
 //   );
 // }
-
-
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -555,25 +553,34 @@ export default function CartSidebar({
     return res.json();
   };
 
-  // Call your server endpoint to capture payment (server must use Razorpay secret)
-  const capturePaymentOnServer = async (paymentId: string, amountPaise: number) => {
-    const endpoint = `https://api.razorpay.com/v1/payments/${paymentId}/capture`;
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+  // UNSAFE: Exposes your Razorpay secret in client-side code. Use ONLY for local testing.
+const capturePaymentOnServer = async (paymentId: string, amountPaise: number) => {
+  const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_RNiKLAWnAJRrZG";
+  const keySecret = (process.env.NEXT_PUBLIC_RAZORPAY_KEY_SECRET || "Xhweoip9SXz3nw0M1rK5teyo"); // WILL BE exposed!
+  if (!keyId || !keySecret) throw new Error("Razorpay key id/secret not provided (client).");
 
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ payment_id: paymentId, amount_paise: amountPaise }),
-      credentials: "same-origin",
-    });
-    console.log("TESTING",res)
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      throw new Error(`Capture API error ${res.status}: ${txt}`);
-    }
-    return res.json();
-  };
+  const url = `https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}/capture`;
+  const basicAuth = btoa(`${keyId}:${keySecret}`); // browser btoa
+
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Basic ${basicAuth}`,
+    },
+    body: JSON.stringify({ amount: Number(amountPaise) }) // amount in paise
+  });
+
+  const text = await resp.text();
+  let json;
+  try { json = text ? JSON.parse(text) : {}; } catch { json = { raw: text }; }
+
+  if (!resp.ok) {
+    throw new Error(`Capture failed ${resp.status}: ${JSON.stringify(json)}`);
+  }
+  return json;
+};
+
 
   // main payment flow
   const handlePayWithRazorpay = async () => {

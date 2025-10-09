@@ -121,8 +121,8 @@ export default function Home() {
       }
     };
 
-    window.addEventListener("categoryFilterChange", handler);
-    return () => window.removeEventListener("categoryFilterChange", handler);
+    // window.addEventListener("categoryFilterChange", handler);
+    // return () => window.removeEventListener("categoryFilterChange", handler);
   }, []);
 
   if (isLoading) {
