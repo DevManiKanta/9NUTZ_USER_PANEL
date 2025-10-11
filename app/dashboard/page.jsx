@@ -76,7 +76,7 @@ export default function UserDashboard() {
     setShowLogoutConfirm(false);
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status) => {
     switch (status) {
       case 'delivered':
         return 'bg-green-100 text-green-800';

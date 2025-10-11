@@ -29,7 +29,7 @@ export default function ContactPage() {
   const handleChange = (e) =>
     setFormData((s) => ({ ...s, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async (e:any) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
     // Replace with real submit logic / API call

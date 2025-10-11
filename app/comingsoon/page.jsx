@@ -22,7 +22,7 @@ export default function Page() {
     return () => clearInterval(id);
   }, [target]);
 
-  function getDelta(t: Date) {
+  function getDelta(t) {
     const diff = Math.max(0, t.getTime() - Date.now());
     const d = Math.floor(diff / (1000 * 60 * 60 * 24));
     const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
@@ -31,7 +31,7 @@ export default function Page() {
     return { d, h, m, s };
   }
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = (e) => {
     e.preventDefault();
     setError("");
     const simpleEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -186,8 +186,8 @@ export default function Page() {
   );
 }
 
-function TimeBox({ label, value }: { label: string; value: number }) {
-  const pad = (n: number) => String(n).padStart(2, "0");
+function TimeBox({ label, value }) {
+  const pad = (n) => String(n).padStart(2, "0");
   return (
     <div className="flex flex-col items-center">
       <div className="bg-white/6 px-3 py-2 rounded-lg font-mono text-lg font-semibold">

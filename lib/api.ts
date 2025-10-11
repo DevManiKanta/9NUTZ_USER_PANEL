@@ -5,7 +5,7 @@ type ReqOpts = {
   body?: any;
   token?: string | null;
   headers?: Record<string,string>;
-  credentials?: RequestCredentials; // optional
+  credentials?: RequestCredentials; 
 };
 
 function buildUrl(path: string) {
@@ -59,6 +59,9 @@ export const registerAPI = (payload: { name: string; email: string; password: st
 export const loginAPI = (payload: { email: string; password: string }) =>
   request('/api/auth/login', { method: 'POST', body: payload, credentials: 'include' }); // if backend sets cookies
 
+
+
+
 export const meAPI = (token?: string) =>
   request('/api/auth/me', { token, credentials: 'include' });
 
@@ -83,11 +86,11 @@ export const adminGetUserOrdersAPI = (userId: string | number, token?: string) =
 
 // Public
 // export const getCategoriesPublicAPI = () => request('/api/categories');
- export const CATEGORIES_API_URL = "https://9nutsapi.nearbydoctors.in/public/api/category/show";
-  
+//  export const CATEGORIES_API_URL = "https://9nutsapi.nearbydoctors.in/public/api/category/show";
+   export const CATEGORIES_API_URL = "http://192.168.29.100:8000/api/category/show";
  
- export const PRODUCTS_URL = "https://9nutsapi.nearbydoctors.in/public/api/product/show";
-
+//  export const PRODUCTS_URL = "https://9nutsapi.nearbydoctors.in/public/api/product/show";
+  export const PRODUCTS_URL = "http://192.168.29.100:8000/api/product/show";
  export const getCategoriesPublicAPI = async () => {
   const API_URL = "https://9nutsapi.nearbydoctors.in/public/api/admin/categories/show";
   const TOKEN =
@@ -115,8 +118,6 @@ export const adminGetUserOrdersAPI = (userId: string | number, token?: string) =
     throw error;
   }
 };
-
-
 // Admin (token required)
 export const adminGetCategoriesAPI = (token?: string) =>
   request('/api/admin/categories', { token });
