@@ -15,6 +15,7 @@ export default function CartSidebar({
   onUpdateQuantity,
   onProceedToPay,
   onClearCart,
+  handlePaymentComplete
 }) {
   // prefer context values but fallback to localStorage (handles auth_token / user created by older code)
   const authCtx = useAuth() ?? {};
@@ -309,7 +310,7 @@ export default function CartSidebar({
       }
 
       const createData = await createRes.json();
-      console.debug("Create order response:", createData);
+
 
       if (!createData || !(createData.status === true || createData.success === true || createData.data)) {
         throw new Error("Server failed to create Razorpay order: " + (createData?.message || JSON.stringify(createData)));
@@ -394,7 +395,7 @@ export default function CartSidebar({
             if (verifyData && (verifyData.status === true || verifyData.success === true)) {
               toast.dismiss(verifyToastId);
               toast.success("✅ Payment successful & verified!", { duration: 4000 });
-
+              handlePaymentComplete()
               // keep existing fallback call
               try {
                 await submitOrderToServer(razorpayResponse, payloadItems, { created_by: "client_fallback" });

@@ -42,10 +42,10 @@ export default function Home() {
     setShowPaymentFlow(true);
   };
 
-  const handlePaymentComplete = () => {
-    setShowPaymentFlow(false);
-    setCartItems([]); // empty the cart
-  };
+const handlePaymentComplete = () => {
+  // setShowPaymentFlow(false);
+  setCartItems([]); 
+};
 
   const addToCart = (product) => {
     setCartItems((prev) => {
@@ -109,6 +109,7 @@ export default function Home() {
         onCartClick={() => setIsCartOpen(true)}
         cartItemCount={cartItems.reduce((s, i) => s + (i.quantity || 0), 0)}
         cartTotal={cartTotal}
+        handlePaymentComplete={handlePaymentComplete}
       />
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
@@ -143,6 +144,7 @@ export default function Home() {
         items={cartItems}
         onUpdateQuantity={updateQuantity}
         onProceedToPay={handleProceedToPay}
+        handlePaymentComplete={handlePaymentComplete}
       />
 
     </div>

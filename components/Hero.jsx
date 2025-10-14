@@ -9,24 +9,9 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useAuth } from "@/contexts/AuthContext";
 import { CATEGORIES_API_URL } from "@/lib/api";
-type BannerItem = {
-  id: number;
-  title?: string;
-  subtitle?: string;
-  discount?: string;
-  image_url?: string | null;
-  redirect_url?: string | null;
-  buttonText?: string;
-  is_active?: number | boolean;
-};
 
-type CategoryRow = {
-  id: number | string;
-  name: string;
-  image?: string | null; // may be relative path
-  image_url?: string | null; // absolute URL provided by API
-  products_count?: any;
-};
+
+
 
 const PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Crect fill='%23f3f4f6' width='1200' height='800'/%3E%3Ctext fill='%239ca3af' font-family='Arial, Helvetica, sans-serif' font-size='28' x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'%3EImage not available%3C/text%3E%3C/svg%3E";
@@ -55,17 +40,17 @@ async function getCategoriesPublicAPI() {
 // ------------------------------------------------------------------
 
 export default function Hero() {
-  const [banners, setBanners] = useState<BannerItem[]>([]);
-  const [currentBanner, setCurrentBanner] = useState<number>(0);
-  const [categories, setCategories] = useState<CategoryRow[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true);
-  const [categoriesError, setCategoriesError] = useState<string | null>(null);
+  const [banners, setBanners] = useState([]);
+  const [currentBanner, setCurrentBanner] = useState(0);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState(null);
 
-  const autoplayRef = useRef<number | null>(null);
+  const autoplayRef = useRef(null);
   const isHoveringRef = useRef(false);
 
   // helper to convert backend image paths to full URLs
-  const toFullImageUrl = (img?: string | null) => {
+  const toFullImageUrl = (img) => {
     const val = img ?? "";
     if (!val) return "";
     if (val.startsWith("http://") || val.startsWith("https://") || val.startsWith("data:")) return val;
@@ -111,12 +96,12 @@ export default function Hero() {
           ]);
           return;
         }
-        const data: BannerItem[] = await res.json();
+        const data= await res.json();
         if (cancelled) return;
-        const active = (data || []).filter((b) => b && (b as any).is_active !== 0 && (b as any).is_active !== false);
+        const active = (data || []).filter((b) => b && (b ).is_active !== 0 && (b).is_active !== false);
         const mapped = (active.length ? active : data).map((b) => ({
           ...b,
-          image_url: toFullImageUrl((b as BannerItem).image_url)
+          image_url: toFullImageUrl((b).image_url)
         }));
         setBanners(mapped);
       } catch (err) {
@@ -138,15 +123,15 @@ export default function Hero() {
         const rows = await getCategoriesPublicAPI();
         if (cancelled) return;
         // normalize rows to CategoryRow type (use image_url from API)
-        const norm = (rows || []).map((r: any) => ({
+        const norm = (rows || []).map((r) => ({
           id: r.id,
           name: r.name,
           image: r.image, // relative path maybe
           image_url: r.image_url || toFullImageUrl(r.image),
           products_count: r.products_count
-        })) as CategoryRow[];
+        })) 
         setCategories(norm);
-      } catch (err: any) {
+      } catch (err) {
         setCategoriesError(String(err?.message || err));
         setCategories([]);
       } finally {
@@ -182,7 +167,7 @@ export default function Hero() {
 
   // keyboard nav
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
+    const onKey = (e) => {
       if (e.key === "ArrowLeft") prevBanner();
       if (e.key === "ArrowRight") nextBanner();
     };
@@ -313,11 +298,6 @@ function CategoryCarousel({
   loading,
   error,
   toFullImageUrl
-}: {
-  categories: CategoryRow[];
-  loading: boolean;
-  error: string | null;
-  toFullImageUrl: (img?: string | null) => string;
 }) {
   // slick settings
   const slidesToShow = Math.min(6, Math.max(1, categories.length || 1));

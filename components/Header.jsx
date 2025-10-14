@@ -8,7 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Logo from "../assests/LOGO.jpg";
 
-export default function Header({ onLoginClick, onLocationClick, onCartClick, cartItemCount, cartTotal }) {
+export default function Header({ onLoginClick, onLocationClick, onCartClick, cartItemCount, cartTotal,handlePaymentComplete }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { token, logout } = useAuth();
   const hasToken = Boolean(token);
@@ -108,9 +108,18 @@ export default function Header({ onLoginClick, onLocationClick, onCartClick, car
           <div className="flex items-center space-x-3 relative">
             {hasToken ? (
               <button
-                onClick={() => {
-                  try { logout?.(); } catch (_) {}
-                }}
+             // Recommended: async (handles promise-returning logout and ensures handlePaymentComplete runs)
+onClick={async () => {
+  try {
+    if (typeof logout === "function") {
+      await logout();
+    }
+  } catch (err) {
+    console.warn("Logout failed:", err);
+  } finally {
+    handlePaymentComplete();
+  }
+}}
                 className="px-3 py-1 rounded-md bg-red-100 text-red-700 text-sm font-medium hover:bg-red-200 transition-colors"
                 aria-label="Logout"
               >
