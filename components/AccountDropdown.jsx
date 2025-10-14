@@ -5,11 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { User } from 'lucide-react';
 import Link from 'next/link';
 
-interface AccountDropdownProps {
-  onLoginClick: () => void;
-}
-
-export default function AccountDropdown({ onLoginClick }: AccountDropdownProps) {
+export default function AccountDropdown({ onLoginClick }) {
   const { user } = useAuth();
 
   if (!user) {
@@ -33,3 +29,5 @@ export default function AccountDropdown({ onLoginClick }: AccountDropdownProps) 
     </Link>
   );
 }
+
+

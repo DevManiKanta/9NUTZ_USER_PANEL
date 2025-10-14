@@ -284,17 +284,10 @@ import React, { useState } from "react";
 import { X, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface LoginModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+// Delegate API calls to AuthContext; keep base only for password reset fallback if needed
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || "https://9nutsapi.nearbydoctors.in/public").replace(/\/+$/,'');
 
-const API_BASE = "http://192.168.29.100:8000"; 
-
-const API_AUTH_BEARER =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."; // optional, remove if not needed
-
-function tryNotifyAuthContext(auth: any, action: "login" | "signup", payload: any) {
+function tryNotifyAuthContext(auth, action, payload) {
   try {
     if (!auth) return;
     const fn = action === "login" ? auth.login : auth.signup;
@@ -306,10 +299,10 @@ function tryNotifyAuthContext(auth: any, action: "login" | "signup", payload: an
   }
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose }) {
   const authContext = useAuth();
 
-  const [mode, setMode] = useState<"login" | "signup" | "reset">("login");
+  const [mode, setMode] = useState("login");
 
   // common fields
   const [name, setName] = useState("");
@@ -322,9 +315,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   // reset fields
   const [resetEmail, setResetEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [resetMessage, setResetMessage] = useState(null);
 
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const clearAll = () => {
@@ -344,7 +337,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   };
 
   // Helper to parse JSON safely
-  async function safeJson(res: Response) {
+  async function safeJson(res) {
     try {
       return await res.json();
     } catch {
@@ -352,8 +345,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     }
   }
 
-  /** LOGIN — try JSON then fallback to form-data (depending on backend) */
-  const handleLoginSubmit = async (e: React.FormEvent) => {
+  /** LOGIN — delegate to AuthContext */
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
@@ -364,65 +357,23 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
     setLoading(true);
     try {
-      const url = `${API_BASE}/api/user-login`;
-
-      // First try JSON (most backends)
-      let res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: API_AUTH_BEARER ? `Bearer ${API_AUTH_BEARER}` : "",
-        },
-        body: JSON.stringify({ username: email.trim().toLowerCase(), password }),
-      });
-
-      // If backend expects multipart/form-data, try that as fallback
-      if (!res.ok) {
-        const fd = new FormData();
-        fd.append("username", email.trim().toLowerCase());
-        fd.append("password", password);
-
-        res = await fetch(url, {
-          method: "POST",
-          headers: {
-            Authorization: API_AUTH_BEARER ? `Bearer ${API_AUTH_BEARER}` : "",
-            // IMPORTANT: DO NOT set Content-Type when sending FormData
-          } as any,
-          body: fd,
-        });
-      }
-
-      const body = await safeJson(res);
+      const ok = await authContext.login(email.trim().toLowerCase(), password);
       setLoading(false);
-
-      if (!res.ok) {
-        const msg = body?.message || body?.detail || `Login failed (${res.status})`;
-        setError(msg);
-        console.debug("login failed body:", body);
+      if (!ok) {
+        setError("Invalid credentials. Please try again.");
         return;
       }
-
-      // Accept common token shapes
-      const token = body?.token ?? body?.access_token ?? body?.accessToken ?? null;
-      if (token) localStorage.setItem("auth_token", token);
-
-      const user = body?.user ?? body?.data ?? null;
-      if (user) localStorage.setItem("user", JSON.stringify(user));
-      else localStorage.setItem("user", JSON.stringify({ email: email.trim().toLowerCase() }));
-
-      tryNotifyAuthContext(authContext, "login", { email: email.trim().toLowerCase(), password });
-      // leave closing / reload to calling code if desired
+      onClose();
     } catch (err) {
       setLoading(false);
-      console.error("Network/login error:", err);
-      setError("Network error while logging in.");
+      setError("Login failed. Please try again.");
     }
   };
 
   /** SIGNUP — send as FormData if contact present (common), otherwise JSON
    *  After successful signup, attempt to log the user in automatically.
    */
-  const handleSignupSubmit = async (e: React.FormEvent) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
@@ -437,161 +388,21 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
     setLoading(true);
     try {
-      const url = `${API_BASE}/api/register`;
-
-      // Prefer FormData (your earlier curl used multipart/form-data)
-      const fd = new FormData();
-      fd.append("name", name.trim());
-      fd.append("email", email.trim().toLowerCase());
-      fd.append("password", password);
-      fd.append("contact", contact.trim());
-
-      // IMPORTANT: When sending FormData, DO NOT set Content-Type header (browser will set the boundary)
-      let res = await fetch(url, {
-        method: "POST",
-        headers: {
-          Authorization: API_AUTH_BEARER ? `Bearer ${API_AUTH_BEARER}` : "",
-        } as any,
-        body: fd,
-      });
-
-      // If the backend fails for FormData, try JSON as a fallback
-      if (!res.ok) {
-        const jsonBody = await safeJson(res);
-        // If error indicates wrong content type, try JSON
-        if (res.status >= 400) {
-          const res2 = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: API_AUTH_BEARER ? `Bearer ${API_AUTH_BEARER}` : "",
-            },
-            body: JSON.stringify({
-              name: name.trim(),
-              email: email.trim().toLowerCase(),
-              password,
-              contact: contact.trim(),
-            }),
-          });
-          res = res2;
-        }
-      }
-
-      const body = await safeJson(res);
+      const ok = await authContext.signup(name.trim(), email.trim().toLowerCase(), password, contact.trim());
       setLoading(false);
-
-      if (!res.ok) {
-        const msg = body?.message || body?.detail || `Signup failed (${res.status})`;
-        setError(msg);
-        console.debug("signup failed body:", body);
+      if (!ok) {
+        setError("Signup failed. Please try again.");
         return;
       }
-
-      // store tokens/user if present
-      const token = body?.token ?? body?.access_token ?? body?.accessToken ?? null;
-      const user = body?.user ?? body?.data ?? null;
-
-      if (token) {
-        // If signup response already returns token & user, store and notify
-        localStorage.setItem("auth_token", token);
-        if (user) {
-          localStorage.setItem("user", JSON.stringify(user));
-        } else {
-          localStorage.setItem(
-            "user",
-            JSON.stringify({ name: name.trim(), email: email.trim().toLowerCase(), contact: contact.trim() })
-          );
-        }
-
-        tryNotifyAuthContext(authContext, "signup", { name, email, password, contact });
-        // Also notify login so any auth consumers update immediately
-        tryNotifyAuthContext(authContext, "login", { email: email.trim().toLowerCase(), password });
-
-        // done — keep existing behavior (you can uncomment to auto-close)
-        // clearAll(); onClose();
-        return;
-      }
-
-      // If no token returned on signup, attempt to login automatically now
-      try {
-        setLoading(true);
-        const loginUrl = `${API_BASE}/api/user-login`;
-
-        // First try JSON login
-        let loginRes = await fetch(loginUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: API_AUTH_BEARER ? `Bearer ${API_AUTH_BEARER}` : "",
-          },
-          body: JSON.stringify({ username: email.trim().toLowerCase(), password }),
-        });
-
-        if (!loginRes.ok) {
-          // fallback to form-data login
-          const loginFd = new FormData();
-          loginFd.append("username", email.trim().toLowerCase());
-          loginFd.append("password", password);
-
-          loginRes = await fetch(loginUrl, {
-            method: "POST",
-            headers: {
-              Authorization: API_AUTH_BEARER ? `Bearer ${API_AUTH_BEARER}` : "",
-            } as any,
-            body: loginFd,
-          });
-        }
-
-        const loginBody = await safeJson(loginRes);
-        setLoading(false);
-
-        if (!loginRes.ok) {
-          // Login after signup failed — but signup itself succeeded; show a helpful message
-          console.debug("auto-login after signup failed:", loginBody);
-          setError(
-            loginBody?.message ||
-              loginBody?.detail ||
-              "Account created but automatic login failed. Please sign in manually."
-          );
-
-          // Still notify signup (so external logic can refresh lists etc.)
-          tryNotifyAuthContext(authContext, "signup", { name, email, password, contact });
-          return;
-        }
-
-        // success: store token + user
-        const loginToken = loginBody?.token ?? loginBody?.access_token ?? loginBody?.accessToken ?? null;
-        const loginUser = loginBody?.user ?? loginBody?.data ?? null;
-
-        if (loginToken) localStorage.setItem("auth_token", loginToken);
-        if (loginUser) localStorage.setItem("user", JSON.stringify(loginUser));
-        else
-          localStorage.setItem(
-            "user",
-            JSON.stringify({ name: name.trim(), email: email.trim().toLowerCase(), contact: contact.trim() })
-          );
-
-        // Notify auth context about both signup and login (keeps compatibility)
-        tryNotifyAuthContext(authContext, "signup", { name, email, password, contact });
-        tryNotifyAuthContext(authContext, "login", { email: email.trim().toLowerCase(), password });
-
-        // done — keep existing behavior (you can uncomment to auto-close)
-        // clearAll(); onClose();
-      } catch (loginErr) {
-        setLoading(false);
-        console.error("auto-login error after signup:", loginErr);
-        setError("Account created but automatic login failed. Please sign in manually.");
-        tryNotifyAuthContext(authContext, "signup", { name, email, password, contact });
-      }
+      onClose();
     } catch (err) {
       setLoading(false);
-      console.error("Network/signup error:", err);
-      setError("Network error while creating account.");
+      setError("Signup failed. Please try again.");
     }
   };
 
   /** RESET — adjust endpoint as needed */
-  const handleResetSubmit = async (e: React.FormEvent) => {
+  const handleResetSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setResetMessage(null);

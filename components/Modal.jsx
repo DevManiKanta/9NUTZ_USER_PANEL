@@ -1,17 +1,9 @@
-// components/Modal.tsx
 "use client";
 
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 
-interface ModalProps {
-  open: boolean;
-  onClose?: () => void;
-  children?: React.ReactNode;
-  ariaLabel?: string;
-}
-
-export default function Modal({ open, onClose, children, ariaLabel = "dialog" }: ModalProps) {
+export default function Modal({ open, onClose, children, ariaLabel = "dialog" }) {
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -41,7 +33,8 @@ export default function Modal({ open, onClose, children, ariaLabel = "dialog" }:
         {children}
       </div>
     </div>,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    document.body!
+    document.body
   );
 }
+
+

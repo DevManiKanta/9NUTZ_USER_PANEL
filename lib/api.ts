@@ -86,11 +86,11 @@ export const adminGetUserOrdersAPI = (userId: string | number, token?: string) =
 
 // Public
 // export const getCategoriesPublicAPI = () => request('/api/categories');
-//  export const CATEGORIES_API_URL = "https://9nutsapi.nearbydoctors.in/public/api/category/show";
-   export const CATEGORIES_API_URL = "http://192.168.29.100:8000/api/category/show";
+ export const CATEGORIES_API_URL = "https://9nutsapi.nearbydoctors.in/public/api/category/show";
+  //  export const CATEGORIES_API_URL = "https://9nutzs.nearbydoctors.in/api/category/show";
  
-//  export const PRODUCTS_URL = "https://9nutsapi.nearbydoctors.in/public/api/product/show";
-  export const PRODUCTS_URL = "http://192.168.29.100:8000/api/product/show";
+ export const PRODUCTS_URL = "https://9nutsapi.nearbydoctors.in/public/api/product/show";
+  // export const PRODUCTS_URL = "http://192.168.29.100:8000/api/product/show";
  export const getCategoriesPublicAPI = async () => {
   const API_URL = "https://9nutsapi.nearbydoctors.in/public/api/admin/categories/show";
   const TOKEN =

@@ -1,98 +1,20 @@
-
-
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback
-} from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import {PRODUCTS_URL} from "@/lib/api";
+import { PRODUCTS_URL } from "@/lib/api";
+
 const API_ORIGIN = new URL(PRODUCTS_URL).origin;
 
-export interface ApiCategory {
-  id: number;
-  name: string;
-  image?: string | null;       // relative path on some rows
-  image_url?: string | null;   // full URL when provided
-}
+const ProductContext = createContext(undefined);
 
-export interface ApiProductRow {
-  id: number;
-  name: string;
-  category?: ApiCategory | null;
-  grams?: string | null;
-  price?: string | number | null;            // e.g. "1000.00"
-  image?: string | null;                     // e.g. "products/xxx.jpg"
-  image_url?: string | null;                 // full URL
-  discount_price?: string | number | null;
-  discount_amount?: string | number | null;
-  discount_percent?: string | number | null;
-  vendor_id?: number | null;
-  stock?: string | number | null;
-  created_at?: string | null;
-  updated_at?: string | null;
-  [k: string]: any;
-}
-
-/* ---------------------------
-   App Product shape (normalized)
-   --------------------------- */
-
-export interface ProductCategory {
-  id: string;
-  name: string;
-  imageUrl?: string;
-}
-
-export interface Product {
-  id: string;
-  name: string;
-  category?: ProductCategory;
-  grams?: string;
-  price: number;                 // parsed number
-  imageUrl?: string;             // full URL (image_url preferred)
-  discountPrice?: number;        // discount_price
-  discountAmount?: number;       // discount_amount
-  discountPercent?: number;
-  vendorId?: string | null;
-  stock: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-  // extra helpers
-  isOutOfStock: boolean;
-}
-
-/* ---------------------------
-   Context types
-   --------------------------- */
-
-interface ProductContextType {
-  products: Product[];
-  reload: () => Promise<void>;
-  addProduct: (payload: any) => Promise<Product>;
-  updateProduct: (id: string, payload: any) => Promise<Product>;
-  deleteProduct: (id: string) => Promise<void>;
-  getProductById: (id: string) => Product | undefined;
-  getActiveProducts: () => Product[];
-}
-
-const ProductContext = createContext<ProductContextType | undefined>(undefined);
-
-export const useProducts = (): ProductContextType => {
+export const useProducts = () => {
   const ctx = useContext(ProductContext);
   if (!ctx) throw new Error("useProducts must be used within a ProductProvider");
   return ctx;
 };
 
-/* ---------------------------
-   Normalizer
-   --------------------------- */
-
-function toNumberSafe(v: any): number {
+function toNumberSafe(v) {
   if (typeof v === "number") return v;
   if (typeof v === "string") {
     const n = Number.parseFloat(v.replace(/,/g, ""));
@@ -101,16 +23,15 @@ function toNumberSafe(v: any): number {
   return 0;
 }
 
-function getFullStorageUrl(pathOrUrl?: string | null): string | undefined {
+function getFullStorageUrl(pathOrUrl) {
   if (!pathOrUrl) return undefined;
   const s = String(pathOrUrl).trim();
   if (!s) return undefined;
   if (/^https?:\/\//i.test(s)) return s;
-  // server stores images under /public/storage/...
   return `${API_ORIGIN}/public/storage/${s.replace(/^\/+/, "")}`;
 }
 
-function normalizeServerProduct(r: ApiProductRow): Product {
+function normalizeServerProduct(r) {
   const imageUrl = r.image_url ? String(r.image_url) : (r.image ? getFullStorageUrl(r.image) : undefined);
 
   const price = toNumberSafe(r.price);
@@ -127,7 +48,7 @@ function normalizeServerProduct(r: ApiProductRow): Product {
     ? {
         id: String(r.category.id ?? ""),
         name: String(r.category.name ?? ""),
-        imageUrl: r.category.image_url ? String(r.category.image_url) : (r.category.image ? getFullStorageUrl(r.category.image) : undefined)
+        imageUrl: r.category.image_url ? String(r.category.image_url) : (r.category.image ? getFullStorageUrl(r.category.image) : undefined),
       }
     : undefined;
 
@@ -145,21 +66,14 @@ function normalizeServerProduct(r: ApiProductRow): Product {
     stock: Number.isFinite(Number(stock)) ? Number(stock) : 0,
     createdAt: r.created_at ? new Date(r.created_at) : undefined,
     updatedAt: r.updated_at ? new Date(r.updated_at) : undefined,
-    isOutOfStock: (Number.isFinite(Number(stock)) ? Number(stock) : 0) <= 0
+    isOutOfStock: (Number.isFinite(Number(stock)) ? Number(stock) : 0) <= 0,
   };
 }
 
-/* ---------------------------
-   Provider
-   --------------------------- */
-
-export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ProductProvider = ({ children }) => {
   const { token } = useAuth();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState([]);
 
-  /**
-   * Reload - calls the exact endpoint you provided and expects { status, data }
-   */
   const reload = useCallback(async () => {
     try {
       const res = await fetch(PRODUCTS_URL, {
@@ -173,11 +87,8 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
 
       const payload = await res.json();
-
-      // payload expected: { status: true, data: [...] }
       const rows = Array.isArray(payload?.data) ? payload.data : [];
-
-      const normalized = rows.map((r: ApiProductRow) => normalizeServerProduct(r));
+      const normalized = rows.map((r) => normalizeServerProduct(r));
       setProducts(normalized);
     } catch (err) {
       console.error("reload products failed", err);
@@ -186,15 +97,10 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   useEffect(() => {
-    // auto-load once on mount
     reload();
   }, [reload]);
 
-  /* ---------------------------
-     CRUD helpers (use same origin for admin endpoints)
-     --------------------------- */
-
-  const buildFormData = (productData: any) => {
+  const buildFormData = (productData) => {
     const fd = new FormData();
     if (productData.name) fd.append("name", String(productData.name));
     if (productData.description) fd.append("description", String(productData.description ?? ""));
@@ -203,22 +109,22 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (productData.category_id) fd.append("category_id", String(productData.category_id));
     if (typeof productData.stock !== "undefined") fd.append("stock", String(productData.stock || 0));
     if (productData.imageFiles && Array.isArray(productData.imageFiles)) {
-      productData.imageFiles.forEach((f: File) => fd.append("images", f));
+      productData.imageFiles.forEach((f) => fd.append("images", f));
     }
     if (Array.isArray(productData.images)) {
       const urlImages = productData.images
-        .map((s: any) => String(s || "").trim())
-        .filter((s: string) => /^https?:\/\//i.test(s));
+        .map((s) => String(s || "").trim())
+        .filter((s) => /^https?:\/\//i.test(s));
       if (urlImages.length) fd.append("images_urls", JSON.stringify(urlImages));
     }
     return fd;
   };
 
-  const addProduct = useCallback(async (productData: any): Promise<Product> => {
+  const addProduct = useCallback(async (productData) => {
     const fd = buildFormData(productData);
     const res = await fetch(`${API_ORIGIN}/public/api/admin/products`, {
-      method: "POST", // do not set Content-Type (browser will set)
-      body: fd
+      method: "POST",
+      body: fd,
     });
     if (!res.ok) {
       const t = await res.text().catch(() => "");
@@ -226,19 +132,19 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
     const body = await res.json();
     const row = body?.data ?? body;
-    const normalized = normalizeServerProduct(row as ApiProductRow);
-    setProducts(prev => [normalized, ...prev]);
+    const normalized = normalizeServerProduct(row);
+    setProducts((prev) => [normalized, ...prev]);
     window.dispatchEvent(new CustomEvent("productsUpdated"));
     return normalized;
   }, []);
 
-  const updateProduct = useCallback(async (id: string, productData: any): Promise<Product> => {
+  const updateProduct = useCallback(async (id, productData) => {
     const hasFiles = Array.isArray(productData.imageFiles) && productData.imageFiles.length > 0;
     if (hasFiles) {
       const fd = buildFormData(productData);
       const res = await fetch(`${API_ORIGIN}/public/api/admin/products/${id}`, {
         method: "PUT",
-        body: fd
+        body: fd,
       });
       if (!res.ok) {
         const t = await res.text().catch(() => "");
@@ -246,25 +152,24 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
       const body = await res.json();
       const row = body?.data ?? body;
-      const normalized = normalizeServerProduct(row as ApiProductRow);
-      setProducts(prev => prev.map(p => (p.id === String(id) ? normalized : p)));
+      const normalized = normalizeServerProduct(row);
+      setProducts((prev) => prev.map((p) => (p.id === String(id) ? normalized : p)));
       window.dispatchEvent(new CustomEvent("productsUpdated"));
       return normalized;
     }
 
-    // JSON update
-    const payload: any = {
+    const payload = {
       name: productData.name,
       price: productData.price,
       discount_price: productData.discount_price,
       stock: productData.stock,
-      category_id: productData.category_id
+      category_id: productData.category_id,
     };
-    const headers = {"Content-Type": "application/json" };
+    const headers = { "Content-Type": "application/json" };
     const res = await fetch(`${API_ORIGIN}/public/api/admin/products/${id}`, {
       method: "PUT",
       headers,
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       const t = await res.text().catch(() => "");
@@ -272,13 +177,13 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
     const body = await res.json();
     const row = body?.data ?? body;
-    const normalized = normalizeServerProduct(row as ApiProductRow);
-    setProducts(prev => prev.map(p => (p.id === String(id) ? normalized : p)));
+    const normalized = normalizeServerProduct(row);
+    setProducts((prev) => prev.map((p) => (p.id === String(id) ? normalized : p)));
     window.dispatchEvent(new CustomEvent("productsUpdated"));
     return normalized;
   }, []);
 
-  const deleteProduct = useCallback(async (id: string) => {
+  const deleteProduct = useCallback(async (id) => {
     const res = await fetch(`${API_ORIGIN}/public/api/admin/products/${id}`, {
       method: "DELETE",
     });
@@ -286,26 +191,24 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const t = await res.text().catch(() => "");
       throw new Error(`Delete product failed ${res.status}: ${t || res.statusText}`);
     }
-    setProducts(prev => prev.filter(p => p.id !== String(id)));
+    setProducts((prev) => prev.filter((p) => p.id !== String(id)));
     window.dispatchEvent(new CustomEvent("productsUpdated"));
   }, []);
 
-  /* ---------------------------
-     Consumers / helpers
-     --------------------------- */
+  const getProductById = (id) => products.find((p) => p.id === id);
+  const getActiveProducts = () => products.filter((p) => !p.isOutOfStock);
 
-  const getProductById = (id: string) => products.find(p => p.id === id);
-  const getActiveProducts = () => products.filter(p => !p.isOutOfStock);
-
-  const ctxValue: ProductContextType = {
+  const ctxValue = {
     products,
     reload,
     addProduct,
     updateProduct,
     deleteProduct,
     getProductById,
-    getActiveProducts
+    getActiveProducts,
   };
 
   return <ProductContext.Provider value={ctxValue}>{children}</ProductContext.Provider>;
 };
+
+

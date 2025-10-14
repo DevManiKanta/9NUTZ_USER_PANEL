@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, User, Eye, Heart } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Eye } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -15,7 +15,7 @@ export default function BlogPage() {
       author: "Nutritionist Sarah",
       date: "January 15, 2025",
       views: 1250,
-      category: "Health & Nutrition"
+      category: "Health & Nutrition",
     },
     {
       id: 2,
@@ -25,7 +25,7 @@ export default function BlogPage() {
       author: "Budget Expert Mike",
       date: "January 12, 2025",
       views: 890,
-      category: "Shopping Tips"
+      category: "Shopping Tips",
     },
     {
       id: 3,
@@ -35,7 +35,7 @@ export default function BlogPage() {
       author: "Chef Maria",
       date: "January 10, 2025",
       views: 675,
-      category: "Seasonal"
+      category: "Seasonal",
     },
     {
       id: 4,
@@ -45,55 +45,34 @@ export default function BlogPage() {
       author: "Wellness Coach Amy",
       date: "January 8, 2025",
       views: 1120,
-      category: "Recipes"
-    }
+      category: "Recipes",
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header
-        onLoginClick={() => {}}
-        onLocationClick={() => {}}
-        onCartClick={() => {}}
-        cartItemCount={0}
-        cartTotal={0}
-      />
-      
+      <Header onLoginClick={() => {}} onLocationClick={() => {}} onCartClick={() => {}} cartItemCount={0} cartTotal={0} />
       <main className="pt-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
           <div className="mb-8">
-            <Link 
-              href="/"
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
-            >
+            <Link href="/" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors">
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Home</span>
             </Link>
-            
             <div className="text-center">
               <h1 className="text-4xl font-bold text-gray-900 mb-4">JBasket Blog</h1>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Fresh insights, recipes, and tips for a healthier, more convenient lifestyle
-              </p>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">Fresh insights, recipes, and tips for a healthier, more convenient lifestyle</p>
             </div>
           </div>
 
-          {/* Featured Post */}
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-12">
             <div className="grid md:grid-cols-2 gap-0">
               <div className="aspect-[4/3] md:aspect-auto">
-                <img 
-                  src={blogPosts[0].image} 
-                  alt={blogPosts[0].title}
-                  className="w-full h-full object-cover"
-                />
+                <img src={blogPosts[0].image} alt={blogPosts[0].title} className="w-full h-full object-cover" />
               </div>
               <div className="p-8 flex flex-col justify-center">
                 <div className="flex items-center space-x-4 mb-4">
-                  <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium">
-                    Featured
-                  </span>
+                  <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium">Featured</span>
                   <span className="text-gray-500 text-sm">{blogPosts[0].category}</span>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">{blogPosts[0].title}</h2>
@@ -116,26 +95,17 @@ export default function BlogPage() {
             </div>
           </div>
 
-          {/* Blog Posts Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogPosts.slice(1).map((post) => (
               <article key={post.id} className="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img 
-                    src={post.image} 
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                  <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-6">
                   <div className="flex items-center space-x-2 mb-3">
-                    <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-medium">
-                      {post.category}
-                    </span>
+                    <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-medium">{post.category}</span>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
-                    {post.title}
-                  </h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">{post.title}</h3>
                   <p className="text-gray-600 text-sm mb-4">{post.excerpt}</p>
                   <div className="flex items-center justify-between text-xs text-gray-500">
                     <div className="flex items-center space-x-3">
@@ -152,25 +122,19 @@ export default function BlogPage() {
             ))}
           </div>
 
-          {/* Newsletter Signup */}
           <div className="bg-green-50 rounded-2xl p-8 mt-16 text-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Stay Updated</h3>
             <p className="text-gray-600 mb-6">Subscribe to our newsletter for the latest recipes, tips, and exclusive offers.</p>
             <div className="flex max-w-md mx-auto">
-              <input 
-                type="email" 
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <button className="bg-green-600 text-white px-6 py-3 rounded-r-lg hover:bg-green-700 transition-colors font-medium">
-                Subscribe
-              </button>
+              <input type="email" placeholder="Enter your email" className="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+              <button className="bg-green-600 text-white px-6 py-3 rounded-r-lg hover:bg-green-700 transition-colors font-medium">Subscribe</button>
             </div>
           </div>
         </div>
       </main>
-      
       <Footer />
     </div>
   );
 }
+
+

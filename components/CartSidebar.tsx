@@ -642,7 +642,7 @@ export default function CartSidebar({
   const [loadingPayment, setLoadingPayment] = useState(false);
   const mountedRef = useRef(true);
 
-  const API_BASE = "http://192.168.29.100:8000";
+  const API_BASE = "https://9nutsapi.nearbydoctors.in/public";
   const CREATE_ORDER_ENDPOINT = `${API_BASE}/api/razorpay/order`;
   const VERIFY_ENDPOINT = `${API_BASE}/api/razorpay/verify`;
 
