@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import {Login_API_BASE} from "@/lib/api";
 
 const AuthContext = createContext(undefined);
 
@@ -13,7 +14,7 @@ export const useAuth = () => {
   return context;
 };
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || "https://9nutsapi.nearbydoctors.in/public").replace(/\/+$/,'');
+const API_BASE = Login_API_BASE;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

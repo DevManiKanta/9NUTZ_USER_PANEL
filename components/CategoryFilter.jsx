@@ -3,10 +3,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronDown, Filter } from 'lucide-react';
 
-interface CategoryFilterProps {
-  onCategoryChange: (category: string) => void;
-  selectedCategory: string;
-}
 
 const filterCategories = [
   { value: 'all', label: 'All Categories', count: 'View All' },
@@ -20,13 +16,13 @@ const filterCategories = [
   { value: 'Personal Care', label: 'Personal Care', count: '9 items' }
 ];
 
-export default function CategoryFilter({ onCategoryChange, selectedCategory }: CategoryFilterProps) {
+export default function CategoryFilter({ onCategoryChange, selectedCategory }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
   const selectedCategoryData = filterCategories.find(cat => cat.value === selectedCategory);
 
-  const handleCategorySelect = (category: string) => {
+  const handleCategorySelect = (category) => {
     setIsAnimating(true);
     setIsOpen(false);
     
@@ -39,8 +35,8 @@ export default function CategoryFilter({ onCategoryChange, selectedCategory }: C
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
+    const handleClickOutside = (event) => {
+      const target = event.target 
       if (!target.closest('.category-filter-dropdown')) {
         setIsOpen(false);
       }

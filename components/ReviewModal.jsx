@@ -3,19 +3,14 @@
 import React, { useState } from 'react';
 import { X, Star, Send } from 'lucide-react';
 
-interface ReviewModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  orderTotal: number;
-}
 
-export default function ReviewModal({ isOpen, onClose, orderTotal }: ReviewModalProps) {
+export default function ReviewModal({ isOpen, onClose, orderTotal }) {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
   const [hoveredStar, setHoveredStar] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     

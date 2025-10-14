@@ -7,13 +7,7 @@ import Footer from '@/components/Footer';
 import { ArrowLeft, Grid, List, Filter, SortAsc } from 'lucide-react';
 import { categories, sampleProducts, getCategoryById } from '@/lib/categories';
 
-interface CategoryClientPageProps {
-  category: any;
-  categoryProducts: any[];
-  slug: string;
-}
-
-export default function CategoryClientPage({ category, categoryProducts, slug }: CategoryClientPageProps) {
+export default function CategoryClientPage({ category, categoryProducts, slug }) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('popularity');
   const [filterBy, setFilterBy] = useState('all');
@@ -80,7 +74,7 @@ export default function CategoryClientPage({ category, categoryProducts, slug }:
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             {/* <h2 className="text-lg font-semibold text-gray-900 mb-4">Shop by Category</h2> */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {category.subcategories.map((subcategory: any) => (
+              {category.subcategories.map((subcategory) => (
                 <Link
                   key={subcategory.id}
                   href={`/category/${category.slug}/${subcategory.slug}`}

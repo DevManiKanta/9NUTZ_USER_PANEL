@@ -6,34 +6,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Trash2, Edit, Plus, X } from "lucide-react";
 import { API_BASE, bannerImageUrl } from "@/utils/apiBase";
 
-type Banner = {
-  id: number;
-  title: string;
-  subtitle?: string;
-  discount?: string;
-  image_url?: string | null;
-  redirect_url?: string | null;
-  is_active?: 0 | 1;
-  sort_order?: number;
-  created_at?: string;
-};
 
-type FormState = {
-  title: string;
-  subtitle: string;
-  discount: string;
-  redirect_url: string;
-  is_active: boolean;
-  imageFile?: File | null;
-  imagePreview?: string | null; // data URL or backend image_url (full URL)
-  image_url?: string; // optional external url typed in by admin
-};
 
-export default function BannerManagement(): JSX.Element {
+
+
+export default function BannerManagement() {
   const { token } = useAuth();
-  const [banners, setBanners] = useState<Banner[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [banners, setBanners] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -61,10 +42,10 @@ export default function BannerManagement(): JSX.Element {
         },
       });
       if (!res.ok) throw new Error(`Failed to load (${res.status})`);
-      const data: Banner[] = await res.json();
+      const data = await res.json();
       const sorted = data.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
       setBanners(sorted);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       setError(err?.message || "Failed to fetch banners");
     } finally {
@@ -93,7 +74,7 @@ export default function BannerManagement(): JSX.Element {
     setIsModalOpen(true);
   };
 
-  const openEdit = (b: Banner) => {
+  const openEdit = (b) => {
     setIsEditing(true);
     setEditingBannerId(b.id);
     setForm({
@@ -110,7 +91,7 @@ export default function BannerManagement(): JSX.Element {
     setIsModalOpen(true);
   };
 
-  const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = (e) => {
     const file = e.target.files?.[0] ?? null;
     if (!file) {
       setForm((f) => ({ ...f, imageFile: null, imagePreview: null }));
@@ -123,15 +104,15 @@ export default function BannerManagement(): JSX.Element {
     reader.readAsDataURL(file);
   };
 
-  const onImageUrlChange = (v: string) => {
+  const onImageUrlChange = (v) => {
     setForm((f) => ({ ...f, image_url: v, imageFile: null, imagePreview: v || null }));
   };
 
-  const change = (key: keyof FormState, value: any) => {
+  const change = (key, value) => {
     setForm((f) => ({ ...f, [key]: value }));
   };
 
-  const submit = async (e?: React.FormEvent) => {
+  const submit = async (e) => {
     e?.preventDefault();
     setError(null);
 
@@ -173,7 +154,7 @@ export default function BannerManagement(): JSX.Element {
           const body = await res.json().catch(() => null);
           throw new Error(body?.message || `Update failed (${res.status})`);
         }
-        const updated: Banner = await res.json();
+        const updated = await res.json();
         setBanners((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
       } else {
         const res = await fetch(`${API_BASE}/api/admin/banners`, {
@@ -187,12 +168,12 @@ export default function BannerManagement(): JSX.Element {
           const body = await res.json().catch(() => null);
           throw new Error(body?.message || `Create failed (${res.status})`);
         }
-        const created: Banner = await res.json();
+        const created = await res.json();
         setBanners((prev) => [created, ...prev]);
       }
 
       setIsModalOpen(false);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       setError(err?.message || "Save failed");
     } finally {
@@ -200,7 +181,7 @@ export default function BannerManagement(): JSX.Element {
     }
   };
 
-  const remove = async (id: number) => {
+  const remove = async (id) => {
     if (!confirm("Are you sure you want to delete this banner?")) return;
     try {
       setLoading(true);
@@ -210,7 +191,7 @@ export default function BannerManagement(): JSX.Element {
       });
       if (!res.ok) throw new Error(`Delete failed (${res.status})`);
       setBanners((prev) => prev.filter((b) => b.id !== id));
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       setError(err?.message || "Delete failed");
     } finally {
@@ -218,7 +199,7 @@ export default function BannerManagement(): JSX.Element {
     }
   };
 
-  const toggleActive = async (b: Banner) => {
+  const toggleActive = async (b) => {
     try {
       setLoading(true);
       const res = await fetch(`${API_BASE}/api/admin/banners/${b.id}`, {
@@ -232,7 +213,7 @@ export default function BannerManagement(): JSX.Element {
       if (!res.ok) throw new Error(`Update failed (${res.status})`);
       const updated = await res.json();
       setBanners((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       setError(err?.message || "Toggle failed");
     } finally {

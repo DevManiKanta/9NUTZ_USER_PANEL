@@ -3,26 +3,20 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Plus, Minus, Star } from "lucide-react";
-import { useProducts, Product as NormalizedProduct } from "@/contexts/ProductContext";
-
-interface ProductGridProps {
-  onAddToCart: (product: NormalizedProduct) => void;
-  selectedCategory?: string;
-  isAnimating?: boolean;
-}
+import { useProducts } from "@/contexts/ProductContext";
 
 export default function FilterableProductGrid({
   onAddToCart,
   selectedCategory,
   isAnimating = false,
-}: ProductGridProps) {
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [displayedProducts, setDisplayedProducts] = useState<NormalizedProduct[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+}) {
+  const [quantities, setQuantities] = useState({});
+  const [displayedProducts, setDisplayedProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const { products } = useProducts();
+  const { products } = useProducts() || {};
 
-  const staticFallbackProduct: NormalizedProduct = {
+  const staticFallbackProduct = {
     id: "static-001",
     name: "Sample Product (Static)",
     price: 499.0,
@@ -30,13 +24,14 @@ export default function FilterableProductGrid({
     discountAmount: 100,
     stock: 10,
     imageUrl: "/placeholder.png",
-  } as NormalizedProduct;
+  };
 
   // Listen to global "siteSearch" events dispatched by Header
   useEffect(() => {
-    const handleSearch = (e: Event) => {
-      const ce = e as CustomEvent<string>;
-      const term = (ce?.detail || "").toString().trim().toLowerCase();
+    const handleSearch = (e) => {
+      // event may be a CustomEvent with detail string
+      const detail = e && e.detail ? e.detail : "";
+      const term = String(detail || "").toString().trim().toLowerCase();
       setSearchTerm(term);
     };
     window.addEventListener("siteSearch", handleSearch);
@@ -53,7 +48,7 @@ export default function FilterableProductGrid({
     if (selectedCategory && selectedCategory !== "all") {
       const catLower = selectedCategory.toLowerCase();
       result = result.filter((p) => {
-        const pcat = (p as any).category ?? "";
+        const pcat = (p && p.category) || "";
         return String(pcat).toLowerCase().includes(catLower);
       });
     }
@@ -61,9 +56,10 @@ export default function FilterableProductGrid({
     // Search filter (name, description, category)
     if (searchTerm) {
       result = result.filter((p) => {
-        const name = String((p as any).name ?? "").toLowerCase();
-        const desc = String((p as any).description ?? (p as any).short_description ?? "").toLowerCase();
-        const category = String((p as any).category ?? "").toLowerCase();
+        const name = String((p && p.name) || "").toLowerCase();
+        const desc = String((p && (p.description || p.short_description)) || "")
+          .toLowerCase();
+        const category = String((p && p.category) || "").toLowerCase();
 
         return (
           name.includes(searchTerm) ||
@@ -81,32 +77,32 @@ export default function FilterableProductGrid({
     setDisplayedProducts(filteredProducts);
   }, [filteredProducts]);
 
-  const qtyOf = (id: string) => Math.max(0, Math.trunc(quantities[id] ?? 0));
+  const qtyOf = (id) => Math.max(0, Math.trunc(quantities[id] ?? 0));
 
-  const handleQuantityChange = (productId: string, newQuantity: number) => {
+  const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity < 0) return;
     setQuantities((prev) => ({ ...prev, [productId]: Math.trunc(newQuantity) }));
   };
 
-  const handleAddToCart = (product: NormalizedProduct) => {
-    if ((product as any).stock <= 0) return;
+  const handleAddToCart = (product) => {
+    if ((product && product.stock) <= 0) return;
     const qty = Math.max(1, qtyOf(String(product.id)));
     for (let i = 0; i < qty; i++) onAddToCart(product);
     setQuantities((prev) => ({ ...prev, [product.id]: 0 }));
   };
 
-  const formatPrice = (n: number) => n.toFixed(2);
+  const formatPrice = (n) => Number(n || 0).toFixed(2);
 
-  const computeDisplayPrice = (p: NormalizedProduct) => {
-    if (typeof (p as any).discountPrice === "number" && (p as any).discountPrice > 0)
-      return (p as any).discountPrice;
-    if (typeof (p as any).discountAmount === "number" && (p as any).discountAmount > 0)
-      return Math.max(0, (p as any).price - (p as any).discountAmount);
-    return (p as any).price;
+  const computeDisplayPrice = (p) => {
+    if (typeof (p && p.discountPrice) === "number" && (p.discountPrice > 0))
+      return p.discountPrice;
+    if (typeof (p && p.discountAmount) === "number" && (p.discountAmount > 0))
+      return Math.max(0, (p.price || 0) - p.discountAmount);
+    return p.price || 0;
   };
 
-  const computeDiscountPercent = (p: NormalizedProduct) => {
-    const original = (p as any).price || 0;
+  const computeDiscountPercent = (p) => {
+    const original = (p && p.price) || 0;
     const shown = computeDisplayPrice(p);
     if (!original || shown >= original) return 0;
     return Math.round(((original - shown) / original) * 100);
@@ -123,20 +119,20 @@ export default function FilterableProductGrid({
           transition-all duration-300 ease-in-out ${isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
       >
         {displayedProducts.map((product, idx) => {
-          const productId = String(product.id);
+          const productId = String(product && product.id);
           const currentQuantity = qtyOf(productId);
           const displayPrice = computeDisplayPrice(product);
           const discountPercent = computeDiscountPercent(product);
-          const outOfStock = (product as any).stock <= 0;
+          const outOfStock = (product && product.stock) <= 0;
 
           const img =
-            (product as any).imageUrl ||
-            (Array.isArray((product as any).images) && (product as any).images[0]) ||
+            (product && product.imageUrl) ||
+            (Array.isArray(product && product.images) && product.images[0]) ||
             "/placeholder.png";
 
           return (
             <article
-              key={productId}
+              key={productId || `product-${idx}`}
               className="bg-white rounded-2xl shadow-[0_6px_18px_rgba(13,18,25,0.08)] border border-transparent hover:border-gray-100 overflow-hidden flex flex-col"
               style={{ animationDelay: `${idx * 40}ms`, animationFillMode: "both" }}
             >
@@ -144,16 +140,23 @@ export default function FilterableProductGrid({
                 <div className="rounded-xl overflow-hidden bg-gray-50">
                   <img
                     src={img}
-                    alt={product.name}
-                    // onError={(e) => ((e.currentTarget as HTMLImageElement).src = "/placeholder.png")}
+                    alt={(product && product.name) || "product"}
+                    onError={(e) => {
+                      // plain JS fallback for broken images
+                      try {
+                        e.currentTarget.src = "/placeholder.png";
+                      } catch (err) {
+                        /* ignore */
+                      }
+                    }}
                     className="w-full h-56 object-cover block"
                   />
                 </div>
               </div>
 
               <div className="px-5 pb-5 flex-1 flex flex-col">
-                <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2" title={product.name}>
-                  {product.name}
+                <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2" title={(product && product.name) || ""}>
+                  {(product && product.name) || "Unnamed"}
                 </h3>
 
                 <div className="flex items-center gap-1 mb-3">
@@ -165,7 +168,7 @@ export default function FilterableProductGrid({
                 <div className="mt-auto">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-2xl font-bold text-gray-900">Rs.{formatPrice((product as any).price)}</div>
+                      <div className="text-2xl font-bold text-gray-900">Rs.{formatPrice((product && product.price) || 0)}</div>
                       {discountPercent > 0 && (
                         <div className="text-xs text-gray-400 mt-1">Disc: Rs.{formatPrice(displayPrice)}</div>
                       )}

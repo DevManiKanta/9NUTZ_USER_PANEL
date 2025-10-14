@@ -14,7 +14,7 @@ export default function Header({ onLoginClick, onLocationClick, onCartClick, car
   const hasToken = Boolean(token);
 
   const tabs = [
-    { href: "/", label: "Shop" },
+    { href: "", label: "Shop" },
     { href: "/packages", label: "Packages" },
     { href: "/shippingmethods", label: "Shipping Methods" },
     { href: "/franchise", label: "Franchise With Us" },

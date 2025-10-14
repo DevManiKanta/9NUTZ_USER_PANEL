@@ -1,12 +1,7 @@
 import React from 'react';
 import { X, Home, Package, Users, Settings } from 'lucide-react';
 
-interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose }) => {
   return (
     <>
       {/* Backdrop */}

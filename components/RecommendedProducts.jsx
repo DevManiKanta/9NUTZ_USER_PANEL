@@ -4,14 +4,7 @@ import React, { useState } from 'react';
 import { useProducts } from '@/contexts/ProductContext';
 import { Star, TrendingUp, Search, X, Plus, Edit, Trash2 } from 'lucide-react';
 
-interface RecommendedProduct {
-  id: string;
-  productId: string;
-  priority: number;
-  reason: string;
-  status: 'active' | 'inactive';
-  createdAt: Date;
-}
+
 
 export default function RecommendedProducts() {
   const { getActiveProducts, getProductById } = useProducts();
@@ -43,7 +36,7 @@ export default function RecommendedProducts() {
     productId: '',
     priority: 1,
     reason: '',
-    status: 'active' as 'active' | 'inactive'
+    status: 'active' 
   });
 
   const activeProducts = getActiveProducts();
@@ -51,7 +44,7 @@ export default function RecommendedProducts() {
     !recommendedProducts.some(rec => rec.productId === product.id)
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     
     if (editingRecommendation) {
@@ -61,7 +54,7 @@ export default function RecommendedProducts() {
           : rec
       ));
     } else {
-      const newRecommendation: RecommendedProduct = {
+      const newRecommendation = {
         ...formData,
         id: `rec-${Date.now()}`,
         createdAt: new Date()
@@ -79,7 +72,7 @@ export default function RecommendedProducts() {
     setEditingRecommendation(null);
   };
 
-  const handleEdit = (recommendation: RecommendedProduct) => {
+  const handleEdit = (recommendation) => {
     setFormData({
       productId: recommendation.productId,
       priority: recommendation.priority,
@@ -90,12 +83,12 @@ export default function RecommendedProducts() {
     setShowForm(true);
   };
 
-  const handleDelete = (recId: string) => {
+  const handleDelete = (recId) => {
     setRecommendedProducts(prev => prev.filter(rec => rec.id !== recId));
     setDeleteConfirm(null);
   };
 
-  const toggleStatus = (recId: string) => {
+  const toggleStatus = (recId) => {
     setRecommendedProducts(prev => prev.map(rec =>
       rec.id === recId
         ? { ...rec, status: rec.status === 'active' ? 'inactive' : 'active' }
@@ -330,7 +323,7 @@ export default function RecommendedProducts() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                 <select
                   value={formData.status}
-                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as 'active' | 'inactive' }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   <option value="active">Active</option>

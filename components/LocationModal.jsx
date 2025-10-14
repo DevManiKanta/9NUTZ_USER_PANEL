@@ -3,12 +3,7 @@
 import { X, MapPin } from 'lucide-react';
 import { useState } from 'react';
 
-interface LocationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
+export default function LocationModal({ isOpen, onClose }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   if (!isOpen) return null;

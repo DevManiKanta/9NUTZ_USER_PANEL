@@ -6,52 +6,31 @@ import { Plus, Minus } from "lucide-react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useRouter } from "next/navigation";
 
-interface GridProduct {
-  id: string | number;
-  name: string;
-  price?: number;
-  offerPrice?: number;
-  image?: string;
-  images?: string[];
-  weight?: string;
-  category?: string;
-  rating?: number;
-  reviews?: number;
-  quantityPrices?: any; // optional JSON
-  categoryId?: string | number;
-}
 
-interface Props {
-  products?: GridProduct[]; // if not provided, will use useProducts()
-  onAddToCart: (product: any) => void;
-  categoryFilter?: string;
-  limit?: number;
-  title?: string;
-}
 
-export default function ProductGrid({ products: propProducts, onAddToCart, categoryFilter, limit, title }: Props) {
+export default function ProductGrid({ products: propProducts, onAddToCart, categoryFilter, limit, title }) {
   const router = useRouter();
   const { getActiveProducts } = useProducts();
   const productsFromContext = useMemo(() => getActiveProducts(), [getActiveProducts]);
 
-  const products: GridProduct[] = propProducts && propProducts.length ? propProducts : productsFromContext;
+  const products = propProducts && propProducts.length ? propProducts : productsFromContext;
 
   const filtered = products.filter(p => {
     if (!categoryFilter) return true;
-    const cat = (p as any).categoryId ?? (p as any).category_id ?? (p as any).category;
+    const cat = (p).categoryId ?? (p).category_id ?? (p).category;
     return String(cat) === String(categoryFilter) || String(p.category) === String(categoryFilter);
   });
 
   const display = limit ? filtered.slice(0, limit) : filtered;
 
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [quantities, setQuantities] = useState({});
 
-  const handleQtyChange = (id: string | number, next: number) => {
+  const handleQtyChange = (id, next) => {
     if (next < 0) return;
     setQuantities(prev => ({ ...prev, [String(id)]: next }));
   };
 
-  const handleAdd = (product: GridProduct) => {
+  const handleAdd = (product) => {
     const qty = quantities[String(product.id)] || 1;
     // build minimal add payload
     const payload = {

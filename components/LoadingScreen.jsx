@@ -1,39 +1,11 @@
-// import React from 'react';
-// import LOGO from "../assests/LOGO.jpg"
-
-// export default function LoadingScreen() {
-//   return (
-//     <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
-//       {/* Animated Loading Screen with Rotating Basket */}
-//       <div className="text-center">
-//         {/* Main Basket Animation */}
-//         <div className="relative mb-8">
-//         </div>
-        
-//         {/* JBasket Logo & Text */}
-//         <div className="mb-6">
-//           <h1 className="text-3xl font-bold text-gray-900 mb-2">9 NUTZ</h1>
-//         </div>
-        
-//         {/* Loading Dots */}
-//         <div className="flex justify-center space-x-2">
-//           <div className="w-3 h-3 bg-green-600 rounded-full animate-bounce"></div>
-//           <div className="w-3 h-3 bg-green-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-//           <div className="w-3 h-3 bg-green-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-//         </div>
-        
-//         <p className="text-gray-500 mt-4 text-sm">Loading fresh groceries...</p>
-//       </div>
-//     </div>
-//   );
-// }  
+  
 "use client";
 
 import React from "react";
 import Image from "next/image";
 import LOGO from "../assests/LOGO.jpg";
 
-export default function LoadingScreen(): JSX.Element {
+export default function LoadingScreen() {
   return (
     <div
       className="fixed inset-0 bg-white z-50 flex items-center justify-center"

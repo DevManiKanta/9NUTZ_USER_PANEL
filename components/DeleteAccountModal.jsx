@@ -4,10 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { X, AlertTriangle } from 'lucide-react';
 
-interface DeleteAccountModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+
 
 const DELETE_REASONS = [
   'I found a better alternative',
@@ -20,7 +17,7 @@ const DELETE_REASONS = [
   'Other'
 ];
 
-export default function DeleteAccountModal({ isOpen, onClose }: DeleteAccountModalProps) {
+export default function DeleteAccountModal({ isOpen, onClose }) {
   const [step, setStep] = useState<'reason' | 'confirm'>('reason');
   const [selectedReason, setSelectedReason] = useState('');
   const [otherReason, setOtherReason] = useState('');

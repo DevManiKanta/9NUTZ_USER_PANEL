@@ -3,21 +3,7 @@
 import React, { useState } from 'react';
 import { Search, Edit, Trash2, Plus, X, Percent, Calendar, Users } from 'lucide-react';
 
-interface Coupon {
-  id: string;
-  code: string;
-  description: string;
-  discountType: 'percentage' | 'fixed';
-  discountValue: number;
-  minOrderAmount: number;
-  maxDiscount?: number;
-  validFrom: Date;
-  validUntil: Date;
-  usageLimit: number;
-  usedCount: number;
-  status: 'active' | 'inactive';
-  createdAt: Date;
-}
+
 
 export default function CouponManagement() {
   const [coupons, setCoupons] = useState<Coupon[]>([
@@ -60,17 +46,17 @@ export default function CouponManagement() {
   const [formData, setFormData] = useState({
     code: '',
     description: '',
-    discountType: 'percentage' as 'percentage' | 'fixed',
+    discountType: 'percentage',
     discountValue: 0,
     minOrderAmount: 0,
     maxDiscount: 0,
     validFrom: '',
     validUntil: '',
     usageLimit: 1,
-    status: 'active' as 'active' | 'inactive'
+    status: 'active' 
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     
     if (editingCoupon) {
@@ -85,7 +71,7 @@ export default function CouponManagement() {
           : coupon
       ));
     } else {
-      const newCoupon: Coupon = {
+      const newCoupon = {
         ...formData,
         id: `coupon-${Date.now()}`,
         validFrom: new Date(formData.validFrom),
@@ -112,7 +98,7 @@ export default function CouponManagement() {
     setEditingCoupon(null);
   };
 
-  const handleEdit = (coupon: Coupon) => {
+  const handleEdit = (coupon) => {
     setFormData({
       code: coupon.code,
       description: coupon.description,
@@ -129,12 +115,12 @@ export default function CouponManagement() {
     setShowForm(true);
   };
 
-  const handleDelete = (couponId: string) => {
+  const handleDelete = (couponId) => {
     setCoupons(prev => prev.filter(coupon => coupon.id !== couponId));
     setDeleteConfirm(null);
   };
 
-  const toggleStatus = (couponId: string) => {
+  const toggleStatus = (couponId) => {
     setCoupons(prev => prev.map(coupon =>
       coupon.id === couponId
         ? { ...coupon, status: coupon.status === 'active' ? 'inactive' : 'active' }
@@ -356,7 +342,7 @@ export default function CouponManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                   <select
                     value={formData.status}
-                    onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as 'active' | 'inactive' }))}
+                    onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value  }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="active">Active</option>
@@ -382,7 +368,7 @@ export default function CouponManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Discount Type</label>
                   <select
                     value={formData.discountType}
-                    onChange={(e) => setFormData(prev => ({ ...prev, discountType: e.target.value as 'percentage' | 'fixed' }))}
+                    onChange={(e) => setFormData(prev => ({ ...prev, discountType: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="percentage">Percentage</option>
