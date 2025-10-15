@@ -7,6 +7,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "../assests/LOGO.jpg";
+import { User } from "lucide-react";
+
 
 export default function Header({ onLoginClick, onLocationClick, onCartClick, cartItemCount, cartTotal,handlePaymentComplete }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -21,6 +23,31 @@ export default function Header({ onLoginClick, onLocationClick, onCartClick, car
   ];
 
   const [query, setQuery] = useState("");
+  
+const [profileOpen, setProfileOpen] = useState(false);
+const profileBtnRef = useRef(null);
+const profileMenuRef = useRef(null);
+
+useEffect(() => {
+  const handleClick = (e) => {
+    if (
+      profileOpen &&
+      profileMenuRef.current &&
+      profileBtnRef.current &&
+      !profileMenuRef.current.contains(e.target) &&
+      !profileBtnRef.current.contains(e.target)
+    ) {
+      setProfileOpen(false);
+    }
+  };
+  const handleEsc = (e) => e.key === "Escape" && setProfileOpen(false);
+  document.addEventListener("mousedown", handleClick);
+  document.addEventListener("keydown", handleEsc);
+  return () => {
+    document.removeEventListener("mousedown", handleClick);
+    document.removeEventListener("keydown", handleEsc);
+  };
+}, [profileOpen]);
   const searchInputRef = useRef(null);
 
   const [aboutTooltipOpen, setAboutTooltipOpen] = useState(false);
@@ -106,28 +133,54 @@ export default function Header({ onLoginClick, onLocationClick, onCartClick, car
           </div>
 
           <div className="flex items-center space-x-3 relative">
-            {hasToken ? (
-              <button
-             // Recommended: async (handles promise-returning logout and ensures handlePaymentComplete runs)
-onClick={async () => {
-  try {
-    if (typeof logout === "function") {
-      await logout();
-    }
-  } catch (err) {
-    console.warn("Logout failed:", err);
-  } finally {
-    handlePaymentComplete();
-  }
-}}
-                className="px-3 py-1 rounded-md bg-red-100 text-red-700 text-sm font-medium hover:bg-red-200 transition-colors"
-                aria-label="Logout"
-              >
-                Logout
-              </button>
-            ) : (
-              <AccountDropdown onLoginClick={onLoginClick} />
-            )}
+               {hasToken ? (
+  <div className="relative">
+    {/* Profile button */}
+    <button
+      ref={profileBtnRef}
+      onClick={() => setProfileOpen(!profileOpen)}
+      className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"
+    >
+      <User className="h-5 w-5 text-gray-700" />
+      <span className="hidden sm:inline text-sm font-medium text-gray-700">Profile</span>
+    </button>
+
+    {/* Dropdown */}
+    {profileOpen && (
+      <div
+        ref={profileMenuRef}
+        className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50"
+      >
+        <Link
+          href="/dashboard"
+          onClick={() => setProfileOpen(false)}
+          className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+        >
+          Dashboard
+        </Link>
+        <button
+          onClick={async () => {
+            try {
+              if (typeof logout === "function") await logout();
+            } catch (err) {
+              console.warn("Logout failed:", err);
+            } finally {
+              setProfileOpen(false);
+              handlePaymentComplete();
+            }
+          }}
+          className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+        >
+          Logout
+        </button>
+      </div>
+    )}
+  </div>
+) : (
+  <AccountDropdown onLoginClick={onLoginClick} />
+)}
+
+
 
             <button onClick={onCartClick} aria-label="Open cart" className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <ShoppingCart className="h-6 w-6 text-gray-700" />

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import {Login_API_BASE} from "@/lib/api";
+import {Login_API_BASE,LOCAL_API_BASE} from "@/lib/api";
 
 const AuthContext = createContext(undefined);
 
@@ -14,7 +14,7 @@ export const useAuth = () => {
   return context;
 };
 
-const API_BASE = Login_API_BASE;
+const API_BASE = LOCAL_API_BASE;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -38,7 +38,6 @@ export const AuthProvider = ({ children }) => {
     setToken(tokenValue);
     setUser(userValue);
   }
-
   useEffect(() => {
     (async () => {
       try {
@@ -62,7 +61,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/user-login`, {
+      const res = await fetch(`${API_BASE}/user-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: email, password }),

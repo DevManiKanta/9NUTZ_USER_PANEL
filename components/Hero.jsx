@@ -31,6 +31,7 @@ async function getCategoriesPublicAPI() {
     }
     const json = await res.json();
     // API returns { status: true, data: [ ... ] }
+    console.log("CATogery RESponse ",json)
     return Array.isArray(json?.data) ? json.data : [];
   } catch (err) {
     console.error("getCategoriesPublicAPI error:", err);

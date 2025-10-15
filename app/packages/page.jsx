@@ -380,16 +380,16 @@ export default function Packages() {
                 {/* Image Section */}
                 <div className="relative w-full h-44 sm:h-48 lg:h-40 xl:h-44 bg-gray-100">
                   <Image
-                    src={pkg.image || "/placeholder.png"}
+                    // src={pkg.image || "/placeholder.png"}
                     alt={pkg.name}
                     fill
                     style={{ objectFit: "cover" }}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     onError={(e) => {
                       const img = e.target;
-                      if (img && img.src !== "/placeholder.png") {
-                        img.src = "/placeholder.png";
-                      }
+                      // if (img && img.src !== "/placeholder.png") {
+                      //   img.src = "/placeholder.png";
+                      // }
                     }}
                   />
                 </div>

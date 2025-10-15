@@ -127,8 +127,7 @@ export default function FilterableProductGrid({
 
           const img =
             (product && product.imageUrl) ||
-            (Array.isArray(product && product.images) && product.images[0]) ||
-            "/placeholder.png";
+            (Array.isArray(product && product.images) && product.images[0]) 
 
           return (
             <article
@@ -144,7 +143,7 @@ export default function FilterableProductGrid({
                     onError={(e) => {
                       // plain JS fallback for broken images
                       try {
-                        e.currentTarget.src = "/placeholder.png";
+                        // e.currentTarget.src = "/placeholder.png";
                       } catch (err) {
                         /* ignore */
                       }
