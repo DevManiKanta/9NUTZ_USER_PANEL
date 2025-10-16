@@ -2,10 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { PRODUCTS_URL,LOCAL_API_BASE } from "@/lib/api";
-
-const API_ORIGIN = new URL(PRODUCTS_URL).origin;
-
+import apiAxios from "@/lib/api";
+// const API_ORIGIN = new URL(apiAxios).origin;
 const ProductContext = createContext(undefined);
 
 export const useProducts = () => {
@@ -74,28 +72,20 @@ export const ProductProvider = ({ children }) => {
   const { token } = useAuth();
   const [products, setProducts] = useState([]);
 
-  const reload = useCallback(async () => {
-    try {
-      const res = await fetch(`http://192.168.29.100:8000/api/product/show`, {
-        method: "GET",
-      });
+const reload = useCallback(async () => {
+  try {
+    const res = await apiAxios.get("/product/show");
 
-      if (!res.ok) {
-        console.warn("Failed fetching products:", res.status, res.statusText);
-        setProducts([]);
-        return;
-      }
+    const payload = res.data;
+    const rows = Array.isArray(payload?.data) ? payload.data : [];
 
-      const payload = await res.json();
-      const rows = Array.isArray(payload?.data) ? payload.data : [];
-      const normalized = rows.map((r) => normalizeServerProduct(r));
-      setProducts(normalized);
-    } catch (err) {
-      console.error("reload products failed", err);
-      setProducts([]);
-    }
-  }, []);
-
+    const normalized = rows.map((r) => normalizeServerProduct(r));
+    setProducts(normalized);
+  } catch (err) {
+    console.error("Reload products failed:", err.response?.data || err.message);
+    setProducts([]);
+  }
+}, []);
   useEffect(() => {
     reload();
   }, [reload]);

@@ -9,6 +9,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useAuth } from "@/contexts/AuthContext";
 import { CATEGORIES_API_URL } from "@/lib/api";
+import apiAxios from "@/lib/api";
 
 
 
@@ -16,25 +17,24 @@ import { CATEGORIES_API_URL } from "@/lib/api";
 const PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Crect fill='%23f3f4f6' width='1200' height='800'/%3E%3Ctext fill='%239ca3af' font-family='Arial, Helvetica, sans-serif' font-size='28' x='50%' y='50%' dominant-baseline='middle' text-anchor='middle'%3EImage not available%3C/text%3E%3C/svg%3E";
 
-async function getCategoriesPublicAPI() {
+export async function getCategoriesPublicAPI() {
   try {
-    const res = await fetch(CATEGORIES_API_URL, {
-      method: "GET",
+    const res = await apiAxios.get("category/show", {
       headers: {
         "Content-Type": "application/json",
       },
-      cache: "no-store",
+      // Axios doesn’t use "cache: no-store" — it always fetches fresh data unless you manually cache
     });
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(`Categories API error ${res.status}: ${text}`);
-    }
-    const json = await res.json();
+
     // API returns { status: true, data: [ ... ] }
-    console.log("CATogery RESponse ",json)
-    return Array.isArray(json?.data) ? json.data : [];
+    console.log("Category Response:", res.data);
+
+    return Array.isArray(res.data?.data) ? res.data.data : [];
   } catch (err) {
-    console.error("getCategoriesPublicAPI error:", err);
+    console.error(
+      "getCategoriesPublicAPI error:",
+      err.response?.data || err.message
+    );
     throw err;
   }
 }
