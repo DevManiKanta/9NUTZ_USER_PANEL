@@ -940,7 +940,6 @@
 //     </div>
 //   );
 // }
-
 "use client";
 import React, { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -959,13 +958,14 @@ import {
   Box,
   CheckCircle2,
   MapPin,
+  Bell,
 } from "lucide-react";
-import { LOCAL_API_BASE,Login_API_BASE } from "@/lib/api";
+import { LOCAL_API_BASE, Login_API_BASE } from "@/lib/api";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function UserDashboard() {
   // Default to "profile" now that Add Address lives inside it
-  const [activeSection, setActiveSection] = useState("profile");
+  const [activeSection, setActiveSection] = useState("notifications");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -1268,31 +1268,32 @@ export default function UserDashboard() {
   // ---------- ORDERS (tabular grid, includes one static demo row) ----------
   const renderOrders = () => {
     // Flatten real orders
-    const rows = (userOrders || []).flatMap((order) =>
-      (order?.items || []).map((item, idx) => {
-        const qty = item?.qty ?? item?.quantity ?? 1;
-        const price = Number(item?.price ?? item?.unitPrice ?? 0);
-        const lineTotal = qty * price;
-        return {
-          key: `${order.id}-${idx}`,
-          orderId: order.id,
-          status: (order.status || "").toLowerCase(),
-          orderDate: order.orderDate,
-          deliveryAddress: order.deliveryAddress,
-          total: order.total,
-          item: {
-            name: item?.name ?? "—",
-            image: item?.image,
-            sku: item?.sku ?? item?.code ?? "—",
-            qty,
-            price,
-            lineTotal,
-            variant: item?.variant ?? item?.options ?? null,
-            category: item?.category ?? null,
-          },
-        };
-      })
-    );
+    const rows =
+      (userOrders || []).flatMap((order) =>
+        (order?.items || []).map((item, idx) => {
+          const qty = item?.qty ?? item?.quantity ?? 1;
+          const price = Number(item?.price ?? item?.unitPrice ?? 0);
+          const lineTotal = qty * price;
+          return {
+            key: `${order.id}-${idx}`,
+            orderId: order.id,
+            status: (order.status || "").toLowerCase(),
+            orderDate: order.orderDate,
+            deliveryAddress: order.deliveryAddress,
+            total: order.total,
+            item: {
+              name: item?.name ?? "—",
+              image: item?.image,
+              sku: item?.sku ?? item?.code ?? "—",
+              qty,
+              price,
+              lineTotal,
+              variant: item?.variant ?? item?.options ?? null,
+              category: item?.category ?? null,
+            },
+          };
+        })
+      ) || [];
 
     // Static demo rows
     const staticRows = [
@@ -1749,6 +1750,65 @@ export default function UserDashboard() {
     );
   };
 
+  // ---------- NOTIFICATIONS (new, dummy data only) ----------
+  const renderNotifications = () => {
+    const notifications = [
+      {
+        id: "n1",
+        title: "Order #DEMO123456 Shipped",
+        message: "Your package is on the way. Track it from the Tracking tab.",
+        time: "Just now",
+        tone: "info",
+        icon: <Truck className="h-5 w-5" />,
+      },
+      {
+        id: "n2",
+        title: "Payment Received",
+        message: "We’ve received your payment for Order #DEMO123456.",
+        time: "2 hours ago",
+        tone: "success",
+        icon: <CheckCircle2 className="h-5 w-5" />,
+      },
+    ];
+
+    const toneClasses = {
+      info: "bg-blue-50 border-blue-200",
+      success: "bg-green-50 border-green-200",
+      warning: "bg-yellow-50 border-yellow-200",
+      error: "bg-red-50 border-red-200",
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Bell className="h-6 w-6 text-green-600" />
+            Notifications
+          </h2>
+          <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+            {notifications.length} new
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          {notifications.map((n) => (
+            <div
+              key={n.id}
+              className={`p-4 rounded-xl border flex items-start gap-3 ${toneClasses[n.tone]}`}
+            >
+              <div className="mt-0.5 text-gray-700">{n.icon}</div>
+              <div className="flex-1">
+                <div className="font-semibold text-gray-900">{n.title}</div>
+                <div className="text-sm text-gray-700">{n.message}</div>
+                <div className="text-xs text-gray-500 mt-1">{n.time}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // ---------- Guard ----------
   if (!user) {
     return (
@@ -1815,6 +1875,22 @@ export default function UserDashboard() {
                     <Truck className="h-4 w-4" />
                     <span className="font-medium">Tracking</span>
                   </button>
+
+                  {/* NEW: Notifications tab */}
+                  <button
+                    onClick={() => setActiveSection("notifications")}
+                    className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg text-left transition-colors ${
+                      activeSection === "notifications"
+                        ? "bg-white text-green-600 shadow-sm border border-gray-200"
+                        : "text-gray-700 hover:bg-white hover:shadow-sm"
+                    }`}
+                  >
+                    <Bell className="h-4 w-4" />
+                    <span className="font-medium">Notifications</span>
+                    <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                      2
+                    </span>
+                  </button>
                 </nav>
               </aside>
 
@@ -1823,6 +1899,7 @@ export default function UserDashboard() {
                 {activeSection === "profile" && renderProfile()}
                 {activeSection === "orders" && renderOrders()}
                 {activeSection === "tracking" && renderTracking()}
+                {activeSection === "notifications" && renderNotifications()}
               </section>
             </div>
           </div>
@@ -1856,3 +1933,4 @@ export default function UserDashboard() {
     </div>
   );
 }
+
