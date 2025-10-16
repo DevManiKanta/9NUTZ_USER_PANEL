@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { PRODUCTS_URL } from "@/lib/api";
+import { PRODUCTS_URL,LOCAL_API_BASE } from "@/lib/api";
 
 const API_ORIGIN = new URL(PRODUCTS_URL).origin;
 
@@ -76,7 +76,7 @@ export const ProductProvider = ({ children }) => {
 
   const reload = useCallback(async () => {
     try {
-      const res = await fetch(PRODUCTS_URL, {
+      const res = await fetch(`http://192.168.29.100:8000/api/product/show`, {
         method: "GET",
       });
 
