@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Search, Filter, Grid, List, Star } from 'lucide-react';
-import { categories, searchProducts, sampleProducts } from '@/lib/categories';
+// import { categories, searchProducts,  } from '@/lib/categories';
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -15,7 +15,7 @@ export default function SearchPage() {
   
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('popularity');
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -19,7 +19,11 @@ type UseRequireAuthOptions = {
  */
 export function useRequireAuth(opts: UseRequireAuthOptions = {}) {
   const { redirectTo = '/login', requireAdmin = false, onUnauthorized } = opts;
-  const { user, isLoading } = useAuth();
+  // The auth context is implemented in JS, so add a local type for safety
+  const { user, isLoading } = useAuth() as {
+    user: { role?: string } | null;
+    isLoading: boolean;
+  };
   const router = useRouter();
 
   useEffect(() => {
@@ -35,7 +39,7 @@ export function useRequireAuth(opts: UseRequireAuthOptions = {}) {
     }
 
     // if admin required but user isn't admin -> redirect or show unauthorized
-    if (requireAdmin && user.role !== 'admin') {
+    if (requireAdmin && user && user.role !== 'admin') {
       if (onUnauthorized) onUnauthorized();
       router.push(redirectTo);
       return;

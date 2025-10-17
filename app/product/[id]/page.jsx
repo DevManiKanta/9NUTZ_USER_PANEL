@@ -1,4 +1,4 @@
-// app/product/[id]/page.tsx
+// app/product/[id]/page.jsx
 "use client";
 
 import React from "react";
@@ -8,66 +8,20 @@ import Footer from "@/components/Footer";
 import CartSidebar from "@/components/CartSidebar";
 import LoginModal from "@/components/LoginModal";
 import { API_BASE } from "@/lib/api";
-import type { CartItem, ID } from "@/types"; // adapt path if your types live elsewhere
 
-type ProductRow = {
-  id: number | string;
-  name?: string;
-  description?: string;
-  price?: number;
-  price_cents?: number | null;
-  offer_price?: number | null;
-  offerPrice?: number | null;
-  images?: any;
-  image?: string | null;
-  image_url?: string | null;
-  stock?: number | null;
-  inventory?: number | null;
-  status?: string | null;
-  weight?: string | null;
-  brand?: string | null;
-  rating?: number | null;
-  reviews?: number | null;
-  quantity_prices?: any;
-  quantityPrices?: any;
-  created_at?: string | null;
-  updated_at?: string | null;
-  category_id?: number | string | null;
-  [k: string]: any;
-};
-
-type Product = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  offerPrice?: number;
-  images: string[];
-  image: string;
-  stock: number;
-  status: "active" | "inactive";
-  weight: string;
-  brand: string;
-  rating: number;
-  reviews: number;
-  quantityPrices: any[];
-  createdAt: Date;
-  updatedAt: Date;
-  categoryId: string;
-};
-
-const normalizeServerProduct = (r: ProductRow): Product => {
+// --- Normalize API product into a consistent shape (JS only) ---
+const normalizeServerProduct = (r) => {
   const BASE = API_BASE.replace(/\/+$/, "");
 
-  let imgs: string[] = [];
+  let imgs = [];
   try {
     if (Array.isArray(r.images)) {
-      imgs = r.images.map((x: any) => String(x)).filter(Boolean);
+      imgs = r.images.map((x) => String(x)).filter(Boolean);
     } else if (typeof r.images === "string") {
       const s = String(r.images).trim();
       if (s.startsWith("[")) {
         const parsed = JSON.parse(s);
-        if (Array.isArray(parsed)) imgs = parsed.map((x: any) => String(x));
+        if (Array.isArray(parsed)) imgs = parsed.map((x) => String(x));
       } else if (s) {
         imgs = [s];
       }
@@ -85,13 +39,21 @@ const normalizeServerProduct = (r: ProductRow): Product => {
     .map((src) => {
       const trimmed = String(src).trim();
       if (!trimmed) return "";
-      if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")) return trimmed;
+      if (
+        trimmed.startsWith("http://") ||
+        trimmed.startsWith("https://") ||
+        trimmed.startsWith("data:")
+      )
+        return trimmed;
       if (trimmed.startsWith("/")) return `${BASE}${trimmed}`;
       return `${BASE}/${trimmed}`;
     })
     .filter(Boolean);
 
-  const price = typeof r.price_cents === "number" ? Math.round(Number(r.price_cents) / 100) : (r.price ?? 0);
+  const price =
+    typeof r.price_cents === "number"
+      ? Math.round(Number(r.price_cents) / 100)
+      : r.price ?? 0;
 
   const offerVal =
     typeof r.offer_price !== "undefined" && r.offer_price !== null
@@ -100,10 +62,14 @@ const normalizeServerProduct = (r: ProductRow): Product => {
       ? Number(r.offerPrice)
       : undefined;
 
-  let qp: any[] = [];
+  let qp = [];
   try {
     if (Array.isArray(r.quantity_prices)) qp = r.quantity_prices;
-    else if (typeof r.quantity_prices === "string" && r.quantity_prices.trim()) qp = JSON.parse(r.quantity_prices);
+    else if (
+      typeof r.quantity_prices === "string" &&
+      r.quantity_prices.trim()
+    )
+      qp = JSON.parse(r.quantity_prices);
     else if (Array.isArray(r.quantityPrices)) qp = r.quantityPrices;
     else qp = [];
   } catch {
@@ -133,58 +99,58 @@ const normalizeServerProduct = (r: ProductRow): Product => {
   };
 };
 
-// client-only helpers for cart persistence
-function loadCartFromStorage(): CartItem[] {
+// --- client-only helpers for cart persistence (JS only) ---
+function loadCartFromStorage() {
   try {
     if (typeof window === "undefined") return [];
     const raw = localStorage.getItem("jbasket_cart_v1");
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.map((it: any) => ({
+    return parsed.map((it) => ({
       ...it,
       originalPrice: it.originalPrice ?? undefined,
-    })) as CartItem[];
+    }));
   } catch {
     return [];
   }
 }
-function saveCartToStorage(items: CartItem[]) {
+function saveCartToStorage(items) {
   try {
     if (typeof window === "undefined") return;
     localStorage.setItem("jbasket_cart_v1", JSON.stringify(items));
   } catch {}
 }
 
-export default function ProductPageClient({ params }: { params: { id: string } }) {
+export default function ProductPageClient({ params }) {
   const router = useRouter();
   const { id } = params;
 
-  const [product, setProduct] = React.useState<Product | null>(null);
-  const [loading, setLoading] = React.useState<boolean>(true);
+  const [product, setProduct] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
 
-  // login modal state (this is the key to make header login open the modal)
+  // login modal state
   const [loginOpen, setLoginOpen] = React.useState(false);
-
 
   // Cart state
   const [cartOpen, setCartOpen] = React.useState(false);
-  const [cartItems, setCartItems] = React.useState<CartItem[]>(() => []); // start empty on server
+  const [cartItems, setCartItems] = React.useState(() => []); // start empty on server
 
   // mounted flag - prevents hydration mismatch
   const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
     setIsMounted(true);
-
     // load cart only on client after mount
     const items = loadCartFromStorage();
     setCartItems(items);
   }, []);
 
-  // derived totals (safe to compute on server but these are used only after mount)
+  // derived totals
   const cartItemCount = cartItems.reduce((s, it) => s + (it.quantity || 0), 0);
-  const cartTotal = Math.round(cartItems.reduce((s, it) => s + ((it.price || 0) * (it.quantity || 0)), 0));
+  const cartTotal = Math.round(
+    cartItems.reduce((s, it) => s + (Number(it.price || 0) * (it.quantity || 0)), 0)
+  );
 
   React.useEffect(() => {
     // Persist cart whenever it changes
@@ -209,7 +175,7 @@ export default function ProductPageClient({ params }: { params: { id: string } }
           if (mounted) setProduct(null);
           return;
         }
-        const raw = data.find((p: any) => String(p.id) === String(id));
+        const raw = data.find((p) => String(p.id) === String(id));
         if (!raw) {
           if (mounted) setProduct(null);
           return;
@@ -229,7 +195,7 @@ export default function ProductPageClient({ params }: { params: { id: string } }
   }, [id]);
 
   // Header callbacks
-  const handleLoginClick = () => setLoginOpen(true); ;
+  const handleLoginClick = () => setLoginOpen(true);
   const handleLocationClick = () => {
     // open location modal etc
   };
@@ -242,29 +208,35 @@ export default function ProductPageClient({ params }: { params: { id: string } }
       const existing = prev.find((it) => String(it.id) === String(product.id));
       if (existing) {
         const next = prev.map((it) =>
-          String(it.id) === String(product.id) ? { ...it, quantity: it.quantity + qty } : it
+          String(it.id) === String(product.id)
+            ? { ...it, quantity: (it.quantity || 0) + qty }
+            : it
         );
         return next;
       }
-      const newItem: CartItem = {
+      const newItem = {
         id: product.id,
         name: product.name,
-        image: product.image || product.images?.[0] || "/placeholder.png",
+        image: product.image || (product.images && product.images[0]) || "/placeholder.png",
         price: product.offerPrice ?? product.price,
         originalPrice: undefined,
         quantity: qty,
         weight: product.weight,
-      } as CartItem;
+      };
       return [newItem, ...prev];
     });
     setCartOpen(true);
   };
 
-  const handleUpdateQuantity = (itemId: ID, quantity: number) => {
+  const handleUpdateQuantity = (itemId, quantity) => {
     setCartItems((prev) => {
       const next = prev
-        .map((it) => (String(it.id) === String(itemId) ? { ...it, quantity: Math.max(0, quantity) } : it))
-        .filter((it) => it.quantity > 0);
+        .map((it) =>
+          String(it.id) === String(itemId)
+            ? { ...it, quantity: Math.max(0, Number(quantity)) }
+            : it
+        )
+        .filter((it) => (it.quantity || 0) > 0);
       return next;
     });
   };
@@ -293,8 +265,10 @@ export default function ProductPageClient({ params }: { params: { id: string } }
         cartItemCount={headerCartItemCount}
         cartTotal={headerCartTotal}
       />
+
       {/* Login modal controlled by this page */}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
+
       <CartSidebar
         isOpen={cartOpen}
         onClose={() => setCartOpen(false)}
@@ -303,6 +277,7 @@ export default function ProductPageClient({ params }: { params: { id: string } }
         isLoggedIn={false}
         onProceedToPay={handleProceedToPay}
       />
+
       <main className="max-w-6xl mx-auto p-6 pt-24 min-h-[60vh]">
         <div className="mb-4 flex items-center gap-3">
           <button
@@ -323,9 +298,15 @@ export default function ProductPageClient({ params }: { params: { id: string } }
               <div className="rounded-lg border overflow-hidden mb-4">
                 {product.images && product.images.length ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={product.images[0]} alt={product.name} className="w-full h-96 object-cover" />
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="w-full h-96 object-cover"
+                  />
                 ) : (
-                  <div className="w-full h-96 flex items-center justify-center bg-gray-100 text-gray-400">No image</div>
+                  <div className="w-full h-96 flex items-center justify-center bg-gray-100 text-gray-400">
+                    No image
+                  </div>
                 )}
               </div>
 
@@ -333,7 +314,12 @@ export default function ProductPageClient({ params }: { params: { id: string } }
                 <div className="flex gap-3 overflow-x-auto">
                   {product.images.map((src, i) => (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img key={i} src={src} alt={`${product.name} ${i + 1}`} className="w-24 h-24 object-cover rounded-lg border" />
+                    <img
+                      key={i}
+                      src={src}
+                      alt={`${product.name} ${i + 1}`}
+                      className="w-24 h-24 object-cover rounded-lg border"
+                    />
                   ))}
                 </div>
               )}
@@ -342,16 +328,24 @@ export default function ProductPageClient({ params }: { params: { id: string } }
             {/* Right: info */}
             <div>
               <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
-              <p className="text-sm text-gray-500 mb-4">{product.brand} • {product.weight}</p>
+              <p className="text-sm text-gray-500 mb-4">
+                {product.brand} • {product.weight}
+              </p>
 
               <div className="mb-4">
-                <div className="text-2xl font-extrabold text-green-600">₹{product.offerPrice ?? product.price}</div>
+                <div className="text-2xl font-extrabold text-green-600">
+                  ₹{product.offerPrice ?? product.price}
+                </div>
                 {product.offerPrice && product.offerPrice < product.price && (
-                  <div className="text-sm text-gray-400 line-through">₹{product.price}</div>
+                  <div className="text-sm text-gray-400 line-through">
+                    ₹{product.price}
+                  </div>
                 )}
               </div>
 
-              <div className="mb-4 text-sm text-gray-700 whitespace-pre-wrap">{product.description}</div>
+              <div className="mb-4 text-sm text-gray-700 whitespace-pre-wrap">
+                {product.description}
+              </div>
 
               <div className="flex items-center gap-3">
                 <button
@@ -362,14 +356,19 @@ export default function ProductPageClient({ params }: { params: { id: string } }
                 </button>
 
                 <button
-                  onClick={() => { handleAddToCart(1); router.push("/cart"); }}
+                  onClick={() => {
+                    handleAddToCart(1);
+                    router.push("/cart");
+                  }}
                   className="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50"
                 >
                   Buy now
                 </button>
               </div>
 
-              <div className="mt-6 text-xs text-gray-400">Product ID: {product.id} • Category: {product.categoryId}</div>
+              <div className="mt-6 text-xs text-gray-400">
+                Product ID: {product.id} • Category: {product.categoryId}
+              </div>
             </div>
           </div>
         ) : (

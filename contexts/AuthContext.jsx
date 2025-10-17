@@ -101,7 +101,7 @@ const router = useRouter();
   const signup = async (name, email, password, contact) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/register`, {
+      const res = await fetch(`${API_BASE}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
