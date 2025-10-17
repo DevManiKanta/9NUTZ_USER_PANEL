@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import {LOCAL_API_BASE,Login_API_BASE} from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const AuthContext = createContext(undefined);
 
@@ -20,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [token, setToken] = useState(null);
-
+const router = useRouter();
   function saveAuth(tokenValue, userValue) {
     if (typeof window === "undefined") return;
     if (tokenValue) {
@@ -134,6 +135,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     saveAuth(null, null);
     toast.success("Logged out");
+    router.push("/"); 
   };
 
   const resetPassword = async (email) => {

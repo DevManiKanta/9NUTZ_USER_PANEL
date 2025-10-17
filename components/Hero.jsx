@@ -111,6 +111,16 @@ useEffect(() => {
           buttonText: "ORDER NOW",
           is_active: 1,
         },
+        {
+          id: 2,
+          title: "FRESH GROCERIES",
+          subtitle: "DELIVERED IN MINUTES",
+          discount: "UP TO 25% OFF*",
+          image_url:
+            "https://images.pexels.com/photos/1300972/pexels-photo-1300972.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900",
+          buttonText: "ORDER NOW",
+          is_active: 1,
+        },
       ]);
     }
   };

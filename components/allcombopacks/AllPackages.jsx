@@ -60,7 +60,7 @@ const PACKAGES = [
     priceOneTime: 1999,
     priceMonthly: 0,
     savingsPercent: 22,
-    image:testImage,
+    image:"https://9nutz.com/wp-content/uploads/2025/06/SPECIAL-DRY-FRUITS-300x300.png",
     features: [
       "20 assorted sweets (large)",
       "1kg mixed nuts pouch",
@@ -104,7 +104,7 @@ export default function AllPackages() {
                 {/* Image Section */}
                 <div className="relative w-full h-44 sm:h-48 lg:h-40 xl:h-44 bg-gray-100">
                   <Image
-                    // src={pkg.image || "/placeholder.png"}
+                    src={pkg.image}
                     alt={pkg.name}
                     fill
                     style={{ objectFit: "cover" }}

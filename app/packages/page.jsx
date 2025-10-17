@@ -380,7 +380,7 @@ export default function Packages() {
                 {/* Image Section */}
                 <div className="relative w-full h-44 sm:h-48 lg:h-40 xl:h-44 bg-gray-100">
                   <Image
-                    // src={pkg.image || "/placeholder.png"}
+                    src={pkg.image}
                     alt={pkg.name}
                     fill
                     style={{ objectFit: "cover" }}
