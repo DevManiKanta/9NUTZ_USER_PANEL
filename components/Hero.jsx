@@ -3,12 +3,11 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { API_BASE } from "@/lib/api"; // keep your banner behavior as-is
+import { API_BASE } from "@/lib/api";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useAuth } from "@/contexts/AuthContext";
-import { CATEGORIES_API_URL } from "@/lib/api";
 import apiAxios from "@/lib/api";
 
 
@@ -61,58 +60,68 @@ export default function Hero() {
     return `${base}/${val}`;
   };
 
-  // fetch banners (same approach as you had)
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const base = (API_BASE || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/+$/, "");
-        const res = await fetch(`${base}/api/banners`);
-        if (!res.ok) {
-          // fallback sample banners
-          if (cancelled) return;
-          setBanners([
-            {
-              id: 1,
-              title: "ONE STOP SOLUTION",
-              subtitle: "FOR ALL YOUR DAILY ESSENTIALS",
-              discount: "UP TO 35% OFF*",
-              image_url:
-                "https://computervignanam.com/9nutzweb/wp-content/uploads/2025/07/are-rice-cakes-healthy-busting-m-removebg-preview.png",
-              redirect_url: "/categories",
-              buttonText: "SHOP NOW",
-              is_active: 1
-            },
-            {
-              id: 2,
-              title: "FRESH GROCERIES",
-              subtitle: "DELIVERED IN MINUTES",
-              discount: "UP TO 25% OFF*",
-              image_url:
-                "https://images.pexels.com/photos/1300972/pexels-photo-1300972.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900",
-              redirect_url: "/category/fruits-vegetables",
-              buttonText: "ORDER NOW",
-              is_active: 1
-            }
-          ]);
-          return;
-        }
-        const data= await res.json();
-        if (cancelled) return;
-        const active = (data || []).filter((b) => b && (b ).is_active !== 0 && (b).is_active !== false);
-        const mapped = (active.length ? active : data).map((b) => ({
-          ...b,
-          image_url: toFullImageUrl((b).image_url)
-        }));
-        setBanners(mapped);
-      } catch (err) {
-        console.error("Error loading banners:", err);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+useEffect(() => {
+  let cancelled = false;
+
+  const fetchBanners = async () => {
+    try {
+      const base =
+        (API_BASE || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/+$/, "");
+
+      // ✅ Use your axios instance
+      const res = await apiAxios.get("banners");
+
+      if (cancelled) return;
+
+      const data = res.data || [];
+      const active = data.filter(
+        (b) => b && b.is_active !== 0 && b.is_active !== false
+      );
+
+      const mapped = (active.length ? active : data).map((b) => ({
+        ...b,
+        image_url: toFullImageUrl(b.image_url),
+      }));
+
+      setBanners(mapped);
+    } catch (err) {
+      console.error("Error loading banners:", err);
+
+      if (cancelled) return;
+
+      // ✅ Fallback banners
+      setBanners([
+         {
+          id: 2,
+          title: "FRESH GROCERIES",
+          subtitle: "DELIVERED IN MINUTES",
+          discount: "UP TO 25% OFF*",
+          image_url:
+            "https://images.pexels.com/photos/1300972/pexels-photo-1300972.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900",
+          buttonText: "ORDER NOW",
+          is_active: 1,
+        },,
+        {
+          id: 2,
+          title: "FRESH GROCERIES",
+          subtitle: "DELIVERED IN MINUTES",
+          discount: "UP TO 25% OFF*",
+          image_url:
+            "https://images.pexels.com/photos/1300972/pexels-photo-1300972.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900",
+          buttonText: "ORDER NOW",
+          is_active: 1,
+        },
+      ]);
+    }
+  };
+
+  fetchBanners();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
 
   // fetch categories directly here (using the token)
   useEffect(() => {
@@ -214,14 +223,14 @@ export default function Hero() {
                   <div className="absolute inset-0 bg-black/30 -z-0" />
                   <div className="relative z-10 h-full flex items-center justify-center px-6">
                     <div className="max-w-3xl text-center text-white">
-                      {banner.title && <div className="text-sm md:text-base font-semibold opacity-90 mb-2">{banner.title}</div>}
-                      {banner.subtitle && <h2 className="text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">{banner.subtitle}</h2>}
-                      {banner.discount && (
+                      {/* {banner.title && <div className="text-sm md:text-base font-semibold opacity-90 mb-2">{banner.title}</div>}
+                      {banner.subtitle && <h2 className="text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">{banner.subtitle}</h2>} */}
+                      {/* {banner.discount && (
                         <div className="mb-6">
                           <span className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-md font-bold">{banner.discount}</span>
                         </div>
-                      )}
-                      {banner.buttonText && (
+                      )} */}
+                      {/* {banner.buttonText && (
                         <div>
                           <button
                             onClick={(e) => {
@@ -234,7 +243,7 @@ export default function Hero() {
                             <ChevronRight className="h-4 w-4" />
                           </button>
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>

@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { ArrowLeft, Grid, List, Filter, SortAsc } from 'lucide-react';
-import { categories, sampleProducts, getCategoryById } from '@/lib/categories';
+// import { ArrowLeft, Grid, List, Filter, SortAsc } from 'lucide-react';
+// import { categories, sampleProducts, getCategoryById } from '@/lib/categories';
+import apiAxios from '@/lib/api';
 
 export default function CategoryClientPage({ category, categoryProducts, slug }) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
