@@ -3,8 +3,19 @@ import Link from 'next/link';
 import MinimalHeaderClient from '@/components/MinimalHeaderClient';
 import Footer from '@/components/Footer';
 
-export const dynamic = 'force-dynamic';
-export async function generateStaticParams() { return []; }
+export async function generateStaticParams() { 
+  return [
+    { slug: 'nuts', subcategory: 'almonds' },
+    { slug: 'nuts', subcategory: 'walnuts' },
+    { slug: 'seeds', subcategory: 'sunflower' },
+    { slug: 'seeds', subcategory: 'pumpkin' },
+    { slug: 'dried-fruits', subcategory: 'raisins' },
+    { slug: 'dried-fruits', subcategory: 'dates' },
+    { slug: 'snacks', subcategory: 'trail-mix' },
+    { slug: 'snacks', subcategory: 'granola' }
+  ]; 
+}
+export const dynamicParams = false;
 
 export default function SubcategoryPage({ params }) {
   const categorySlug = params.slug;

@@ -2,8 +2,15 @@ import React from 'react';
 import MinimalHeaderClient from '@/components/MinimalHeaderClient';
 import Footer from '@/components/Footer';
 
-export const dynamic = 'force-dynamic';
-export async function generateStaticParams() { return []; }
+export async function generateStaticParams() { 
+  return [
+    { slug: 'nuts' },
+    { slug: 'seeds' },
+    { slug: 'dried-fruits' },
+    { slug: 'snacks' }
+  ]; 
+}
+export const dynamicParams = false;
 
 export default function CategoryPage({ params }) {
   const { slug } = params;
