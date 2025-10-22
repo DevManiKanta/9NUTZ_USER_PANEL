@@ -22,6 +22,8 @@ import {
 import { LOCAL_API_BASE, Login_API_BASE } from "@/lib/api";
 import apiAxios from "@/lib/api";
 import toast, { Toaster } from "react-hot-toast";
+import ProfilePage from "@/app/myprofile/page"
+import OrdersTablePage from "@/app/myorders/page"
 export default function UserDashboard() {
   // Default to "profile" now that Add Address lives inside it
   const [activeSection, setActiveSection] = useState("notifications");
@@ -401,7 +403,6 @@ export default function UserDashboard() {
             />
           </div>
         </div>
-
         {rowsWithStatic.length === 0 ? (
           <div className="text-center py-12">
             <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -493,7 +494,7 @@ export default function UserDashboard() {
     );
   };
 
-  // ---------- PROFILE (now includes Add Address form) ----------
+
   const renderProfile = () => {
     const name = user?.name || user?.fullName || user?.username || "User";
 
@@ -538,23 +539,11 @@ export default function UserDashboard() {
               </div>
             </div>
           </div>
-
-          {/* Quick Stats */}
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <ClipboardList className="h-5 w-5" /> Quick Stats
+              Edit Password
             </h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                <span className="text-gray-600">Total Orders</span>
-                <span className="font-semibold text-gray-900">{userOrders?.length ?? 0}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                <span className="text-gray-600">Delivered</span>
-                <span className="font-semibold text-gray-900">
-                  {userOrders?.filter((o) => (o.status || "").toLowerCase() === "delivered").length ?? 0}
-                </span>
-              </div>
               <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
                 <span className="text-gray-600">In Transit</span>
                 <span className="font-semibold text-gray-900">
@@ -953,8 +942,8 @@ export default function UserDashboard() {
 
               {/* RIGHT: content */}
               <section className="flex-1 p-6 md:p-8">
-                {activeSection === "profile" && renderProfile()}
-                {activeSection === "orders" && renderOrders()}
+                {activeSection === "profile" && <ProfilePage/>}
+                {activeSection === "orders" && <OrdersTablePage/>}
                 {activeSection === "tracking" && renderTracking()}
                 {activeSection === "notifications" && renderNotifications()}
               </section>
