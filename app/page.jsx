@@ -130,9 +130,7 @@ const handlePaymentComplete = () => {
           />
         </div>
       </main>
-
-      <AllPackages />
-
+      {/* <AllPackages /> */}
       <Footer />
 
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />

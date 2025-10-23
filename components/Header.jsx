@@ -97,7 +97,6 @@ export default function Header({
                 priority
               />
             </Link>
-
             <nav className="hidden md:flex items-center space-x-2">
               {tabs.map((t) => (
                 <Link
@@ -108,7 +107,6 @@ export default function Header({
                   {t.label}
                 </Link>
               ))}
-
               {/* Tooltip: About Us */}
               <div
                 className="relative"
@@ -160,7 +158,7 @@ export default function Header({
               role="search"
               aria-label="Site search"
             >
-              <div className="relative w-[240px] sm:w-[500px]"> {/* ✅ Reduced width */}
+              <div className="relative w-[240px] sm:w-[500px]">
                 <input
                   ref={searchInputRef}
                   type="search"

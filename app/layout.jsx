@@ -6,6 +6,7 @@ import { CategoryProvider } from '@/contexts/CategoryContext';
 import { CartProvider } from "@/contexts/CartContext";
 import { SettingsProvider } from "@/contexts/SettingsContext"
 import { ProductProvider } from '@/contexts/ProductContext';
+import { CategoryDataProvider } from "@/contexts/CategoryDataContext";
 export const metadata = {
   title: '9NUTZ',
   description: 'Grocery delivery in minutes. Order from thousands of products and get delivery within 8 minutes.',
@@ -24,7 +25,9 @@ export default function RootLayout({
                 <AddressProvider>
                   <CartProvider>
                     <SettingsProvider>
+                      <CategoryDataProvider>
                   {children}
+                  </CategoryDataProvider>
                   </SettingsProvider>
                   </CartProvider>
                 </AddressProvider>

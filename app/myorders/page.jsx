@@ -297,20 +297,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Search, Package, Clock } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { LOCAL_API_BASE } from "@/lib/api";
-
-/**
- * OrdersTablePage
- *
- * - Fetches from: GET `${LOCAL_API_BASE}/api/admin/online-orders/user`
- * - Shows columns: customer_name, image (first item's image parsed from items JSON string),
- *   total, payment, order_time (formatted), address
- *
- * Important:
- * - Token is read from localStorage.getItem('token'). Change getToken() if your key differs.
- * - The component expects the response shape you posted:
- *   { status: true, message: "...", data: { data: [ { ...orders... } ], ... } }
- */
+import { LOCAL_API_BASE, Login_API_BASE } from "@/lib/api";
 
 export default function OrdersTablePage({ initialOrders = [] }) {
   const [orders, setOrders] = useState(Array.isArray(initialOrders) ? initialOrders : []);
@@ -334,7 +321,7 @@ export default function OrdersTablePage({ initialOrders = [] }) {
     setIsLoading(true);
     const loadingId = toast.loading("Loading orders...");
     try {
-      const res = await fetch(`${LOCAL_API_BASE}/admin/online-orders/user`, {
+      const res = await fetch(`${Login_API_BASE}/admin/online-orders/user`, {
         method: "GET",
         headers: {
           Accept: "application/json",

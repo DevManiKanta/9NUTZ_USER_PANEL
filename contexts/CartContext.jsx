@@ -52,9 +52,7 @@ export function CartProvider({ children }) {
       return prev.map((i) => (i.id === id ? { ...i, quantity: q } : i));
     });
   }, []);
-
   const clearCart = useCallback(() => setItems([]), []);
-
   const cartCount = items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
   const cartTotal = items.reduce((s, it) => s + (Number(it.price) || 0) * (Number(it.quantity) || 0), 0);
 
