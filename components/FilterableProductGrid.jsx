@@ -516,7 +516,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
             <h3 className="text-xl font-semibold">Combopack</h3>
             <div className="text-sm text-gray-500">{combopackProducts.length} items</div>
           </div>
-
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
             {combopackProducts.map((product, idx) => {
               const productId = String(product && product.id ? product.id : `combo-${idx}`);
