@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "../assests/LOGO.jpg";
+import { useSettings } from "@/contexts/SettingsContext";
 
 
 export default function Header({
@@ -20,7 +21,8 @@ export default function Header({
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { token, logout } = useAuth();
   const hasToken = Boolean(token);
-
+    const { settings } = useSettings();
+  const logoSrc = settings?.logo_url || Logo;
   const tabs = [
     { href: "", label: "Shop" },
     { href: "/packages", label: "Packages" },
@@ -87,10 +89,10 @@ export default function Header({
           <div className="flex items-center gap-4 sm:gap-6">
             <Link href="/" className="flex items-center" aria-label="Home">
               <Image
-                src={Logo}
+                src={logoSrc}
                 alt="9NUTZ"
-                width={140}
-                height={35}
+                width={50}
+                height={50}
                 className="object-contain"
                 priority
               />

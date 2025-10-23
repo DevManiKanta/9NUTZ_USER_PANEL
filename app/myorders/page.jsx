@@ -291,6 +291,8 @@
 //   );
 // }
 
+"use client";
+
 // OrdersTablePage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { Search, Package, Clock } from "lucide-react";

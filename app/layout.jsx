@@ -4,7 +4,7 @@ import { OrderProvider } from '@/contexts/OrderContext';
 import { AddressProvider } from '@/contexts/AddressContext';
 import { CategoryProvider } from '@/contexts/CategoryContext';
 import { CartProvider } from "@/contexts/CartContext";
-
+import { SettingsProvider } from "@/contexts/SettingsContext"
 import { ProductProvider } from '@/contexts/ProductContext';
 export const metadata = {
   title: '9NUTZ',
@@ -23,7 +23,9 @@ export default function RootLayout({
               <OrderProvider>
                 <AddressProvider>
                   <CartProvider>
+                    <SettingsProvider>
                   {children}
+                  </SettingsProvider>
                   </CartProvider>
                 </AddressProvider>
               </OrderProvider>

@@ -4,8 +4,12 @@
 import React from "react";
 import Image from "next/image";
 import LOGO from "../assests/LOGO.jpg";
+import { useSettings } from "@/contexts/SettingsContext";
 
 export default function LoadingScreen() {
+    const { settings } = useSettings();
+  const logoSrc = settings?.logo_url || "9 Nutz";
+  const Title=settings?.site_name
   return (
     <div
       className="fixed inset-0 bg-white z-50 flex items-center justify-center"
@@ -20,19 +24,18 @@ export default function LoadingScreen() {
           style={{ width: 320, height: 120 }}
         >
           <Image
-            src={LOGO}
+            src={logoSrc}
             alt="9NUTZ logo"
             className="object-contain"
-            width={280}
-            height={90}
+            width={100}
+            height={100}
             priority
           />
         </div>
-
         {/* Brand name */}
         <div className="mb-4">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-            9 NUTZ
+             {Title}
           </h1>
         </div>
 

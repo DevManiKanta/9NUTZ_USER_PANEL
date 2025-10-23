@@ -1,4 +1,6 @@
 
+"use client";
+
 // import React, { useEffect, useState, useRef } from "react";
 // import {
 //   User,
@@ -572,18 +574,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { LOCAL_API_BASE } from "@/lib/api";
-
-/**
- * ProfilePage
- *
- * - Fetches profile from GET `${LOCAL_API_BASE}/admin/profile`
- * - Edits (Name, Email, Phone, Address, optional Password) via POST `${LOCAL_API_BASE}/admin/profile/update`
- *   using FormData to match your curl (--form).
- * - Uses react-hot-toast for UX feedback (success/error/loading).
- *
- * NOTE: Only added password field & UI/validation; functionality otherwise unchanged.
- */
-
+import { useDispatch } from "react-redux";
 export default function ProfilePage({ initialUser = null, initialOrders = [] }) {
   // user state (editable)
   const [user, setUser] = useState(
