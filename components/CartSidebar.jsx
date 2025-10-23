@@ -866,14 +866,14 @@ export default function CartSidebar({
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-gray-900">Bill details</h3>
-                <button
+                {effectiveToken&&<button
                   onClick={() => setAddressModalOpen(true)}
                   className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-sm"
                   aria-expanded={addressModalOpen}
                 >
                   <Plus className="w-4 h-4" />
-                  <span>{selectedAddress ? "Change address" : "Add address"}</span>
-                </button>
+                  <span>{selectedAddress ? "Change address" : "Select address"}</span>
+                </button>}
               </div>
 
               <div className="space-y-2 text-sm">

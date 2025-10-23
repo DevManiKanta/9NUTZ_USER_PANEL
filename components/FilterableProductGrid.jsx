@@ -111,7 +111,8 @@ export default function FilterableProductGrid({
   return (
     <div className="mb-12">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Shop by Products</h2>
+        {<h2 className="text-2xl font-bold text-gray-900">Shop by Products</h2>}
+        {displayedProducts.length>0&&<h3>Searched results</h3>}
       </div>
       <div
         className={`grid gap-6 

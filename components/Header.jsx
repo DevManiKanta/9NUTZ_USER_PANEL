@@ -24,7 +24,7 @@ export default function Header({
     const { settings } = useSettings();
   const logoSrc = settings?.logo_url || Logo;
   const tabs = [
-    { href: "", label: "Shop" },
+    { href: "/", label: "Shop" },
     { href: "/packages", label: "Packages" },
     { href: "/shippingmethods", label: "Shipping Methods" },
     { href: "/franchise", label: "Franchise With Us" },

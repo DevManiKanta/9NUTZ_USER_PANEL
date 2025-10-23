@@ -489,10 +489,10 @@ export default function Hero() {
         // Try endpoint relative to axios base; fallback to absolute if needed
         let res;
         try {
-          res = await apiAxios.get("/admin/banners");
+          res = await apiAxios.get("list-banners");
         } catch (e) {
           // fallback absolute path if axios baseURL not configured
-          res = await apiAxios.get("/admin/banners/");
+          res = await apiAxios.get("list-banners");
         }
 
         if (cancelled) return;

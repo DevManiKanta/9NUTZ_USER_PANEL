@@ -919,7 +919,7 @@ export default function UserDashboard() {
                     }`}
                   >
                     <Truck className="h-4 w-4" />
-                    <span className="font-medium">Tracking</span>
+                    <span className="font-medium">Tracking(on-Progess)</span>
                   </button>
 
                   {/* NEW: Notifications tab */}
@@ -931,8 +931,8 @@ export default function UserDashboard() {
                         : "text-gray-700 hover:bg-white hover:shadow-sm"
                     }`}
                   >
-                    <Bell className="h-4 w-4" />
-                    <span className="font-medium">Notifications</span>
+                    {/* <Bell className="h-4 w-4" /> */}
+                    <span className="font-medium">Notifications (On-Progres)</span>
                     <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">
                       2
                     </span>
