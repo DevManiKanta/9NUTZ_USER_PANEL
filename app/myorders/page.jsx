@@ -321,7 +321,7 @@ export default function OrdersTablePage({ initialOrders = [] }) {
     setIsLoading(true);
     const loadingId = toast.loading("Loading orders...");
     try {
-      const res = await fetch(`${Login_API_BASE}/admin/online-orders/user`, {
+      const res = await fetch(`${LOCAL_API_BASE}/admin/online-orders/user`, {
         method: "GET",
         headers: {
           Accept: "application/json",

@@ -26,7 +26,7 @@ import ProfilePage from "@/app/myprofile/page"
 import OrdersTablePage from "@/app/myorders/page"
 export default function UserDashboard() {
   // Default to "profile" now that Add Address lives inside it
-  const [activeSection, setActiveSection] = useState("notifications");
+  const [activeSection, setActiveSection] = useState("");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -797,63 +797,63 @@ export default function UserDashboard() {
   };
 
   // ---------- NOTIFICATIONS (new, dummy data only) ----------
-  const renderNotifications = () => {
-    const notifications = [
-      {
-        id: "n1",
-        title: "Order #DEMO123456 Shipped",
-        message: "Your package is on the way. Track it from the Tracking tab.",
-        time: "Just now",
-        tone: "info",
-        icon: <Truck className="h-5 w-5" />,
-      },
-      {
-        id: "n2",
-        title: "Payment Received",
-        message: "We’ve received your payment for Order #DEMO123456.",
-        time: "2 hours ago",
-        tone: "success",
-        icon: <CheckCircle2 className="h-5 w-5" />,
-      },
-    ];
+  // const renderNotifications = () => {
+  //   const notifications = [
+  //     {
+  //       id: "n1",
+  //       title: "Order #DEMO123456 Shipped",
+  //       message: "Your package is on the way. Track it from the Tracking tab.",
+  //       time: "Just now",
+  //       tone: "info",
+  //       icon: <Truck className="h-5 w-5" />,
+  //     },
+  //     {
+  //       id: "n2",
+  //       title: "Payment Received",
+  //       message: "We’ve received your payment for Order #DEMO123456.",
+  //       time: "2 hours ago",
+  //       tone: "success",
+  //       icon: <CheckCircle2 className="h-5 w-5" />,
+  //     },
+  //   ];
 
-    const toneClasses = {
-      info: "bg-blue-50 border-blue-200",
-      success: "bg-green-50 border-green-200",
-      warning: "bg-yellow-50 border-yellow-200",
-      error: "bg-red-50 border-red-200",
-    };
+  //   const toneClasses = {
+  //     info: "bg-blue-50 border-blue-200",
+  //     success: "bg-green-50 border-green-200",
+  //     warning: "bg-yellow-50 border-yellow-200",
+  //     error: "bg-red-50 border-red-200",
+  //   };
 
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Bell className="h-6 w-6 text-green-600" />
-            Notifications
-          </h2>
-          <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-            {notifications.length} new
-          </span>
-        </div>
+  //   return (
+  //     <div className="space-y-6">
+  //       <div className="flex items-center justify-between">
+  //         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+  //           <Bell className="h-6 w-6 text-green-600" />
+  //           Notifications
+  //         </h2>
+  //         <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+  //           {notifications.length} new
+  //         </span>
+  //       </div>
 
-        <div className="space-y-3">
-          {notifications.map((n) => (
-            <div
-              key={n.id}
-              className={`p-4 rounded-xl border flex items-start gap-3 ${toneClasses[n.tone]}`}
-            >
-              <div className="mt-0.5 text-gray-700">{n.icon}</div>
-              <div className="flex-1">
-                <div className="font-semibold text-gray-900">{n.title}</div>
-                <div className="text-sm text-gray-700">{n.message}</div>
-                <div className="text-xs text-gray-500 mt-1">{n.time}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
+  //       <div className="space-y-3">
+  //         {notifications.map((n) => (
+  //           <div
+  //             key={n.id}
+  //             className={`p-4 rounded-xl border flex items-start gap-3 ${toneClasses[n.tone]}`}
+  //           >
+  //             <div className="mt-0.5 text-gray-700">{n.icon}</div>
+  //             <div className="flex-1">
+  //               <div className="font-semibold text-gray-900">{n.title}</div>
+  //               <div className="text-sm text-gray-700">{n.message}</div>
+  //               <div className="text-xs text-gray-500 mt-1">{n.time}</div>
+  //             </div>
+  //           </div>
+  //         ))}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   // ---------- Guard ----------
   if (!user) {
@@ -932,10 +932,10 @@ export default function UserDashboard() {
                     }`}
                   >
                     {/* <Bell className="h-4 w-4" /> */}
-                    <span className="font-medium">Notifications (On-Progres)</span>
-                    <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                    {/* <span className="font-medium">Notifications (On-Progres)</span> */}
+                    {/* <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">
                       2
-                    </span>
+                    </span> */}
                   </button>
                 </nav>
               </aside>
@@ -945,7 +945,7 @@ export default function UserDashboard() {
                 {activeSection === "profile" && <ProfilePage/>}
                 {activeSection === "orders" && <OrdersTablePage/>}
                 {activeSection === "tracking" && renderTracking()}
-                {activeSection === "notifications" && renderNotifications()}
+                {/* {activeSection === "notifications" && renderNotifications()} */}
               </section>
             </div>
           </div>
