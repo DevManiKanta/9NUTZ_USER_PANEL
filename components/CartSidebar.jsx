@@ -43,12 +43,12 @@ export default function CartSidebar({
   const effectiveUser = ctxUser ?? getLocalUser();
 
   // ---- API endpoints ----
-  const CREATE_ORDER_ENDPOINT = `${LOCAL_API_BASE}/admin/razorpay/order`;
-  const VERIFY_ENDPOINT = `${LOCAL_API_BASE}/admin/razorpay/verify`;
-  const ADDRESS_LIST_ENDPOINT = `${LOCAL_API_BASE}/user/address`; // GET list
-  const ADDRESS_ITEM_ENDPOINT = (id) => `${LOCAL_API_BASE}/user/address/delete/${id}`; // DELETE
-  const ADDRESS_UPDATE_ENDPOINT = (id) => `${LOCAL_API_BASE}/user/address/update/${id}`; // UPDATE
-  const ADDRESS_ADD_ENDPOINT = `${LOCAL_API_BASE}/user/address/add`; // ADD
+  const CREATE_ORDER_ENDPOINT = `${Login_API_BASE}/admin/razorpay/order`;
+  const VERIFY_ENDPOINT = `${Login_API_BASE}/admin/razorpay/verify`;
+  const ADDRESS_LIST_ENDPOINT = `${Login_API_BASE}/user/address`; // GET list
+  const ADDRESS_ITEM_ENDPOINT = (id) => `${Login_API_BASE}/user/address/delete/${id}`; // DELETE
+  const ADDRESS_UPDATE_ENDPOINT = (id) => `${Login_API_BASE}/user/address/update/${id}`; // UPDATE
+  const ADDRESS_ADD_ENDPOINT = `${Login_API_BASE}/user/address/add`; // ADD
 
   // ---- State ----
   const [loadingPayment, setLoadingPayment] = useState(false);
@@ -509,7 +509,7 @@ export default function CartSidebar({
   };
 
   const submitOrderToServer = async (paymentResponse, payloadItems, orderMeta) => {
-    const endpoint = `${LOCAL_API_BASE}/admin/razorpay/order`;
+    const endpoint = `${Login_API_BASE}/admin/razorpay/order`;
     const itemsPayload =
       payloadItems ??
       itemsWithPaise.map(({ item, pricePaise, quantity, subtotalPaise }) => ({

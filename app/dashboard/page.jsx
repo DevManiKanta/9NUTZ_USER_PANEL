@@ -910,7 +910,7 @@ export default function UserDashboard() {
                     <span className="font-medium">My Orders</span>
                   </button>
 
-                  <button
+                  {/* <button
                     onClick={() => setActiveSection("tracking")}
                     className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg text-left transition-colors ${
                       activeSection === "tracking"
@@ -918,10 +918,9 @@ export default function UserDashboard() {
                         : "text-gray-700 hover:bg-white hover:shadow-sm"
                     }`}
                   >
-                    <Truck className="h-4 w-4" />
-                    <span className="font-medium">Tracking(on-Progess)</span>
-                  </button>
-
+                    {/* <Truck className="h-4 w-4" /> */}
+                    {/* <span className="font-medium">Tracking(on-Progess)</span> */}
+                  {/* </button> */} 
                   {/* NEW: Notifications tab */}
                   <button
                     onClick={() => setActiveSection("notifications")}

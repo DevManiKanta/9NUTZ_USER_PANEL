@@ -74,7 +74,7 @@ export const ProductProvider = ({ children }) => {
 
 const reload = useCallback(async () => {
   try {
-    const res = await apiAxios.get("http://192.168.29.8:8000/api/product/show");
+    const res = await apiAxios.get("/product/show");
 
     const payload = res.data;
     const rows = Array.isArray(payload?.data) ? payload.data : [];

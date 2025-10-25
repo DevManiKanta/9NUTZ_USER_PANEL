@@ -15,7 +15,7 @@ export const useAuth = () => {
   return context;
 };
 
-const API_BASE = LOCAL_API_BASE;
+const API_BASE = Login_API_BASE;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
