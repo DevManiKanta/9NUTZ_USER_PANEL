@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import {LOCAL_API_BASE,Login_API_BASE} from "@/lib/api";
 import { useRouter } from "next/navigation";
+import apiAxios from "@/lib/allapi";
 
 const AuthContext = createContext(undefined);
 
@@ -14,9 +15,7 @@ export const useAuth = () => {
   }
   return context;
 };
-
 const API_BASE = Login_API_BASE;
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);

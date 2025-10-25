@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import apiAxios from "@/lib/api";
+import { Login_API_BASE } from "@/lib/api";
+import axios from "axios";
 // const API_ORIGIN = new URL(apiAxios).origin;
 const ProductContext = createContext(undefined);
 
@@ -74,8 +76,7 @@ export const ProductProvider = ({ children }) => {
 
 const reload = useCallback(async () => {
   try {
-    const res = await apiAxios.get("/product/show");
-
+    const res = await axios.get(`${Login_API_BASE}/product/show`);
     const payload = res.data;
     const rows = Array.isArray(payload?.data) ? payload.data : [];
 

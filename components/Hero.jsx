@@ -4,6 +4,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import apiAxios, { API_BASE } from "@/lib/api";
+import { Login_API_BASE } from "@/lib/api";
+import axios from "axios"
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -24,14 +26,13 @@ function toFullImageUrl(img) {
 
 export async function getCategoriesPublicAPI() {
   try {
-    const res = await apiAxios.get("category/show", { headers: { "Content-Type": "application/json" } });
+    const res = await axios.get(`${Login_API_BASE}/category/show`, { headers: { "Content-Type": "application/json" } });
     return Array.isArray(res.data?.data) ? res.data.data : [];
   } catch (err) {
     console.error("getCategoriesPublicAPI error:", err?.response?.data ?? err?.message ?? err);
     throw err;
   }
 }
-
 export default function Hero() {
   const [banners, setBanners] = useState([]);
   const [currentBanner, setCurrentBanner] = useState(0);

@@ -629,7 +629,7 @@ export default function ProfilePage({ initialUser = null, initialOrders = [] }) 
     setIsFetching(true);
     const loadingId = toast.loading("Loading profile...");
     try {
-      const res = await fetch(`${LOCAL_API_BASE}/admin/profile`, {
+      const res = await fetch(`${Login_API_BASE}/admin/profile`, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -824,7 +824,7 @@ export default function ProfilePage({ initialUser = null, initialOrders = [] }) 
         fd.append("password", String(form.password));
       }
 
-      const res = await fetch(`${LOCAL_API_BASE}/admin/profile/update`, {
+      const res = await fetch(`${Login_API_BASE}/admin/profile/update`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
