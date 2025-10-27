@@ -301,7 +301,7 @@ function CategoryCarousel({ categories = [], loading, error }) {
     slidesToScroll: 1,
     arrows: true,
     pauseOnHover: true,
-    // ensure responsive breakpoints also respect categories length
+    rtl: false,
     responsive: [
       {
         breakpoint: 1536,
@@ -367,14 +367,13 @@ function CategoryCarousel({ categories = [], loading, error }) {
   }
 
   return (
-    <div className="relative left-1/2 -translate-x-1/2 w-screen">
+    <div className="relative left-1/2 -translate-x-1/2 w-screen" >
       <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="relative left-1/2 -translate-x-1/2 w-screen" style={{padding:"1rem"}}>
           <h2 className="text-2xl font-bold text-gray-900">Shop by Categories</h2>
         </div>
 
         <div className="relative left-1/2 -translate-x-1/2 w-screen" >
-          {/* Add a className to the Slider so we can ensure slides occupy full height */}
           <Slider {...settings} className="category-slider">
             {categories.map((category) => {
               const src = category.image_url || category.image || PLACEHOLDER;

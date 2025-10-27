@@ -529,7 +529,7 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
       <article
         key={productId}
         className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border border-gray-100 overflow-hidden flex flex-col h-full"
-        style={{border:"0.5px solid grey"}}
+        // style={{border:"0.5px solid grey"}}
       >
         <div className="relative p-4 cursor-pointer" onClick={() => router.push(`/product/${productId}`)}>
           <div className="rounded-xl overflow-hidden bg-gray-50">
@@ -590,11 +590,19 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
 
       {/* Product grid */}
       <div
-        className={`grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 transition-all duration-300 ${
-          isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"
-        }`}
-        style={{width:"100%"}}
-      >
+  className={`grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 
+    transition-all duration-300 ease-in-out
+    ${isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
+  style={{
+    width: "100vw",            // full viewport width
+    position: "relative",
+    left: "50%",               // center it properly
+    right: "50%",
+    marginLeft: "-50vw",       // cancel container margins
+    marginRight: "-50vw", // keep your debug border
+  }}
+>
+
         {otherProducts.map((p, i) => renderProductCard(p, i))}
       </div>
 
