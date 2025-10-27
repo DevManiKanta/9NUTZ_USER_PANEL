@@ -211,12 +211,11 @@
 //     </div>
 //   );
 // }
-
+"use client"
 import React, { useEffect, useMemo, useState } from "react";
 import { Search, Package, Clock, X } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import { LOCAL_API_BASE,Login_API_BASE } from "@/lib/api";
-
 export default function OrdersTablePage({ initialOrders = [] }) {
   // store server paginated object and current page data
   const [ordersData, setOrdersData] = useState(null);

@@ -368,7 +368,20 @@ function CategoryCarousel({ categories, loading, error }) {
                   aria-label={`Open category ${category.name}`}
                 >
                   <div className="w-full h-24 md:h-28 lg:h-32 relative">
-                    <img src={src} alt={category.name} className="w-full h-full object-cover rounded-xl" loading="lazy" decoding="async" onError={(e) => (e.currentTarget.src = PLACEHOLDER)} />
+                    {/* <img src={src} alt={category.name} className="w-full h-full object-cover rounded-xl" loading="lazy" decoding="async" onError={(e) => (e.currentTarget.src = PLACEHOLDER)} /> */}
+                       <div className="w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 relative flex items-center justify-center bg-gray-100 rounded-xl overflow-hidden mx-auto">
+  <img
+    src={src}
+    alt={category.name}
+    className="w-full h-full object-cover"
+    loading="lazy"
+    decoding="async"
+    onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
+  />
+  <div className="absolute inset-0 bg-black/20 rounded-xl pointer-events-none" />
+</div>
+
+
                     <div className="absolute inset-0 bg-black/20 rounded-xl pointer-events-none" />
                   </div>
                   <span className="text-xs md:text-sm font-medium text-center text-gray-700 py-2 w-full bg-white/0">{category.name}</span>
