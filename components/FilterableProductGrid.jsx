@@ -225,7 +225,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Plus, Minus, Star } from "lucide-react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategoryDataContext } from "@/contexts/CategoryDataContext";
-
+import { useRouter } from "next/navigation";
 export default function FilterableProductGrid({ onAddToCart, selectedCategory, isAnimating = false }) {
   const [quantities, setQuantities] = useState({});
   const [displayedProducts, setDisplayedProducts] = useState([]);
@@ -244,6 +244,8 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     stock: 10,
     imageUrl: "/placeholder.png",
   };
+   
+  const router = useRouter();
 
   // Listen to global "siteSearch" events dispatched by Header
   useEffect(() => {
@@ -397,7 +399,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
       if (matchedById || matchedByName || matchedByFallbackString) combo.push(p);
       else others.push(p);
     }
-
     return { combopackProducts: combo, otherProducts: others };
   }, [displayedProducts, combopackCategoryIds, getProductCategoryIdAndName]);
 
@@ -415,7 +416,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
                 "/placeholder.png";
 
     const descriptionText = String((product && (product.description || product.short_description)) || "").trim();
-
     return (
       <article
         key={productId}
@@ -426,6 +426,7 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
           <div className="rounded-xl overflow-hidden bg-gray-50">
             <img
               src={img}
+                 onClick={() => { if (productId && !productId.startsWith('tmp-')) router.push(`/product/${productId}`); }}
               alt={(product && product.name) || "product"}
               onError={(e) => {
                 try {

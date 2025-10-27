@@ -26,7 +26,7 @@ export default function RootLayout({
                   <CartProvider>
                     <SettingsProvider>
                       <CategoryDataProvider>
-                  {children}
+                         {children}
                   </CategoryDataProvider>
                   </SettingsProvider>
                   </CartProvider>
