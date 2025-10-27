@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import apiAxios, { API_BASE } from "@/lib/api";
 import { Login_API_BASE } from "@/lib/api";
-import axios from "axios"
+import axios from "axios";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -33,12 +33,12 @@ export async function getCategoriesPublicAPI() {
     throw err;
   }
 }
+
 export default function Hero() {
   const [banners, setBanners] = useState([]);
   const [currentBanner, setCurrentBanner] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState(null);
@@ -54,12 +54,11 @@ export default function Hero() {
 
     const fetchBanners = async () => {
       try {
-        // Try endpoint relative to axios base; fallback to absolute if needed
         let res;
         try {
           res = await apiAxios.get("list-banners");
         } catch (e) {
-          // fallback absolute path if axios baseURL not configured
+          // fallback (kept same as original)
           res = await apiAxios.get("list-banners");
         }
 
@@ -74,12 +73,10 @@ export default function Hero() {
           ? payload.banners
           : [];
 
-        // prefer active banners but fall back to all if none active
         const active = rows.filter((b) => b && (b.is_active === 1 || b.is_active === true || b.is_active === "1"));
         const source = active.length ? active : rows;
 
         const mapped = (source || []).map((b) => {
-          // Use redirect_url as image source when present (absolute). Otherwise build from image_url.
           const redirect = b?.redirect_url ? String(b.redirect_url) : "";
           const imageCandidate =
             redirect && (redirect.startsWith("http://") || redirect.startsWith("https://"))
@@ -179,15 +176,15 @@ export default function Hero() {
   const prevBanner = () => setCurrentBanner((p) => (banners.length ? (p - 1 + banners.length) % banners.length : 0));
 
   return (
-    <div className="mb-4">
+    <div className="mb-4 mt-1">
       <div
-        className="relative rounded-2xl overflow-hidden shadow-lg"
+        className="relative rounded-2xl overflow-hidden shadow-lg left-1/2 -translate-x-1/2 w-screen"
         onMouseEnter={() => (isHoveringRef.current = true)}
         onMouseLeave={() => (isHoveringRef.current = false)}
       >
         {/* States */}
         {loading ? (
-          <div className="w-full h-80 md:h-96 lg:h-[28rem] bg-gray-100 flex items-center justify-center">
+          <div className="w-full h-90 md:h-96 lg:h-[28rem] flex items-center justify-center">
             <div className="text-gray-500">Loading banners...</div>
           </div>
         ) : error ? (
@@ -198,7 +195,7 @@ export default function Hero() {
             </div>
           </div>
         ) : banners.length === 0 ? (
-          <div className="w-full h-80 md:h-96 lg:h-[28rem] bg-gray-100 flex items-center justify-center">
+          <div className="w-full h-80 md:h-96 lg:h-[28rem] flex items-center justify-center">
             <span className="text-gray-500">No banners available</span>
           </div>
         ) : (
@@ -214,41 +211,22 @@ export default function Hero() {
                   <div
                     role="img"
                     aria-label={`${banner.title ?? ""} ${banner.subtitle ?? ""}`.trim()}
-                    className="relative w-full h-80 md:h-96 lg:h-[28rem]"
-                    tabIndex={-1} /* not focusable for activation */
+                    className="relative w-full h-full"
+                    tabIndex={-1}
                   >
-                    {/* Actual image element ensures crisp rendering */}
                     <img
                       src={src}
                       alt={banner.title || banner.subtitle || "Banner"}
-                      className="w-full h-full object-cover"
+                      // className="w-full h-full"
                       loading="eager"
                       decoding="async"
                       onError={(e) => {
                         e.currentTarget.src = PLACEHOLDER;
                       }}
+                      // style={{}}
                     />
 
-                    {/* overlay to darken image for readable text */}
-                    <div className="absolute inset-0 bg-black/25" />
-
-                    {/* Text content (title/subtitle/discount) */}
-                    <div className="absolute inset-0 z-10 flex items-center justify-center px-6">
-                      <div className="max-w-3xl text-center text-white">
-                        {banner.title ? <div className="text-sm md:text-base font-semibold opacity-90 mb-2">{banner.title}</div> : null}
-                        {banner.subtitle ? (
-                          <h2 className="text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">{banner.subtitle}</h2>
-                        ) : null}
-                        {banner.discount ? (
-                          <div className="mb-4">
-                            <span className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-md font-bold">
-                              {banner.discount}
-                            </span>
-                          </div>
-                        ) : null}
-                        {/* Explore button removed by request */}
-                      </div>
-                    </div>
+                    <div className="absolute" />
                   </div>
                 </div>
               );
@@ -265,7 +243,7 @@ export default function Hero() {
                 e.stopPropagation();
                 prevBanner();
               }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white shadow flex items-center justify-center transition"
+              className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white shadow flex items-center justify-center transition"
             >
               <ChevronLeft className="h-5 w-5 text-gray-700" />
             </button>
@@ -276,7 +254,7 @@ export default function Hero() {
                 e.stopPropagation();
                 nextBanner();
               }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white shadow flex items-center justify-center transition"
+              className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white shadow flex items-center justify-center transition"
             >
               <ChevronRight className="h-5 w-5 text-gray-700" />
             </button>
@@ -297,103 +275,147 @@ export default function Hero() {
           </>
         )}
       </div>
-
-      {/* Category carousel below hero (kept from original) */}
-      <div className="mt-6">
+      <div className="mt-6 left-1/2 -translate-x-1/2 w-screen relative">
         <CategoryCarousel categories={categories} loading={categoriesLoading} error={categoriesError} />
       </div>
     </div>
   );
 }
 
-/* ---------- CategoryCarousel: small component ---------- */
-function CategoryCarousel({ categories, loading, error }) {
-  const slidesToShow = Math.min(6, Math.max(1, categories.length || 1));
+/* ---------- CategoryCarousel: full-width, responsive (fixed) ---------- */
+function CategoryCarousel({ categories = [], loading, error }) {
+  // configuration: max slides to show on largest screens
+  const MAX_SLIDES = 6;
+
+  // determine initial slidesToShow based on available categories
+  const slidesToShowInit = Math.min(MAX_SLIDES, Math.max(1, categories.length || 1));
+  const infiniteEnabled = (categories?.length || 0) > slidesToShowInit;
+
   const settings = {
     dots: false,
-    infinite: true,
-    speed: 800,
+    infinite: infiniteEnabled,
+    speed: 1500,
     autoplay: true,
-    autoplaySpeed: 2500,
-    slidesToShow,
+    autoplaySpeed: 1000,
+    slidesToShow: slidesToShowInit,
     slidesToScroll: 1,
-    arrows: false,
+    arrows: true,
     pauseOnHover: true,
+    // ensure responsive breakpoints also respect categories length
     responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: Math.min(5, categories.length || 1) } },
-      { breakpoint: 1024, settings: { slidesToShow: Math.min(4, categories.length || 1) } },
-      { breakpoint: 768, settings: { slidesToShow: Math.min(3, categories.length || 1) } },
-      { breakpoint: 640, settings: { slidesToShow: Math.min(2, categories.length || 1) } },
+      {
+        breakpoint: 1536,
+        settings: {
+          slidesToShow: Math.min(5, categories.length || 1),
+        },
+      },
+      {
+        breakpoint: 1280,
+        settings: {
+          slidesToShow: Math.min(4, categories.length || 1),
+        },
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: Math.min(3, categories.length || 1),
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: Math.min(2, categories.length || 1),
+        },
+      },
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: Math.min(1, categories.length || 1),
+        },
+      },
     ],
   };
 
   if (loading) {
     return (
-      <div className="w-full h-36 flex items-center justify-center bg-gray-100 text-gray-500 rounded-xl">
-        Loading categories...
+      <div className="left-1/2 -translate-x-1/2 w-screen relative">
+        <div className="w-full h-36 flex items-center justify-center bg-gray-100 text-gray-500 rounded-xl">
+          Loading categories...
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="w-full h-36 flex items-center justify-center bg-red-50 text-red-600 rounded-xl">
-        Failed to load categories: {error}
+      <div className="left-1/2 -translate-x-1/2 w-screen relative">
+        <div className="w-full h-36 flex items-center justify-center bg-red-50 text-red-600 rounded-xl">
+          Failed to load categories: {error}
+        </div>
       </div>
     );
   }
 
   if (!categories || categories.length === 0) {
     return (
-      <div className="w-full h-36 flex items-center justify-center bg-gray-100 text-gray-500 rounded-xl">
-        No categories to display
+      <div className="left-1/2 -translate-x-1/2 w-screen relative">
+        <div className="w-full h-36 flex items-center justify-center bg-gray-100 text-gray-500 rounded-xl">
+          No categories to display
+        </div>
       </div>
     );
   }
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Shop by Categories</h2>
-      </div>
+    <div className="relative left-1/2 -translate-x-1/2 w-screen">
+      <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="relative left-1/2 -translate-x-1/2 w-screen" style={{padding:"1rem"}}>
+          <h2 className="text-2xl font-bold text-gray-900">Shop by Categories</h2>
+        </div>
 
-      <div className="w-full overflow-hidden">
-        <Slider {...settings}>
-          {categories.map((category) => {
-            const src = category.image_url || category.image || PLACEHOLDER;
-            return (
-              <div key={String(category.id)} className="px-2">
-                <button
-                  className="group flex flex-col items-center justify-center p-0 rounded-xl overflow-hidden transform transition-all duration-200 hover:scale-105"
-                  aria-label={`Open category ${category.name}`}
-                >
-                  <div className="w-full h-24 md:h-28 lg:h-32 relative">
-                    {/* <img src={src} alt={category.name} className="w-full h-full object-cover rounded-xl" loading="lazy" decoding="async" onError={(e) => (e.currentTarget.src = PLACEHOLDER)} /> */}
-                       <div className="w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 relative flex items-center justify-center bg-gray-100 rounded-xl overflow-hidden mx-auto">
-  <img
-    src={src}
-    alt={category.name}
-    className="w-full h-full object-cover"
-    loading="lazy"
-    decoding="async"
-    onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
-  />
-  <div className="absolute inset-0 bg-black/20 rounded-xl pointer-events-none" />
-</div>
+        <div className="relative left-1/2 -translate-x-1/2 w-screen" >
+          {/* Add a className to the Slider so we can ensure slides occupy full height */}
+          <Slider {...settings} className="category-slider">
+            {categories.map((category) => {
+              const src = category.image_url || category.image || PLACEHOLDER;
+              return (
+                <div key={String(category.id)} className="px-4 w-full h-full">
+                  <div className="flex flex-col items-center justify-start w-full h-full">
+                    <div className="relative w-full h-[460px] md:h-[420px] sm:h-[350px] bg-gray-100 overflow-hidden rounded-xl shadow-md">
+                      <img
+                        src={src}
+                        alt={category.name}
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
 
-
-                    <div className="absolute inset-0 bg-black/20 rounded-xl pointer-events-none" />
+                    <div className="mt-4 text-center w-full">
+                      <span className="block text-sm md:text-base tracking-wide font-medium text-gray-800 uppercase">
+                        {category.name}
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-xs md:text-sm font-medium text-center text-gray-700 py-2 w-full bg-white/0">{category.name}</span>
-                </button>
-              </div>
-            );
-          })}
-        </Slider>
+                </div>
+              );
+            })}
+          </Slider>
+        </div>
       </div>
-    </>
+      {/* Small inline style to fix slick slide height issues (keeps everything consistent). */}
+      <style jsx>{`
+        /* Ensure each slick slide's internal wrapper takes full height so slides align */
+        :global(.category-slider .slick-slide > div) {
+          height: 100%;
+        }
+        /* optional: prevent transform-based rounding glitches on some browsers */
+        :global(.category-slider .slick-list) {
+          transform: translateZ(0);
+        }
+      `}</style>
+    </div>
   );
 }
-
-
 

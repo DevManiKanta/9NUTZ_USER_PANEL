@@ -191,14 +191,14 @@ export default function ProductDetailClient({
                   onClick={handleAdd}
                   className="px-5 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition"
                 >
-                  Add to cart
+                  Add to carts
                 </button>
               ) : (
                 <div className="px-4 py-2 rounded-md bg-gray-100 text-gray-500">Out of stock</div>
               )}
             </div>
           </div>
-
+           <div>Hello</div>
           {/* meta / details */}
           <div className="pt-4 border-t border-gray-100 text-sm text-gray-700">
             <div className="flex gap-2 mb-2">

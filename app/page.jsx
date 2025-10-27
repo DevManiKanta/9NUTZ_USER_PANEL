@@ -203,6 +203,7 @@ import CartSidebar from "@/components/CartSidebar";
 
 // IMPORTANT: use the reusable ProductDetailClient that dispatches events or calls onAddToCart
 import ProductDetailClient from "@/components/ProductDetailClient";
+import ProductDetailContent from "@/components/ProductDetailContent";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -322,7 +323,6 @@ export default function Home() {
       setIsFilterAnimating(false);
     }, 300);
   };
-
   // ---- Product modal controls ----
   const openProductModal = useCallback((productId) => {
     if (!productId) return;
@@ -335,11 +335,6 @@ export default function Home() {
     setIsProductModalOpen(false);
     setSelectedProductId(null);
   }, []);
-
-  // NOTE: ensure FilterableProductGrid calls props.onProductSelect(product.id)
-  // Example inside FilterableProductGrid.renderProductCard:
-  // <article onClick={() => props.onProductSelect && props.onProductSelect(product.id)}> ... </article>
-
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -349,7 +344,7 @@ export default function Home() {
       <Header
         onLoginClick={() => setIsLoginModalOpen(true)}
         onLocationClick={() => setIsLocationModalOpen(true)}
-        onCartClick={() => setIsCartOpen(true)}
+        // onCartClick={() => setIsCartOpen(true)}
         cartItemCount={cartItems.reduce((s, i) => s + (i.quantity || 0), 0)}
         cartTotal={cartTotal}
         handlePaymentComplete={handlePaymentComplete}
