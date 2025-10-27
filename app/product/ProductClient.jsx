@@ -275,11 +275,17 @@ export default function ProductClient({ id, onAddToCart: externalAddToCart }) {
   // safe product context read
   const { products } = (useProducts && useProducts()) || { products: [] };
 
-  // Defensive: the app may or may not provide a CartContext
-  // so read it safely and create fallbacks.
-  const cartCtx = (typeof useCart === "function" ? useCart() : null) || {};
-  const ctxAddToCart = typeof cartCtx.addToCart === "function" ? cartCtx.addToCart : null;
-  const ctxOpenCart = typeof cartCtx.openCart === "function" ? cartCtx.openCart : null;
+  // Use CartContext directly
+  const cartCtx = useCart();
+  const ctxAddItem = cartCtx?.addItem;
+
+  // Debug logging
+  console.log("ProductClient Debug:", {
+    id,
+    productsCount: products?.length || 0,
+    cartCtxAvailable: !!cartCtx,
+    addItemAvailable: !!ctxAddItem
+  });
 
   // Local quantities state (so this component can support the add-to-cart loop logic)
   const [quantities, setQuantities] = useState({});
@@ -317,16 +323,20 @@ export default function ProductClient({ id, onAddToCart: externalAddToCart }) {
       // qty should be positive integer
       const finalQty = Math.max(1, Math.trunc(qty || 1));
 
-      // 1) Try context addToCart (if available)
-      if (ctxAddToCart) {
+      console.log("callAddToCart called:", { productToAdd, finalQty, ctxAddItemAvailable: !!ctxAddItem });
+
+      // 1) Try context addItem (if available)
+      if (ctxAddItem) {
         try {
           // call with qty — many implementations accept (product, qty)
-          ctxAddToCart(productToAdd, finalQty);
+          const itemToAdd = { ...productToAdd, quantity: finalQty };
+          console.log("Adding to cart via CartContext:", itemToAdd);
+          ctxAddItem(itemToAdd);
           return;
         } catch (err) {
           // swallow and fall back to other methods
           // eslint-disable-next-line no-console
-          console.warn("ctx addToCart failed, falling back", err);
+          console.warn("ctx addItem failed, falling back", err);
         }
       }
 
@@ -357,42 +367,43 @@ export default function ProductClient({ id, onAddToCart: externalAddToCart }) {
         console.warn("productAddToCart dispatch failed", err);
       }
     },
-    [ctxAddToCart, externalAddToCart]
+    [ctxAddItem, externalAddToCart]
   );
 
-  // Unified open-cart helper: prefer context, then event
+  // Unified open-cart helper: dispatch event
   const callOpenCart = useCallback(() => {
-    if (ctxOpenCart) {
-      try {
-        ctxOpenCart();
-        return;
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn("ctx openCart failed, falling back to event", err);
-      }
-    }
     try {
       window.dispatchEvent(new CustomEvent("openCart"));
     } catch (err) {
       // eslint-disable-next-line no-console
       console.warn("openCart dispatch failed", err);
     }
-  }, [ctxOpenCart]);
+  }, []);
 
   // The corrected add-to-cart handler uses the unified helpers
   const handleAddToCart = useCallback(
     (productToAdd) => {
-      if (!productToAdd) return;
+      console.log("handleAddToCart called with:", productToAdd);
+      
+      if (!productToAdd) {
+        console.log("No product provided to handleAddToCart");
+        return;
+      }
 
       // guard for stock: if stock is 0 or negative, do nothing
       const stockVal = Number(
         productToAdd && productToAdd.stock != null ? productToAdd.stock : Infinity
       );
-      if (!isNaN(stockVal) && stockVal <= 0) return;
+      if (!isNaN(stockVal) && stockVal <= 0) {
+        console.log("Product out of stock:", stockVal);
+        return;
+      }
 
       // compute qty using id (prefer id/_id)
       const idForQty = productToAdd && (productToAdd.id ?? productToAdd._id);
       const qty = Math.max(1, qtyOf(idForQty));
+
+      console.log("About to add to cart:", { productToAdd, qty });
 
       // call unified add-to-cart (handles context/prop/event fallbacks)
       callAddToCart(productToAdd, qty);

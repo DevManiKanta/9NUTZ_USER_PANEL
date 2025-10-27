@@ -6,9 +6,11 @@ import { Plus, Minus, ChevronRight, Clock, Star, ArrowLeft, Heart } from "lucide
 import ProductGrid from "./ProductGrid";
 import Header from "./Header";
 import Footer from "./Footer";
+import { useCart } from "@/contexts/CartContext";
 
 export default function ProductDetailContent({ product }) {
   const router = useRouter();
+  const { addItem, items, cartCount, cartTotal } = useCart();
 
   // Normalize images (product.images is preferred)
   const images = useMemo(() => {
@@ -53,21 +55,26 @@ export default function ProductDetailContent({ product }) {
 
   const selectedUnit = units[selectedUnitIndex] ?? units[0] ?? { size: "1", price: 0 };
 
-  // Simple in-memory cart (you probably already have a cart context — replace when integrating)
-  const [cart, setCart] = useState([]);
-
   const addToCart = () => {
+    if (!product) return;
+    
     const item = {
-      id: product?.id,
-      name: product?.name,
+      id: product.id,
+      name: product.name,
+      price: selectedUnit.price,
       image: images[0],
-      unit: selectedUnit.size,
-      unitPrice: selectedUnit.price,
+      weight: selectedUnit.size,
       quantity,
     };
-    setCart((prev) => [...prev, item]);
-    // show a tiny confirmation — in real app you'd call your cart context / api
-    alert(`Added ${quantity} x ${product?.name} (${selectedUnit.size}) to cart`);
+    
+    addItem(item);
+    
+    // Dispatch event to open cart
+    try {
+      window.dispatchEvent(new CustomEvent("openCart"));
+    } catch (err) {
+      console.warn("Failed to dispatch openCart event:", err);
+    }
   };
 
   const toggleWishlist = () => setWishlisted((s) => !s);
@@ -77,9 +84,15 @@ export default function ProductDetailContent({ product }) {
       <Header
         onLoginClick={() => {}}
         onLocationClick={() => {}}
-        onCartClick={() => {}}
-        cartItemCount={cart.reduce((s, i) => s + (i.quantity || 0), 0)}
-        cartTotal={cart.reduce((s, i) => s + (i.unitPrice * (i.quantity || 1)), 0)}
+        onCartClick={() => {
+          try {
+            window.dispatchEvent(new CustomEvent("openCart"));
+          } catch (err) {
+            console.warn("Failed to dispatch openCart event:", err);
+          }
+        }}
+        cartItemCount={cartCount}
+        cartTotal={cartTotal}
       />
 
       <main className="pt-20">

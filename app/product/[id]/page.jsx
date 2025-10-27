@@ -82,34 +82,19 @@
 // app/product/[id]/page.jsx
 // app/product/[id]/page.jsx
 import React from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import ProductClient from "@/app/product/ProductClient";
+import ProductPageClient from "@/app/product/ProductPageClient";
 
 export async function generateStaticParams() {
+  // Provide a minimal set so Next can statically export dynamic route
   return [
-    // Example product ids. Replace with real ids or return [].
-    { id: "42" },
     { id: "40" },
+    { id: "42" },
     { id: "43" },
   ];
 }
 
 export default function ProductPage({ params }) {
   const { id } = params || {};
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 w-full bg-white">
-        <section className="w-full bg-gray-50">
-          <div className="max-w-6xl mx-auto px-4 py-12">
-            <ProductClient id={String(id || "")} />
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
-  );
+  return <ProductPageClient id={String(id || "")} />;
 }
 
