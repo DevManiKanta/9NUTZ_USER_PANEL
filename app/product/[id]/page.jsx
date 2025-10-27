@@ -87,9 +87,9 @@ import ProductPageClient from "@/app/product/ProductPageClient";
 export async function generateStaticParams() {
   // Provide a minimal set so Next can statically export dynamic route
   return [
-    { id: "40" },
-    { id: "42" },
-    { id: "43" },
+    { id: "51" },
+    { id: "46" },
+    { id: "48" },
   ];
 }
 

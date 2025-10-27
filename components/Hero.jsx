@@ -208,27 +208,24 @@ export default function Hero() {
               const src = banner.image_url || PLACEHOLDER;
               return (
                 <div key={banner.id} className="w-full flex-shrink-0">
-                  <div
-                    role="img"
-                    aria-label={`${banner.title ?? ""} ${banner.subtitle ?? ""}`.trim()}
-                    className="relative w-full h-full"
-                    tabIndex={-1}
-                  >
-                    <img
-                      src={src}
-                      alt={banner.title || banner.subtitle || "Banner"}
-                      // className="w-full h-full"
-                      loading="eager"
-                      decoding="async"
-                      onError={(e) => {
-                        e.currentTarget.src = PLACEHOLDER;
-                      }}
-                      // style={{}}
-                    />
+  <div
+    role="img"
+    aria-label={`${banner.title ?? ""} ${banner.subtitle ?? ""}`.trim()}
+    className="relative w-full h-200 md:h-96 lg:h-[40rem]"  
+    tabIndex={-1}
+  >
+    <img
+  src={src}
+  alt={banner.title || banner.subtitle || "Banner"}
+  loading="eager"
+  decoding="async"
+  // onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
+  className="w-full h-full object-cover object-center block"
+/>
 
-                    <div className="absolute" />
-                  </div>
-                </div>
+    <div className="absolute inset-0" />
+  </div>
+</div>
               );
             })}
           </div>

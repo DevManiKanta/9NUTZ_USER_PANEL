@@ -531,7 +531,7 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
         className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border border-gray-100 overflow-hidden flex flex-col h-full"
         // style={{border:"0.5px solid grey"}}
       >
-        <div className="relative p-4 cursor-pointer" onClick={() => router.push(`/product/${productId}`)}>
+        <div className="relative p-4 cursor-pointer" >
           <div className="rounded-xl overflow-hidden bg-gray-50">
             <img src={img} alt={product?.name || "product"} className="w-full h-56 object-cover" />
           </div>

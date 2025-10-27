@@ -493,7 +493,7 @@ export default function ProductClient({ id, onAddToCart: externalAddToCart }) {
       alt={title}
       onError={(e) => {
         try {
-          e.currentTarget.src = "/placeholder-1200x800.png";
+          // e.currentTarget.src = "/placeholder-1200x800.png";
         } catch {}
       }}
       className="w-full h-[320px] md:h-[420px] object-cover block"

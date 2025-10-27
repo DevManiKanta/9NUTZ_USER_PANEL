@@ -8,8 +8,8 @@ import { useSettings } from "@/contexts/SettingsContext";
 
 export default function LoadingScreen() {
     const { settings } = useSettings();
-  const logoSrc = settings?.logo_url || "9 Nutz";
-  const Title=settings?.site_name
+  const logoSrc = settings?.logo_url || "";
+  const Title=settings?.site_name?settings?.site_name:""
   return (
     <div
       className="fixed inset-0 bg-white z-50 flex items-center justify-center"
@@ -25,7 +25,7 @@ export default function LoadingScreen() {
         >
           <Image
             src={logoSrc}
-            alt="9NUTZ logo"
+            alt="Loading ..."
             className="object-contain"
             width={100}
             height={100}
@@ -33,11 +33,11 @@ export default function LoadingScreen() {
           />
         </div>
         {/* Brand name */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
              {Title}
           </h1>
-        </div>
+        </div> */}
 
         {/* Loading dots */}
         <div className="flex justify-center items-center space-x-2 mb-3" aria-hidden>
@@ -52,7 +52,7 @@ export default function LoadingScreen() {
           />
         </div>
 
-        <p className="text-gray-500 text-sm">Loading fresh groceries...</p>
+        <p className="text-gray-500 text-sm">Loading...</p>
       </div>
       <style jsx>{`
         /* no-op here besides keeping consistent look — tailwind's animate-bounce is used for dots */
