@@ -200,10 +200,12 @@ import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
 import LocationModal from "@/components/LocationModal";
 import CartSidebar from "@/components/CartSidebar";
-
+import FeatureStrip from "@/components/ViewBand";
+import HeroTestimonials from "@/components/HeroWithTestimonials"
 // IMPORTANT: use the reusable ProductDetailClient that dispatches events or calls onAddToCart
 import ProductDetailClient from "@/components/ProductDetailClient";
 import ProductDetailContent from "@/components/ProductDetailContent";
+import TopSelling from "@/components/TopSellingProducts"
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -338,20 +340,17 @@ export default function Home() {
   if (isLoading) {
     return <LoadingScreen />;
   }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
         onLoginClick={() => setIsLoginModalOpen(true)}
         onLocationClick={() => setIsLocationModalOpen(true)}
-        // onCartClick={() => setIsCartOpen(true)}
+        onCartClick={() => setIsCartOpen(true)}
         cartItemCount={cartItems.reduce((s, i) => s + (i.quantity || 0), 0)}
         cartTotal={cartTotal}
         handlePaymentComplete={handlePaymentComplete}
       />
-
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
       <main>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Hero />
@@ -369,12 +368,12 @@ export default function Home() {
           />
         </div>
       </main>
-
+        <TopSelling/>
+          <FeatureStrip />
+          <HeroTestimonials/>
       <Footer />
-
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
       <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
-
       <CartSidebar
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -383,7 +382,6 @@ export default function Home() {
         onProceedToPay={handleProceedToPay}
         handlePaymentComplete={handlePaymentComplete}
       />
-
       {/* Product detail modal (client) */}
       {isProductModalOpen && selectedProductId && (
         <div

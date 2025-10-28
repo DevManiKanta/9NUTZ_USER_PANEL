@@ -382,7 +382,7 @@ import { Plus, Minus, Star } from "lucide-react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategoryDataContext } from "@/contexts/CategoryDataContext";
 import { useRouter } from "next/navigation";
-
+import Viewband from "@/components/ViewBand"
 export default function FilterableProductGrid({ onAddToCart, selectedCategory, isAnimating = false }) {
   const [quantities, setQuantities] = useState({});
   const [displayedProducts, setDisplayedProducts] = useState([]);
@@ -577,34 +577,96 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     );
   };
   return (
-    <div className="mb-16">
+    <div className="mb-16 w-full">
       {/* Section header */}
       {/* <div className="relative left-1/2 -translate-x-1/2 w-screen" style={{padding:"1rem"}}>
         <h2 className="text-3xl font-bold text-gray-900">Shop by Products</h2>
         {displayedProducts.length > 0 && <span className="text-sm text-gray-500">Searched results</span>}
       </div> */}
-         <div className="relative left-1/2 -translate-x-1/2 w-screen" style={{padding:"1rem"}}>
+           <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Shop by Products</h2>
-        {displayedProducts.length > 0 && <span className="text-sm text-gray-500">Searched results</span>}
         </div>
+        {/* Centered product grid container with slightly larger cards */}
+<div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
+  <div
+    className={`grid gap-8 sm:gap-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4
+      transition-all duration-300 ease-in-out ${
+        isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"
+      }`}
+  >
+    {otherProducts.map((p, i) => (
+      <div key={p.id || i} className="transform transition-transform hover:scale-[1.02]">
+        <article  
+          onClick={() => router.push(`/product/${p.id}`)}
+          className="bg-white rounded-2xl shadow-md hover:shadow-2xl overflow-hidden border border-gray-100 flex flex-col h-full"
+          style={{
+            height: "480px", // Increased card height
+            minWidth: "280px", // Wider cards
+          }}
+        >
+          <div className="relative w-full h-[260px] sm:h-[280px] md:h-[300px] overflow-hidden">
+            <img
+              src={
+                p?.imageUrl ||
+                (Array.isArray(p?.images) && p.images[0]) ||
+                p?.image ||
+                "/placeholder.png"
+              }
+              alt={p?.name || "product"}
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+            />
+            {p.discountAmount > 0 && (
+              <span className="absolute top-4 left-4 bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded-md shadow">
+                {Math.round(((p.price - (p.discountPrice || p.price - p.discountAmount)) / p.price) * 100)}% OFF
+              </span>
+            )}
+          </div>
 
-      {/* Product grid */}
-      <div
-  className={`grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 
-    transition-all duration-300 ease-in-out
-    ${isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
-  style={{
-    width: "100vw",            // full viewport width
-    position: "relative",
-    left: "50%",               // center it properly
-    right: "50%",
-    marginLeft: "-50vw",       // cancel container margins
-    marginRight: "-50vw", // keep your debug border
-  }}
->
+          <div className="flex-1 flex flex-col px-6 py-4">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+              {p?.name || "Unnamed"}
+            </h3>
 
-        {otherProducts.map((p, i) => renderProductCard(p, i))}
+            <div className="flex items-center gap-1 mb-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="w-4 h-4 text-yellow-400" />
+              ))}
+            </div>
+
+            <div className="mt-auto flex items-center justify-between">
+              <div>
+                <div className="text-xl font-bold text-gray-900">Rs.{p?.discountPrice || p?.price}</div>
+                {p?.discountPrice && (
+                  <div className="text-sm text-gray-400 line-through">Rs.{p?.price}</div>
+                )}
+              </div>
+                  {Number(p?.stock ?? 0) > 0 ? (
+  <button
+    className="px-4 py-2 border-2 border-green-600 text-green-600 rounded-lg font-medium hover:bg-green-50 transition"
+    onClick={(e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      handleAddToCart(p);
+    }}
+  >
+    Add to cart
+  </button>
+) : (
+  <div className="text-xs font-semibold px-3 py-2 rounded-lg bg-gray-200 text-gray-600 select-none">
+    Out of stock
+  </div>
+)}
+
+
+            </div>
+          </div>
+        </article>
       </div>
+    ))}
+  </div>
+</div>
+
+
 
       {displayedProducts.length === 0 && (
         <div className="text-center py-16">
@@ -624,8 +686,10 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
           <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {combopackProducts.map((p, i) => renderProductCard(p, i))}
           </div>
+           
         </section>
       )}
+
     </div>
   );
 }

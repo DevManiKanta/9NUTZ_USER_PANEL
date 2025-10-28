@@ -7,7 +7,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true, // ✅ Skip TS errors if any
   },
-  output: "export", // ✅ Enables static export (creates /out)
+  // output: "export", // ✅ Enables static export (creates /out)
   images: {
     unoptimized: true, // ✅ Prevents image optimization error on static hosting
   },
@@ -16,15 +16,5 @@ const nextConfig = {
 
 module.exports = nextConfig;
 
-// next.config.js
-// const nextConfig = {
-//   eslint: { ignoreDuringBuilds: true },
-//   typescript: { ignoreBuildErrors: true },
-//   // Remove this line:
-//   output: "export",
-//   // Use this if you want a portable server build (Docker/Node):
-//   output: "standalone",
-//   images: { unoptimized: true },
-// };
-// module.exports = nextConfig;
+
 
