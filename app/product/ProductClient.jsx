@@ -295,20 +295,174 @@
 //     </article>
 //   );
 // }
-// app/product/ProductClient.jsx
+
+
 "use client";
 
-import React from "react";
+import React, { useCallback, useState } from "react";
+import { Star, ShoppingCart, ArrowLeft } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import { useRouter } from "next/navigation";
 
 export default function ProductClient({ product }) {
+  const { addItem, openCart } = useCart() || {};
+  const [isAdding, setIsAdding] = useState(false);
+  const router = useRouter();
+
   if (!product) return null;
 
+  const discountPercent =
+    product.discountPrice && product.price
+      ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
+      : 0;
+
+  /** ✅ Add to Cart logic with context + fallback event **/
+  const handleAddToCart = useCallback(
+    (productToAdd) => {
+      if (!productToAdd) return;
+      const stockVal = Number(productToAdd?.stock ?? Infinity);
+      if (!Number.isNaN(stockVal) && stockVal <= 0) return;
+      setIsAdding(true);
+
+      try {
+        if (typeof addItem === "function") {
+          addItem({ ...productToAdd, quantity: 1 });
+        } else {
+          window.dispatchEvent(
+            new CustomEvent("productAddToCart", {
+              detail: { product: productToAdd, quantity: 1 },
+            })
+          );
+        }
+
+        if (typeof openCart === "function") openCart();
+        else window.dispatchEvent(new CustomEvent("openCart"));
+      } catch (err) {
+        console.error("Error adding product:", err);
+      } finally {
+        setTimeout(() => setIsAdding(false), 600);
+      }
+    },
+    [addItem, openCart]
+  );
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
-      <img src={product.imageUrl} alt={product.name} className="w-80 h-80 object-cover rounded-lg" />
-      <p className="mt-4 text-lg">Price: Rs.{product.price}</p>
-      <p className="mt-2 text-gray-600">{product.description}</p>
-    </div>
+    <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* 🔙 Back to Menu Button */}
+      <button
+        onClick={() => router.push("/")}
+        className="absolute -top-2 left-4 flex items-center gap-2 text-gray-600 hover:text-[#C75B3A] transition-colors duration-200"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span className="hidden sm:inline font-medium">Back to Menu</span>
+      </button>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start mt-6">
+        {/* 🖼️ Product Image Section */}
+        <div className="w-full flex justify-center">
+          <div className="relative w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-lg bg-gray-50">
+            <img
+              src={
+                product.imageUrl ||
+                (Array.isArray(product.images) && product.images[0]) ||
+                "/placeholder.png"
+              }
+              alt={product.name}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            />
+            {discountPercent > 0 && (
+              <span className="absolute top-4 left-4 bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded-md shadow">
+                {discountPercent}% OFF
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* 🧾 Product Details Section */}
+        <div className="flex flex-col gap-6">
+          {/* Product Name */}
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+              {product.name}
+            </h1>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" />
+              ))}
+              <span className="text-sm text-gray-500 ml-1">(4.9 / 120 reviews)</span>
+            </div>
+          </div>
+
+          {/* Price */}
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl font-bold text-[#C75B3A]">
+                Rs.{product.discountPrice || product.price}
+              </span>
+              {discountPercent > 0 && (
+                <span className="text-lg text-gray-400 line-through">
+                  Rs.{product.price}
+                </span>
+              )}
+            </div>
+            <p className="mt-2 text-gray-500 text-sm">
+              Inclusive of all taxes. Free delivery on orders above ₹499.
+            </p>
+          </div>
+
+          {/* Stock Status */}
+          {Number(product.stock ?? 0) > 0 ? (
+            <p className="text-green-600 font-semibold">In Stock</p>
+          ) : (
+            <p className="text-red-500 font-semibold">Out of Stock</p>
+          )}
+
+          {/* Description */}
+          <div className="text-gray-700 text-base leading-relaxed">
+            {product.description || "No description available."}
+          </div>
+
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-4">
+            <button
+              onClick={() => handleAddToCart(product)}
+              disabled={Number(product.stock ?? 0) <= 0 || isAdding}
+              className={`flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-xl transition-colors duration-200 ${
+                Number(product.stock ?? 0) > 0
+                  ? "bg-[#C75B3A] text-white hover:bg-[#b14e33]"
+                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
+              }`}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {isAdding
+                ? "Adding..."
+                : Number(product.stock ?? 0) > 0
+                ? "Add to Cart"
+                : "Out of Stock"}
+            </button>
+          </div>
+
+          {/* 🍴 Additional Section */}
+          <div className="mt-12 border-t pt-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Product Details
+            </h2>
+
+            <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-relaxed">
+              <li>Made from premium-quality ingredients for authentic taste and freshness.</li>
+              <li>Prepared under hygienic conditions following strict food safety standards.</li>
+              <li>Free from harmful preservatives, artificial colors, or flavors.</li>
+              <li>Perfect for everyday meals, festive occasions, and quick snack cravings.</li>
+              <li>Rich in natural flavors, nutrients, and wholesome goodness.</li>
+              <li>Packed carefully to preserve freshness and aroma during delivery.</li>
+              <li>Ideal for gifting and sharing with family and friends.</li>
+              <li>Delivered safely to your doorstep with freshness guaranteed.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
+
+
