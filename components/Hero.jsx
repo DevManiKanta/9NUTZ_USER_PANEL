@@ -622,18 +622,18 @@ export default function Hero() {
                 <div key={b.id} className="relative flex-shrink-0 w-full h-full">
                   {/* Blurred background */}
                   <div
-                    className="absolute inset-0 bg-center bg-cover scale-110 filter blur-[20px] brightness-95"
+                    className="absolute inset-0 bg-center bg-cover scale-110 filter  brightness-95"
                     style={{ backgroundImage: `url(${b.image_url || PLACEHOLDER})` }}
                     aria-hidden="true"
                   />
-
+``
                   {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-r from-[#f8f8f8] via-white/70 to-transparent" />
 
                   {/* Content */}
                   <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
                     {/* Left: Text */}
-                    <div className="flex-1 max-w-2xl text-left">
+                    {/* <div className="flex-1 max-w-2xl text-left">
                       <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 leading-tight">
                         {b.title}
                       </h2>
@@ -650,18 +650,18 @@ export default function Hero() {
                           </a>
                         </div>
                       )}
-                    </div>
+                    </div> */}
 
                     {/* Right: Poster image */}
                     <div className="flex-shrink-0 ml-8 hidden sm:block">
                       <div className="w-[260px] sm:w-[300px] md:w-[360px] rounded-xl overflow-hidden shadow-2xl bg-white">
-                        <Image
+                        {/* <Image
                           src={b.image_url || PLACEHOLDER}
                           alt={`${b.title || "Banner"} poster`}
                           width={360}
                           height={540}
                           className="w-full h-auto object-cover block"
-                        />
+                        /> */}
                       </div>
                     </div>
                   </div>
