@@ -433,7 +433,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import apiAxios, { API_BASE } from "@/lib/api";
 import { Login_API_BASE } from "@/lib/api";
@@ -507,15 +506,23 @@ export default function Hero() {
         const active = rows.filter((b) => b && (b.is_active === 1 || b.is_active === true || b.is_active === "1"));
         const source = active.length ? active : rows;
 
-        const mapped = (source || []).map((b) => ({
-          id: b?.id ?? `${b?.title ?? "banner"}-${Math.random().toString(36).slice(2, 8)}`,
-          title: b?.title ?? "",
-          subtitle: b?.subtitle ?? "",
-          discount: b?.discount ?? "",
-          image_url: toFullImageUrl(b?.image_url ?? b?.image ?? ""),
-          redirect_url: b?.redirect_url ?? "",
-          is_active: b?.is_active ?? 0,
-        }));
+        const mapped = (source || []).map((b) => {
+          // Prefer redirect_url if it is an absolute URL; else convert image_url to full
+          const redirect = b?.redirect_url ? String(b.redirect_url).trim() : "";
+          const redirectIsAbsolute = redirect && (redirect.startsWith("http://") || redirect.startsWith("https://") || redirect.startsWith("data:"));
+          const imageSrc = redirectIsAbsolute ? redirect : toFullImageUrl(b?.image_url ?? b?.image ?? "");
+
+          return {
+            id: b?.id ?? `${b?.title ?? "banner"}-${Math.random().toString(36).slice(2, 8)}`,
+            title: b?.title ?? "",
+            subtitle: b?.subtitle ?? "",
+            discount: b?.discount ?? "",
+            image_url: imageSrc || "",      // final URL used for rendering
+            redirect_url: redirect || "",
+            is_active: b?.is_active ?? 0,
+            raw: b,
+          };
+        });
 
         setBanners(mapped);
       } catch (err) {
@@ -606,45 +613,46 @@ export default function Hero() {
       >
         {/* Loading / Error / Empty States */}
         {loading ? (
-          <div className="w-full h-[72vh] flex items-center justify-center text-gray-500">Loading banners...</div>
+          <div className="w-full h-[54vh] flex items-center justify-center text-gray-500">Loading banners...</div>
         ) : error ? (
-          <div className="w-full h-[72vh] flex items-center justify-center bg-red-50 text-red-600">{error}</div>
+          <div className="w-full h-[54vh] flex items-center justify-center bg-red-50 text-red-600">{error}</div>
         ) : banners.length === 0 ? (
-          <div className="w-full h-[72vh] flex items-center justify-center text-gray-500">No banners available</div>
+          <div className="w-full h-[54vh] flex items-center justify-center text-gray-500">No banners available</div>
         ) : (
-          // ✅ Updated HeroCarousel layout using dynamic API banners
-          <section className="relative w-full h-[72vh] min-h-[420px] overflow-hidden">
+          // Banner carousel using API-provided image_url (or redirect_url when absolute)
+          <section className="relative w-full h-[54vh] min-h-[320px] overflow-hidden">
             <div
               className="flex h-full transition-transform duration-700 ease-in-out"
-              style={{ transform: `translateX(-${currentBanner * 100}%)` }}
+              style={{ transform: `translateX(-${currentBanner * 100}%)`, width: `${Math.max(1, banners.length) * 100}%` }}
             >
               {banners.map((b) => (
                 <div key={b.id} className="relative flex-shrink-0 w-full h-full">
-                  {/* Blurred background */}
+                  {/* Blurred background (full-bleed) */}
                   <div
-                    className="absolute inset-0 bg-center bg-cover scale-110 filter  brightness-95"
+                    className="absolute inset-0 bg-center bg-cover scale-110 filter brightness-95"
                     style={{ backgroundImage: `url(${b.image_url || PLACEHOLDER})` }}
                     aria-hidden="true"
                   />
-``
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#f8f8f8] via-white/70 to-transparent" />
 
-                  {/* Content */}
+                  {/* Gradient overlay for readable text */}
+                  <div className="absolute inset-0  via-white/70 to-transparent" />
+
+                  {/* Content container (centered with max width) */}
                   <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-                    {/* Left: Text */}
-                    {/* <div className="flex-1 max-w-2xl text-left">
-                      <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 leading-tight">
-                        {b.title}
-                      </h2>
-                      {b.subtitle && <p className="mt-4 text-lg sm:text-xl text-slate-700">{b.subtitle}</p>}
+                    {/* Left: Text (narrowed so poster gets space) */}
+                    {/* <div className="flex-1 max-w-xl text-left">
+                      {b.title && (
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
+                          {b.title}
+                        </h2>
+                      )}
+                      {b.subtitle && <p className="mt-3 text-base sm:text-lg text-slate-700">{b.subtitle}</p>}
                       {b.discount && <p className="mt-2 text-sm text-emerald-700 font-medium">{b.discount}</p>}
-
                       {b.redirect_url && (
-                        <div className="mt-8">
+                        <div className="mt-6">
                           <a
                             href={b.redirect_url}
-                            className="inline-block bg-slate-900 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-md hover:bg-slate-800 transition"
+                            className="inline-block bg-slate-900 text-white px-5 py-2 rounded-full text-base font-semibold shadow-md hover:bg-slate-800 transition"
                           >
                             Shop Now
                           </a>
@@ -652,16 +660,20 @@ export default function Hero() {
                       )}
                     </div> */}
 
-                    {/* Right: Poster image */}
-                    <div className="flex-shrink-0 ml-8 hidden sm:block">
-                      <div className="w-[260px] sm:w-[300px] md:w-[360px] rounded-xl overflow-hidden shadow-2xl bg-white">
-                        {/* <Image
+                    {/* Right: Poster card (smaller, fixed width; shows placeholder on error) */}
+                    <div className="flex-shrink-0 ml-6 hidden sm:block">
+                      <div className="w-[220px] sm:w-[240px] md:w-[300px] rounded-xl overflow-hidden shadow-2xl bg-white">
+                        <img
                           src={b.image_url || PLACEHOLDER}
                           alt={`${b.title || "Banner"} poster`}
-                          width={360}
-                          height={540}
-                          className="w-full h-auto object-cover block"
-                        /> */}
+                          loading="eager"
+                          decoding="async"
+                          onError={(e) => {
+                            try { e.currentTarget.src = PLACEHOLDER; } catch (err) {}
+                          }}
+                          className="w-full h-auto object-contain block"
+                          style={{ display: "block" }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -669,7 +681,7 @@ export default function Hero() {
               ))}
             </div>
 
-            {/* Controls */}
+            {/* Prev / Next controls */}
             <button
               aria-label="Previous"
               onClick={prevBanner}
@@ -709,7 +721,7 @@ export default function Hero() {
   );
 }
 
-/* ---------- Category Carousel (unchanged) ---------- */
+/* ---------- Category Carousel (small arrows + bullets below) ---------- */
 function CategoryCarousel({ categories = [], loading, error }) {
   if (loading)
     return (
@@ -746,39 +758,103 @@ function CategoryCarousel({ categories = [], loading, error }) {
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Shop by Categories</h2>
         </div>
-        <Swiper
-          modules={[Autoplay, Pagination, Navigation]}
-          breakpoints={breakpoints}
-          navigation
-          loop={categories.length > 6}
-          autoplay={{ delay: 2800, disableOnInteraction: true }}
-          pagination={{ clickable: true }}
-          className="category-swiper py-6"
-        >
-          {categories.map((category) => {
-            const src = category.image_url || category.image || PLACEHOLDER;
-            return (
-              <SwiperSlide key={category.id}>
-                <div className="flex flex-col items-center">
-                  <div className="rounded-full bg-white p-4 flex items-center justify-center w-[130px] h-[130px] overflow-hidden shadow-sm">
-                    <img
-                      src={src}
-                      alt={category.name}
-                      className="w-full h-full object-cover object-center rounded-full"
-                    />
+
+        {/* Wrapper for Swiper and bullets */}
+        <div className="relative">
+          <Swiper
+            modules={[Autoplay, Pagination, Navigation]}
+            breakpoints={breakpoints}
+            navigation
+            loop={categories.length > 6}
+            autoplay={{ delay: 2800, disableOnInteraction: true }}
+            pagination={{ clickable: true, el: ".custom-swiper-pagination" }}
+            className="category-swiper py-6"
+          >
+            {categories.map((category) => {
+              const src = category.image_url || category.image || PLACEHOLDER;
+              return (
+                <SwiperSlide key={category.id}>
+                  <div className="flex flex-col items-center">
+                    <div className="rounded-full bg-white p-4 flex items-center justify-center w-[130px] h-[130px] overflow-hidden shadow-sm">
+                      <img
+                        src={src}
+                        alt={category.name}
+                        className="w-full h-full object-cover object-center rounded-full"
+                      />
+                    </div>
+                    <div className="mt-4 text-center">
+                      <span className="block text-sm md:text-base tracking-widest font-semibold text-emerald-800 uppercase">
+                        {category.name}
+                      </span>
+                      <span className="block text-xs text-gray-500 mt-1">
+                        {category.products_count ?? 0} Products
+                      </span>
+                    </div>
                   </div>
-                  <div className="mt-4 text-center">
-                    <span className="block text-sm md:text-base tracking-widest font-semibold text-emerald-800 uppercase">
-                      {category.name}
-                    </span>
-                    <span className="block text-xs text-gray-500 mt-1">{category.products_count ?? 0} Products</span>
-                  </div>
-                </div>
-              </SwiperSlide>
-            );
-          })}
-        </Swiper>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
+
+          {/* Bullets moved BELOW carousel */}
+          <div className="custom-swiper-pagination mt-6 flex justify-center"></div>
+        </div>
       </div>
+
+      {/* Styles: Small arrows + bullets below */}
+      <style jsx>{`
+        /* Bullets */
+        :global(.custom-swiper-pagination .swiper-pagination-bullet) {
+          width: 10px;
+          height: 6px;
+          border-radius: 999px;
+          background: rgba(0, 0, 0, 0.08);
+          opacity: 1;
+          margin: 0 6px !important;
+          transition: transform 0.25s ease, background 0.25s ease;
+        }
+        :global(.custom-swiper-pagination .swiper-pagination-bullet-active) {
+          background: #c75b3a;
+          width: 26px;
+          height: 8px;
+          border-radius: 999px;
+        }
+
+        /* Smaller, subtle navigation arrows */
+        :global(.category-swiper .swiper-button-next),
+        :global(.category-swiper .swiper-button-prev) {
+          width: 24px;
+          height: 24px;
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 999px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+          color: #374151;
+          opacity: 0.8;
+          transition: all 0.2s ease;
+        }
+
+        :global(.category-swiper .swiper-button-next:hover),
+        :global(.category-swiper .swiper-button-prev:hover) {
+          opacity: 1;
+          background: white;
+          transform: scale(1.05);
+        }
+
+        :global(.category-swiper .swiper-button-next::after),
+        :global(.category-swiper .swiper-button-prev::after) {
+          font-size: 12px;
+          font-weight: bold;
+        }
+
+        :global(.category-swiper .swiper-button-prev) {
+          left: 2px;
+        }
+        :global(.category-swiper .swiper-button-next) {
+          right: 2px;
+        }
+      `}</style>
     </div>
   );
 }
+
+
