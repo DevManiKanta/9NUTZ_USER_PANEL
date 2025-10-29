@@ -179,13 +179,11 @@
 //       </>
 //   );
 // }
-
 "use client";
-
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { LOGIN_API_BASE } from "@/lib/api";
-import Header from "../components/Header";
+import { useCart } from "@/contexts/CartContext";
 const API_BASE = "https://9nutsapi.nearbydoctors.in/public/api";
 
 /** helper to turn backend image path into full URL */
@@ -202,6 +200,42 @@ export default function CategoryProductsClient({ identifier }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [category, setCategory] = useState(null);
+
+  // missing isAdding state — add it here
+  const [isAdding, setIsAdding] = useState(false);
+
+  // call custom hook at top-level (unchanged)
+  const { addItem, openCart } = useCart() || {};
+
+  // Move handler to top-level so hooks are always called in the same order
+  const handleAddToCart = useCallback(
+    (productToAdd) => {
+      if (!productToAdd) return;
+      const stockVal = Number(productToAdd?.stock ?? Infinity);
+      if (!Number.isNaN(stockVal) && stockVal <= 0) return;
+      setIsAdding(true);
+
+      try {
+        if (typeof addItem === "function") {
+          addItem({ ...productToAdd, quantity: 1 });
+        } else {
+          window.dispatchEvent(
+            new CustomEvent("productAddToCart", {
+              detail: { product: productToAdd, quantity: 1 },
+            })
+          );
+        }
+
+        if (typeof openCart === "function") openCart();
+        else window.dispatchEvent(new CustomEvent("openCart"));
+      } catch (err) {
+        console.error("Error adding product:", err);
+      } finally {
+        setTimeout(() => setIsAdding(false), 600);
+      }
+    },
+    [addItem, openCart, setIsAdding]
+  );
 
   useEffect(() => {
     if (!identifier) {
@@ -303,14 +337,9 @@ export default function CategoryProductsClient({ identifier }) {
 
   const products = Array.isArray(category.products) ? category.products : [];
 
-  // ✅ Simple button handler — no localStorage, just console log
-  const handleAddToCart = (product) => {
-    console.log(`Add to Cart clicked: ${product.name}`);
-  };
-
   return (
     <>
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
         <div className="flex items-center gap-6 mb-6">
           {category.image_url ? (
             <img
@@ -372,7 +401,7 @@ export default function CategoryProductsClient({ identifier }) {
                       }}
                       className="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 rounded-md transition"
                     >
-                      Add to Cart
+                      {isAdding ? "Adding..." : "Add to Cart"}
                     </button>
                   </div>
                 </Link>
@@ -384,4 +413,5 @@ export default function CategoryProductsClient({ identifier }) {
     </>
   );
 }
+
 

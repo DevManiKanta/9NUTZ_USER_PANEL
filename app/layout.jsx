@@ -52,7 +52,8 @@ import { CartProvider } from "@/contexts/CartContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { ProductProvider } from "@/contexts/ProductContext";
 import { CategoryDataProvider } from "@/contexts/CategoryDataContext";
-
+import {WishListProvider}from "@/contexts/WishlistContext"
+import { Toaster } from "react-hot-toast";
 export const metadata = {
   title: "9NUTZ",
   description:
@@ -71,7 +72,11 @@ export default function RootLayout({ children }) {
                   <CartProvider>
                     <SettingsProvider>
                       <CategoryDataProvider>
-                        <AppShell>{children}</AppShell>
+                        <WishListProvider>
+                        <AppShell>
+                            <Toaster position="top-right" />
+                          {children}</AppShell>
+                        </WishListProvider>
                       </CategoryDataProvider>
                     </SettingsProvider>
                   </CartProvider>

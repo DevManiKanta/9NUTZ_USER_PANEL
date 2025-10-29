@@ -347,8 +347,7 @@ export default function ProductClient({ product }) {
   );
 
   return (
-    <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      {/* 🔙 Back to Menu Button */}
+    <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-1">
       <button
         onClick={() => router.push("/")}
         className="absolute -top-2 left-4 flex items-center gap-2 text-gray-600 hover:text-[#C75B3A] transition-colors duration-200"
@@ -356,9 +355,7 @@ export default function ProductClient({ product }) {
         <ArrowLeft className="w-5 h-5" />
         <span className="hidden sm:inline font-medium">Back to Menu</span>
       </button>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start mt-6">
-        {/* 🖼️ Product Image Section */}
         <div className="w-full flex justify-center">
           <div className="relative w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-lg bg-gray-50">
             <img

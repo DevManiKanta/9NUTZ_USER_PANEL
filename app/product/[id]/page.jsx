@@ -78,22 +78,9 @@
 //   );
 // }
 
-
-// app/product/[id]/page.jsx
-// app/product/[id]/page.jsx
-
 export const dynamic = "force-dynamic";
 import React from "react";
 import ProductPageClient from "@/app/product/ProductPageClient";
-
-// export async function generateStaticParams() {
-//   // Provide a minimal set so Next can statically export dynamic route
-//   return [
-//     { id: "51" },
-//     { id: "46" },
-//     { id: "48" },
-//   ];
-// }
 
 export default function ProductPage({ params }) {
   const { id } = params || {};

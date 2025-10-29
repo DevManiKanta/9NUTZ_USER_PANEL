@@ -4,11 +4,13 @@ import React, { useEffect, useState, useCallback } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartSidebar from "@/components/CartSidebar";
+import LoginModal from "@/components/LoginModal";
 import { useCart } from "@/contexts/CartContext";
 
 export default function AppShell({ children }) {
   const { items, updateQuantity, clearCart, cartCount, cartTotal } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
 
   const openCart = useCallback(() => setCartOpen(true), []);
   const closeCart = useCallback(() => setCartOpen(false), []);
@@ -21,7 +23,12 @@ export default function AppShell({ children }) {
 
   return (
     <>
-      <Header onCartClick={openCart} cartItemCount={cartCount} cartTotal={cartTotal} />
+      <Header
+        onCartClick={openCart}
+        onLoginClick={() => setLoginOpen(true)}
+        cartItemCount={cartCount}
+        cartTotal={cartTotal}
+      />
       <main className="min-h-screen pt-16">{children}</main>
       <Footer />
 
@@ -32,6 +39,8 @@ export default function AppShell({ children }) {
         onUpdateQuantity={updateQuantity}
         onClearCart={clearCart}
       />
+
+      <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );
 }
