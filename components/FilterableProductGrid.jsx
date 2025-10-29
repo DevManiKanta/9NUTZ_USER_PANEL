@@ -380,7 +380,7 @@ import { Plus, Minus, Star } from "lucide-react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategoryDataContext } from "@/contexts/CategoryDataContext";
 import { useRouter } from "next/navigation";
-import Viewband from "@/components/ViewBand"
+import Viewband from "@/components/ViewBand";
 
 export default function FilterableProductGrid({ onAddToCart, selectedCategory, isAnimating = false }) {
   const [quantities, setQuantities] = useState({});
@@ -412,14 +412,25 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     return () => window.removeEventListener("siteSearch", handleSearch);
   }, []);
 
+  // ===== FIXED: more robust category id/name extraction =====
   const getProductCategoryIdAndName = useCallback((p) => {
     const cat = p && p.category;
-    if (!cat && typeof cat !== "string") return { id: undefined, name: undefined };
-    if (typeof cat === "string") return { id: cat, name: cat };
+
+    // no category provided
+    if (cat == null) return { id: undefined, name: undefined };
+
+    // category provided as a primitive id (string or number)
+    if (typeof cat === "string" || typeof cat === "number") {
+      const id = String(cat).trim() || undefined;
+      return { id, name: undefined };
+    }
+
+    // category provided as an object -> try common keys
     const id = String(cat.id ?? cat._id ?? cat.category_id ?? cat.categoryId ?? "").trim() || undefined;
-    const name = String(cat.name ?? cat.title ?? cat.category_name ?? "").trim() || undefined;
+    const name = String(cat.name ?? cat.title ?? cat.category_name ?? cat.categoryName ?? "").trim() || undefined;
     return { id, name };
   }, []);
+  // ===========================================================
 
   const combopackCategoryIds = useMemo(() => {
     if (!Array.isArray(categories)) return new Set();
@@ -509,7 +520,8 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     displayedProducts.forEach((p) => {
       const { id, name } = getProductCategoryIdAndName(p);
       const lower = (name || "").toLowerCase();
-      if (combopackCategoryIds.has(String(id)) || lower.includes("combopack") || lower.includes("cobopack")) combo.push(p);
+      // compare id as string to match combopackCategoryIds entries
+      if (id && combopackCategoryIds.has(String(id)) || lower.includes("combopack") || lower.includes("cobopack")) combo.push(p);
       else others.push(p);
     });
     return { combopackProducts: combo, otherProducts: others };
