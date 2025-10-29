@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrders } from "@/contexts/OrderContext";
  
@@ -23,9 +23,20 @@ import apiAxios from "@/lib/api";
 import toast, { Toaster } from "react-hot-toast";
 import ProfilePage from "@/app/myprofile/page"
 import OrdersTablePage from "@/app/myorders/page"
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useSearchParams } from "next/navigation";
 export default function UserDashboard() {
   // Default to "profile" now that Add Address lives inside it
   const [activeSection, setActiveSection] = useState("");
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const tab = (searchParams?.get("tab") || "").toLowerCase();
+    if (tab === "orders" || tab === "profile" || tab === "tracking" || tab === "favourites") {
+      setActiveSection(tab);
+    } else if (!activeSection) {
+      setActiveSection("profile");
+    }
+  }, [searchParams]);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -36,8 +47,36 @@ export default function UserDashboard() {
 
   const { user, token, logout } = useAuth();
   const { getUserOrders } = useOrders();
+  const { favorites = [], loading: favLoading, refreshFavorites } = useWishlist() || {};
 
   const userOrders = user ? getUserOrders(user.id) : [];
+
+  const favouriteRows = useMemo(() => {
+    const arr = Array.isArray(favorites) ? favorites : [];
+    return arr.map((f, idx) => {
+      const idRaw = f?.product_id ?? f?.id ?? f?.productId ?? f?.product?.id ?? f?.product?._id;
+      const id = idRaw != null ? String(idRaw) : "";
+      const name = f?.name ?? f?.product_name ?? f?.title ?? f?.product?.name ?? `Product ${id || idx + 1}`;
+      const price = f?.price ?? f?.offerPrice ?? f?.product_price ?? f?.product?.offerPrice ?? f?.product?.price ?? null;
+      const image = f?.image ?? f?.thumbnail ?? f?.product?.image ?? (Array.isArray(f?.product?.images) ? f.product.images[0] : null);
+      return { id, name, price, image };
+    });
+  }, [favorites]);
+
+  useEffect(() => {
+    // Ensure favourites are up-to-date when visiting the dashboard and when switching to the tab
+    try {
+      refreshFavorites?.();
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (activeSection === "favourites") {
+      try {
+        refreshFavorites?.();
+      } catch {}
+    }
+  }, [activeSection]);
 
   const getLocalToken = () => {
     if (typeof window === "undefined") return null;
@@ -908,6 +947,18 @@ export default function UserDashboard() {
                     <span className="font-medium">My Orders</span>
                   </button>
 
+                  <button
+                    onClick={() => setActiveSection("favourites")}
+                    className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg text-left transition-colors ${
+                      activeSection === "favourites"
+                        ? "bg-white text-green-600 shadow-sm border border-gray-200"
+                        : "text-gray-700 hover:bg-white hover:shadow-sm"
+                    }`}
+                  >
+                    <Box className="h-4 w-4" />
+                    <span className="font-medium">Favourites</span>
+                  </button>
+
                   {/* <button
                     onClick={() => setActiveSection("tracking")}
                     className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg text-left transition-colors ${
@@ -942,6 +993,62 @@ export default function UserDashboard() {
                 {activeSection === "profile" && <ProfilePage/>}
                 {activeSection === "orders" && <OrdersTablePage/>}
                 {activeSection === "tracking" && renderTracking()}
+                {activeSection === "favourites" && (
+                  <div className="space-y-6" style={{ width: "100%" }}>
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-2xl font-bold text-gray-900">My Favourites</h2>
+                      <span className="text-sm text-gray-500">{(Array.isArray(favorites) ? favorites.length : 0)} items</span>
+                    </div>
+                    {favLoading ? (
+                      <div className="text-center py-12 text-gray-500">Loading favourites…</div>
+                    ) : favouriteRows.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Box className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No favourites yet</h3>
+                        <p className="text-gray-500">Tap the heart on a product to add it here.</p>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200 border border-gray-100 rounded-lg overflow-hidden">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-100">
+                            {favouriteRows.map((r, i) => (
+                              <tr key={r.id || i} className="hover:bg-gray-50">
+                                <td className="px-4 py-3">
+                                  <div className="flex items-center gap-3">
+                                    {r.image ? (
+                                      <img src={r.image} alt={r.name} className="w-10 h-10 rounded object-cover" />
+                                    ) : (
+                                      <div className="w-10 h-10 rounded bg-gray-100" />
+                                    )}
+                                    <div>
+                                      <div className="text-sm font-medium text-gray-900">{r.name}</div>
+                                      {r.id ? <div className="text-xs text-gray-500">#{r.id}</div> : null}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-700">{r.price ? `₹${r.price}` : "-"}</td>
+                                <td className="px-4 py-3">
+                                  {r.id ? (
+                                    <a href={`/product/${r.id}`} className="text-green-600 hover:text-green-700 text-sm font-medium">View</a>
+                                  ) : (
+                                    <span className="text-gray-400 text-sm">View</span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {/* {activeSection === "notifications" && renderNotifications()} */}
               </section>
             </div>

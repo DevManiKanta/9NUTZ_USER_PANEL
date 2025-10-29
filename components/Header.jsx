@@ -349,7 +349,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { ShoppingCart, User, Bell, Heart as HeartIcon } from "lucide-react";
 import AccountDropdown from "./AccountDropdown";
 import { useAuth } from "@/contexts/AuthContext";
-import { useWishlist } from "@/contexts/WishListContext"; // <- make sure this path matches yours
+import { useWishlist } from "@/contexts/WishlistContext"; // fixed import path
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "../assests/LOGO.jpg";
@@ -521,7 +521,7 @@ export default function Header({
 
             {/* ❤️ Favourites (NEW) */}
             <Link
-              href="/wishlist"
+              href="/dashboard?tab=favourites"
               aria-label="Favourites"
               className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors inline-flex items-center justify-center"
             >

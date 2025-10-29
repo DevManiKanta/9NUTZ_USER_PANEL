@@ -47,13 +47,38 @@ export const WishListProvider = ({ children }) => {
       }
 
       const data = await res.json();
-      const list =
-        Array.isArray(data) ? data :
-        Array.isArray(data?.data) ? data.data :
-        Array.isArray(data?.favorites) ? data.favorites :
-        Array.isArray(data?.result) ? data.result : [];
+      // Try multiple common shapes from backend
+      const root = data?.data ?? data;
+      const listCandidate =
+        (Array.isArray(data) && data) ||
+        (Array.isArray(root?.favorites) && root.favorites) ||
+        (Array.isArray(root?.favorite) && root.favorite) ||
+        (Array.isArray(root?.favourites) && root.favourites) ||
+        (Array.isArray(root?.favourite) && root.favourite) ||
+        (Array.isArray(root?.wishlist) && root.wishlist) ||
+        (Array.isArray(root?.wishlists) && root.wishlists) ||
+        (Array.isArray(root?.result) && root.result) ||
+        [];
 
-      setFavorites(list);
+      // Dedupe by product id and normalize minimal fields
+      const normalized = listCandidate.map((f) => {
+        const id = f?.product_id ?? f?.id ?? f?.productId ?? f?.product?.id ?? f?.product?._id;
+        return {
+          ...f,
+          product_id: id != null ? id : f?.product_id,
+        };
+      });
+
+      const seen = new Set();
+      const deduped = [];
+      for (const item of normalized) {
+        const k = String(item?.product_id ?? item?.id ?? "");
+        if (!k || seen.has(k)) continue;
+        seen.add(k);
+        deduped.push(item);
+      }
+
+      setFavorites(deduped);
     } catch (err) {
       setError(err);
       setFavorites([]);

@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useMemo as useReactMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Minus, ChevronRight, Clock, Star, ArrowLeft, Heart } from "lucide-react";
 import ProductGrid from "./ProductGrid";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 export default function ProductDetailContent({ product }) {
   const router = useRouter();
@@ -49,7 +50,9 @@ export default function ProductDetailContent({ product }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedUnitIndex, setSelectedUnitIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [wishlisted, setWishlisted] = useState(false);
+  const { favorites = [], addFavorite } = useWishlist() || {};
+  const favSet = useReactMemo(() => new Set((favorites || []).map((f) => String(f?.product_id ?? f?.id))), [favorites]);
+  const isWishlisted = favSet.has(String(product?.id));
 
   const selectedUnit = units[selectedUnitIndex] ?? units[0] ?? { size: "1", price: 0 };
 
@@ -75,7 +78,15 @@ export default function ProductDetailContent({ product }) {
     }
   };
 
-  const toggleWishlist = () => setWishlisted((s) => !s);
+  const handleAddToWishlist = async () => {
+    const productId = String(product?.id || "");
+    if (!productId || isWishlisted) return;
+    try {
+      await addFavorite(productId);
+    } catch (e) {
+      // no-op; toast handled in context
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -166,8 +177,10 @@ export default function ProductDetailContent({ product }) {
                 </button>
 
                 <button
-                  onClick={toggleWishlist}
-                  className={`px-4 py-3 rounded-lg border-2 transition ${wishlisted ? "border-red-500 bg-red-50 text-red-600" : "border-gray-300 text-gray-600"}`}
+                  onClick={handleAddToWishlist}
+                  disabled={isWishlisted}
+                  aria-pressed={isWishlisted}
+                  className={`px-4 py-3 rounded-lg border-2 transition ${isWishlisted ? "border-red-500 bg-red-50 text-red-600" : "border-gray-300 text-gray-600"}`}
                 >
                   <Heart className="h-5 w-5" />
                 </button>
