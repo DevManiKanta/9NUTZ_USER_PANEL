@@ -4,8 +4,6 @@ import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Minus, ChevronRight, Clock, Star, ArrowLeft, Heart } from "lucide-react";
 import ProductGrid from "./ProductGrid";
-import Header from "./Header";
-import Footer from "./Footer";
 import { useCart } from "@/contexts/CartContext";
 
 export default function ProductDetailContent({ product }) {
@@ -81,20 +79,6 @@ export default function ProductDetailContent({ product }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header
-        onLoginClick={() => {}}
-        onLocationClick={() => {}}
-        onCartClick={() => {
-          try {
-            window.dispatchEvent(new CustomEvent("openCart"));
-          } catch (err) {
-            console.warn("Failed to dispatch openCart event:", err);
-          }
-        }}
-        cartItemCount={cartCount}
-        cartTotal={cartTotal}
-      />
-         
       <main className="pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
@@ -225,8 +209,6 @@ export default function ProductDetailContent({ product }) {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

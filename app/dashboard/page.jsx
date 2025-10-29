@@ -3,8 +3,7 @@
 import React, { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrders } from "@/contexts/OrderContext";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+ 
 import {
   Package,
   Search,
@@ -870,7 +869,6 @@ export default function UserDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Toaster position="top-right" />
-      <Header onLoginClick={() => {}} onLocationClick={() => {}} onCartClick={() => {}} cartItemCount={0} cartTotal={0} />
       <main>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between mb-6">
@@ -974,7 +972,6 @@ export default function UserDashboard() {
           </div>
         </div>
       )}
-      <Footer />
     </div>
   );
 }

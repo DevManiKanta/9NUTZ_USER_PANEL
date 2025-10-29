@@ -42,8 +42,7 @@
 
 // app/layout.js
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import AppShell from "@/components/AppShell";
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { OrderProvider } from "@/contexts/OrderContext";
@@ -72,11 +71,7 @@ export default function RootLayout({ children }) {
                   <CartProvider>
                     <SettingsProvider>
                       <CategoryDataProvider>
-                        {/* <Header /> */}
-                        {/* <main className="min-h-screen pt-16"> */}
-                          {children}
-                        {/* </main> */}
-                        {/* <Footer /> */}
+                        <AppShell>{children}</AppShell>
                       </CategoryDataProvider>
                     </SettingsProvider>
                   </CartProvider>

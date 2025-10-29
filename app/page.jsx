@@ -191,14 +191,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import LoadingScreen from "@/components/LoadingScreen";
-import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import CategoryFilter from "@/components/CategoryFilter";
 import FilterableProductGrid from "@/components/FilterableProductGrid";
-import Footer from "@/components/Footer";
 import LoginModal from "@/components/LoginModal";
 import LocationModal from "@/components/LocationModal";
-import CartSidebar from "@/components/CartSidebar";
 import FeatureStrip from "@/components/ViewBand";
 import HeroTestimonials from "@/components/HeroWithTestimonials"
 // IMPORTANT: use the reusable ProductDetailClient that dispatches events or calls onAddToCart
@@ -340,14 +337,6 @@ export default function Home() {
   }
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header
-        onLoginClick={() => setIsLoginModalOpen(true)}
-        onLocationClick={() => setIsLocationModalOpen(true)}
-        onCartClick={() => setIsCartOpen(true)}
-        cartItemCount={cartItems.reduce((s, i) => s + (i.quantity || 0), 0)}
-        cartTotal={cartTotal}
-        handlePaymentComplete={handlePaymentComplete}
-      />
       <main>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Hero />
@@ -367,17 +356,8 @@ export default function Home() {
         <TopSelling/>
           <FeatureStrip />
           <HeroTestimonials/>
-      <Footer />
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
       <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />
-      <CartSidebar
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        onUpdateQuantity={updateQuantity}
-        onProceedToPay={handleProceedToPay}
-        handlePaymentComplete={handlePaymentComplete}
-      />
       {/* Product detail modal (client) */}
       {isProductModalOpen && selectedProductId && (
         <div

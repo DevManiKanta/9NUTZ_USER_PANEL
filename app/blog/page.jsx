@@ -2,8 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Eye } from 'lucide-react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+ 
 
 export default function BlogPage() {
   const blogPosts = [
@@ -51,7 +50,6 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header onLoginClick={() => {}} onLocationClick={() => {}} onCartClick={() => {}} cartItemCount={0} cartTotal={0} />
       <main className="pt-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
@@ -132,7 +130,6 @@ export default function BlogPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

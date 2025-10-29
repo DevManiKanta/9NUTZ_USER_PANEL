@@ -769,7 +769,7 @@ function CategoryCarousel({ categories = [], loading, error }) {
               return (
                 <SwiperSlide key={category.id}>
                   <Link 
-                    href={`/category/${category.slug || category.id}`}
+                    href={`/category/${category.id}`}
                     className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-200"
                   >
                     <div className="rounded-full bg-white p-4 flex items-center justify-center w-[130px] h-[130px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">

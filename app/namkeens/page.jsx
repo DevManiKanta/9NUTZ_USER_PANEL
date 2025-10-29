@@ -87,7 +87,6 @@ export default function OrganicSnacksPage() {
   const router = useRouter();
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       <main className="pt-5 pb-12">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
@@ -162,7 +161,6 @@ export default function OrganicSnacksPage() {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 }
