@@ -240,6 +240,24 @@ html {
   animation: enhanced-bounce 1.4s infinite ease-in-out;
 }
 
+/* Banner image quality fixes */
+.banner-image {
+  image-rendering: high-quality !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  filter: none !important;
+  transform: none !important;
+  -webkit-filter: none !important;
+  -webkit-transform: none !important;
+}
+
+/* Ensure banner images are crisp and not blurred */
+.banner-image,
+.banner-image * {
+  image-rendering: high-quality !important;
+  filter: none !important;
+  transform: none !important;
+}
+
 /* Smooth page transitions */
 .page-transition {
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;

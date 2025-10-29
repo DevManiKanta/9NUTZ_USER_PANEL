@@ -439,7 +439,7 @@ import { Login_API_BASE } from "@/lib/api";
 import axios from "axios";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
-
+import Link from "next/link";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
@@ -606,8 +606,9 @@ export default function Hero() {
 
   return (
     <div className="mb-4 mt-1">
+      {/* Top hero/banner wrapper: use w-full to avoid viewport overflow from w-screen + translate */}
       <div
-        className="relative overflow-hidden left-1/2 -translate-x-1/2 w-screen rounded-2xl shadow-lg"
+        className="relative overflow-hidden w-full rounded-2xl shadow-lg"
         onMouseEnter={() => (isHoveringRef.current = true)}
         onMouseLeave={() => (isHoveringRef.current = false)}
       >
@@ -620,46 +621,40 @@ export default function Hero() {
           <div className="w-full h-[54vh] flex items-center justify-center text-gray-500">No banners available</div>
         ) : (
           // Banner carousel using API-provided image_url (or redirect_url when absolute)
-          <section className="relative w-full h-[54vh] min-h-[320px] overflow-hidden">
+          <section className="relative w-full h-[54vh] min-h-[320px] overflow-hidden" style={{ imageRendering: 'high-quality' }}>
             <div
               className="flex h-full transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${currentBanner * 100}%)`, width: `${Math.max(1, banners.length) * 100}%` }}
             >
-              {banners.map((b) => (
+              {banners.map((b) => {
+                console.log("Banner data:", { id: b.id, image_url: b.image_url, title: b.title });
+                return (
                 <div key={b.id} className="relative flex-shrink-0 w-full h-full">
-                  {/* Blurred background (full-bleed) */}
-                  <div
-                    className="absolute inset-0 bg-center bg-cover scale-110 filter brightness-95"
-                    style={{ backgroundImage: `url(${b.image_url || PLACEHOLDER})` }}
-                    aria-hidden="true"
+                  {/* Clear background image (no blur, no scaling) */}
+                  <img
+                    src={`${b.image_url || PLACEHOLDER}?v=${Date.now()}`}
+                    alt={b.title || "Banner"}
+                    className="absolute inset-0 w-full h-full object-cover object-center banner-image"
+                    loading="eager"
+                    decoding="async"
+                    style={{
+                      imageRendering: 'high-quality',
+                      filter: 'none !important',
+                      transform: 'none !important',
+                      WebkitFilter: 'none !important',
+                      WebkitTransform: 'none !important'
+                    }}
+                    onError={(e) => {
+                      console.log("Image error for banner:", b.id, e);
+                      try { e.currentTarget.src = PLACEHOLDER; } catch (err) {}
+                    }}
                   />
 
-                  {/* Gradient overlay for readable text */}
-                  <div className="absolute inset-0  via-white/70 to-transparent" />
+                  {/* Subtle overlay for better text readability */}
+                  <div className="absolute inset-0 bg-black/10" />
 
                   {/* Content container (centered with max width) */}
                   <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-                    {/* Left: Text (narrowed so poster gets space) */}
-                    {/* <div className="flex-1 max-w-xl text-left">
-                      {b.title && (
-                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
-                          {b.title}
-                        </h2>
-                      )}
-                      {b.subtitle && <p className="mt-3 text-base sm:text-lg text-slate-700">{b.subtitle}</p>}
-                      {b.discount && <p className="mt-2 text-sm text-emerald-700 font-medium">{b.discount}</p>}
-                      {b.redirect_url && (
-                        <div className="mt-6">
-                          <a
-                            href={b.redirect_url}
-                            className="inline-block bg-slate-900 text-white px-5 py-2 rounded-full text-base font-semibold shadow-md hover:bg-slate-800 transition"
-                          >
-                            Shop Now
-                          </a>
-                        </div>
-                      )}
-                    </div> */}
-
                     {/* Right: Poster card (smaller, fixed width; shows placeholder on error) */}
                     <div className="flex-shrink-0 ml-6 hidden sm:block">
                       <div className="w-[220px] sm:w-[240px] md:w-[300px] rounded-xl overflow-hidden shadow-2xl bg-white">
@@ -678,7 +673,8 @@ export default function Hero() {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Prev / Next controls */}
@@ -703,9 +699,7 @@ export default function Hero() {
                 <button
                   key={i}
                   onClick={() => setCurrentBanner(i)}
-                  className={`w-3 h-3 rounded-full transition-transform transform ${
-                    i === currentBanner ? "scale-125 bg-slate-900" : "bg-white/70"
-                  }`}
+                  className={`w-3 h-3 rounded-full transition-transform transform ${i === currentBanner ? "scale-125 bg-slate-900" : "bg-white/70"}`}
                 />
               ))}
             </div>
@@ -714,7 +708,7 @@ export default function Hero() {
       </div>
 
       {/* Category Carousel */}
-      <div className="mt-6 left-1/2 -translate-x-1/2 w-screen relative">
+      <div className="mt-6 w-full relative">
         <CategoryCarousel categories={categories} loading={categoriesLoading} error={categoriesError} />
       </div>
     </div>
@@ -725,20 +719,20 @@ export default function Hero() {
 function CategoryCarousel({ categories = [], loading, error }) {
   if (loading)
     return (
-      <div className="left-1/2 -translate-x-1/2 w-screen relative text-center py-10 text-gray-500">
+      <div className="w-full relative text-center py-10 text-gray-500">
         Loading categories...
       </div>
     );
   if (error)
     return (
-      <div className="left-1/2 -translate-x-1/2 w-screen relative text-center py-10 text-red-600">
+      <div className="w-full relative text-center py-10 text-red-600">
         Failed to load categories: {error}
       </div>
     );
 
   if (!categories.length)
     return (
-      <div className="left-1/2 -translate-x-1/2 w-screen relative text-center py-10 text-gray-500">
+      <div className="w-full relative text-center py-10 text-gray-500">
         No categories to display
       </div>
     );
@@ -753,7 +747,7 @@ function CategoryCarousel({ categories = [], loading, error }) {
   };
 
   return (
-    <div className="relative left-1/2 -translate-x-1/2 w-screen">
+    <div className="relative w-full">
       <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Shop by Categories</h2>
@@ -774,8 +768,11 @@ function CategoryCarousel({ categories = [], loading, error }) {
               const src = category.image_url || category.image || PLACEHOLDER;
               return (
                 <SwiperSlide key={category.id}>
-                  <div className="flex flex-col items-center">
-                    <div className="rounded-full bg-white p-4 flex items-center justify-center w-[130px] h-[130px] overflow-hidden shadow-sm">
+                  <Link 
+                    href={`/category/${category.slug || category.id}`}
+                    className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-200"
+                  >
+                    <div className="rounded-full bg-white p-4 flex items-center justify-center w-[130px] h-[130px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                       <img
                         src={src}
                         alt={category.name}
@@ -790,7 +787,7 @@ function CategoryCarousel({ categories = [], loading, error }) {
                         {category.products_count ?? 0} Products
                       </span>
                     </div>
-                  </div>
+                  </Link>
                 </SwiperSlide>
               );
             })}
@@ -856,5 +853,6 @@ function CategoryCarousel({ categories = [], loading, error }) {
     </div>
   );
 }
+
 
 

@@ -192,7 +192,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import LoadingScreen from "@/components/LoadingScreen";
 import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
 import Hero from "@/components/Hero";
 import CategoryFilter from "@/components/CategoryFilter";
 import FilterableProductGrid from "@/components/FilterableProductGrid";
@@ -210,7 +209,6 @@ import TopSelling from "@/components/TopSellingProducts"
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [showPaymentFlow, setShowPaymentFlow] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -350,11 +348,9 @@ export default function Home() {
         cartTotal={cartTotal}
         handlePaymentComplete={handlePaymentComplete}
       />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <main>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Hero />
-
           <CategoryFilter
             onCategoryChange={handleCategoryChange}
             selectedCategory={selectedCategory}
