@@ -47,34 +47,92 @@ export const WishListProvider = ({ children }) => {
       }
 
       const data = await res.json();
-      // Try multiple common shapes from backend
-      const root = data?.data ?? data;
-      const listCandidate =
-        (Array.isArray(data) && data) ||
-        (Array.isArray(root?.favorites) && root.favorites) ||
-        (Array.isArray(root?.favorite) && root.favorite) ||
-        (Array.isArray(root?.favourites) && root.favourites) ||
-        (Array.isArray(root?.favourite) && root.favourite) ||
-        (Array.isArray(root?.wishlist) && root.wishlist) ||
-        (Array.isArray(root?.wishlists) && root.wishlists) ||
-        (Array.isArray(root?.result) && root.result) ||
-        [];
+      console.log("Raw favorites response:", data);
 
-      // Dedupe by product id and normalize minimal fields
+      // --- Robust extraction of the favorites list ---
+      // The backend may return:
+      // 1) An array directly => data
+      // 2) { data: [...] } => data.data
+      // 3) Pagination: { data: { data: [...] , current_page... } } => data.data.data
+      // 4) Various keys like favorites, wishlist, result...
+      let listCandidate = [];
+
+      // 1) data is an array
+      if (Array.isArray(data)) {
+        listCandidate = data;
+      } else {
+        // 2) top-level `data`
+        const top = data?.data ?? null;
+
+        // 3) if top is array
+        if (Array.isArray(top)) {
+          listCandidate = top;
+        } else if (top && Array.isArray(top.data)) {
+          // paginated shape: data.data => array
+          listCandidate = top.data;
+        } else {
+          // fallback to common keys inside top or data root
+          const root = top ?? data;
+          listCandidate =
+            (Array.isArray(root?.favorites) && root.favorites) ||
+            (Array.isArray(root?.favorite) && root.favorite) ||
+            (Array.isArray(root?.favourites) && root.favourites) ||
+            (Array.isArray(root?.favourite) && root.favourite) ||
+            (Array.isArray(root?.wishlist) && root.wishlist) ||
+            (Array.isArray(root?.wishlists) && root.wishlists) ||
+            (Array.isArray(root?.result) && root.result) ||
+            [];
+        }
+      }
+
+      // Normalize each item so consumers (dashboard) can read product/product_id consistently
       const normalized = listCandidate.map((f) => {
-        const id = f?.product_id ?? f?.id ?? f?.productId ?? f?.product?.id ?? f?.product?._id;
+        // possible shapes:
+        //  - favorite item: { id, user_id, product_id, product: { ... } }
+        //  - nested: { product: {...} }
+        const productObj = f?.product ?? null;
+        const productId =
+          f?.product_id ?? f?.productId ?? f?.id ?? productObj?.id ?? productObj?._id ?? null;
+
+        const name =
+          f?.name ??
+          productObj?.name ??
+          f?.product_name ??
+          f?.title ??
+          null;
+
+        const price =
+          f?.price ??
+          productObj?.price ??
+          f?.product_price ??
+          f?.offerPrice ??
+          null;
+
+        const image =
+          productObj?.image_url ??
+          productObj?.image_url ??
+          f?.image_url ??
+          f?.image_url ??
+          null;
         return {
+          // keep original fields (helpful) and add normalized aliases
           ...f,
-          product_id: id != null ? id : f?.product_id,
+          product: productObj ?? f?.product ?? null,
+          product_id: productId != null ? String(productId) : null,
+          product_name: name,
+          product_price: price,
+          product_image: image,
         };
       });
 
+      // Dedupe by product_id (keep the first occurrence)
       const seen = new Set();
       const deduped = [];
       for (const item of normalized) {
-        const k = String(item?.product_id ?? item?.id ?? "");
-        if (!k || seen.has(k)) continue;
-        seen.add(k);
+        const key = String(item?.product_id ?? item?.id ?? "");
+        if (!key) continue;
+        if (seen.has(key)) continue;
+        seen.add(key);
         deduped.push(item);
       }
 
@@ -86,7 +144,7 @@ export const WishListProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [Login_API_BASE, token]);
+  }, [Login_API_BASE, token]); // eslint-disable-line
 
   useEffect(() => {
     if (token) fetchFavorites();
@@ -112,6 +170,8 @@ export const WishListProvider = ({ children }) => {
       // Defensive update
       setFavorites((current) => {
         const arr = Array.isArray(current) ? current : [];
+        // avoid duplicates locally
+        if (arr.some((it) => String(it?.product_id ?? it?.id) === String(productId))) return arr;
         return [...arr, optimisticItem];
       });
 
@@ -136,7 +196,7 @@ export const WishListProvider = ({ children }) => {
             style: {
               background: "#fef2f2",
               color: "green",
-              border: "1px solid green",
+              // border: "1px solid #fca5a5",
               fontWeight: "600",
             },
             iconTheme: {
@@ -145,6 +205,8 @@ export const WishListProvider = ({ children }) => {
             },
           });
         }
+
+        // refresh to get canonical server shape
         await fetchFavorites();
         return data;
       } catch (err) {
@@ -158,7 +220,7 @@ export const WishListProvider = ({ children }) => {
         throw err;
       }
     },
-    [token, favorites, fetchFavorites]
+    [token, favorites, fetchFavorites] // eslint-disable-line
   );
 
   const value = {

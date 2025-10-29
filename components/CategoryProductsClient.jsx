@@ -394,15 +394,25 @@ export default function CategoryProductsClient({ identifier }) {
                       </span>
                     </div>
                     <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleAddToCart(p);
-                      }}
-                      className="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 rounded-md transition"
-                    >
-                      {isAdding ? "Adding..." : "Add to Cart"}
-                    </button>
+  type="button"
+  onClick={(e) => {
+    e.preventDefault();
+    if (Number(p.stock) > 0) handleAddToCart(p);
+  }}
+  disabled={Number(p.stock) <= 0}
+  className={`mt-3 w-full text-sm font-medium py-2 rounded-md transition ${
+    Number(p.stock) > 0
+      ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+      : "bg-gray-300 text-gray-600 cursor-not-allowed"
+  }`}
+>
+  {Number(p.stock) <= 0
+    ? "Out of Stock"
+    : isAdding
+    ? "Adding..."
+    : "Add to Cart"}
+</button>
+
                   </div>
                 </Link>
               </article>

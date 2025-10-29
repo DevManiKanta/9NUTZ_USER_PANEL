@@ -487,8 +487,6 @@ export default function Header({
               </div>
             </nav>
           </div>
-
-          {/* CENTER: Smaller Search */}
           <div className="hidden md:flex flex-1 justify-center px-2 sm:px-4">
             <form onSubmit={handleSearchSubmit} className="w-full flex justify-center" role="search" aria-label="Site search">
               <div className="relative w-[240px] sm:w-[500px]">
@@ -506,10 +504,7 @@ export default function Header({
               </div>
             </form>
           </div>
-
-          {/* RIGHT: Bell, Favourites, Profile, Cart, Menu */}
           <div className="flex items-center space-x-3 relative">
-            {/* 🔔 Notification bell */}
             <Link
               href="/dashboard"
               aria-label="Notifications"
@@ -518,8 +513,6 @@ export default function Header({
               <Bell className="h-5 w-5 text-gray-700" />
               <span className="absolute top-1.5 right-1.5 bg-red-500 rounded-full w-2 h-2" />
             </Link>
-
-            {/* ❤️ Favourites (NEW) */}
             <Link
               href="/dashboard?tab=favourites"
               aria-label="Favourites"
@@ -535,8 +528,6 @@ export default function Header({
                 </span>
               )}
             </Link>
-
-            {/* 👤 Profile */}
             {hasToken ? (
               <div className="relative">
                 <button
