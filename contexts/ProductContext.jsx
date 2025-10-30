@@ -201,14 +201,16 @@
 
 //   return <ProductContext.Provider value={ctxValue}>{children}</ProductContext.Provider>;
 // };
-
 "use client";
+
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import apiAxios from "@/lib/api";
 import { Login_API_BASE } from "@/lib/api";
 import axios from "axios";
+
 const ProductContext = createContext(undefined);
+
 export const useProducts = () => {
   const ctx = useContext(ProductContext);
   if (!ctx) throw new Error("useProducts must be used within a ProductProvider");
@@ -238,16 +240,10 @@ function getFullStorageUrl(pathOrUrl) {
   const s = String(pathOrUrl).trim();
   if (!s) return undefined;
   if (/^https?:\/\//i.test(s)) return s;
-  // If the server already serves via `${STORAGE_BASE}/storage/...` then construct url accordingly.
-  // Many of your responses already include full image_url, but some endpoints may provide only the relative `image` path.
-  // The API responses show full image_url with "/public/storage/...", so we build the same shape.
-  // If `s` already includes 'storage/' return `${LOGIN_BASE_CLEAN}/${s}` otherwise use `storage/${s}`
   const candidate = s.replace(/^\/+/, "");
-  // if candidate looks like "storage/..." or already has "public/storage", preserve structure
   if (/^storage\//i.test(candidate) || /\/storage\//i.test(candidate)) {
     return `${LOGIN_BASE_CLEAN}/${candidate}`;
   }
-  // otherwise assume it should live under /public/storage/
   return `${STORAGE_BASE}/storage/${candidate}`;
 }
 
@@ -305,6 +301,20 @@ function normalizeServerProduct(r) {
     (r.image_url && String(r.image_url)) ||
     (imagesUrls.length > 0 ? imagesUrls[0] : r.image ? getFullStorageUrl(r.image) : undefined);
 
+  // --- NEW: video handling ---
+  // API may supply: video_url (preferred), video, or videos array.
+  // If a relative storage path is provided (not full URL), convert it using getFullStorageUrl.
+  let rawVideo = null;
+  if (r.video_url) rawVideo = r.video_url;
+  else if (r.video) rawVideo = r.video;
+  else if (Array.isArray(r.videos) && r.videos.length) {
+    // if each video item is an object use its .video_url/.url/.path, otherwise use first string
+    const first = r.videos[0];
+    if (typeof first === "string") rawVideo = first;
+    else if (first && typeof first === "object") rawVideo = first.video_url ?? first.url ?? first.path ?? first.video ?? null;
+  }
+  const videoUrl = rawVideo ? (String(rawVideo).trim().startsWith("http") ? String(rawVideo).trim() : getFullStorageUrl(rawVideo)) : undefined;
+
   return {
     id: String(r.id ?? ""),
     name: String(r.name ?? ""),
@@ -324,6 +334,7 @@ function normalizeServerProduct(r) {
     createdAt: r.created_at ? new Date(r.created_at) : undefined,
     updatedAt: r.updated_at ? new Date(r.updated_at) : undefined,
     isOutOfStock: (Number.isFinite(Number(stock)) ? Number(stock) : 0) <= 0,
+    videoUrl, // <-- exposed normalized video URL (or undefined)
     raw: r,
   };
 }
@@ -335,18 +346,13 @@ export const ProductProvider = ({ children }) => {
 
   const reload = useCallback(async () => {
     try {
-      // your existing call used Login_API_BASE; keep it unchanged.
-      // The endpoint you used previously was `${Login_API_BASE}/product/show` — but sample responses you provided show the payload under data array.
-      // We will attempt to call the same endpoint and safely extract res.data.data (array).
       const res = await axios.get(`${Login_API_BASE}/product/show`);
       const payload = res.data ?? res;
-      // payload may be { status: true, message: "...", data: [...] }
       const rows = Array.isArray(payload?.data) ? payload.data : Array.isArray(payload) ? payload : [];
 
       const normalized = rows.map((r) => normalizeServerProduct(r)).filter(Boolean);
       setProducts(normalized);
     } catch (err) {
-      // keep behavior: on error, empty list (no crash)
       console.error("reload products failed", err);
       setProducts([]);
     }
@@ -391,10 +397,6 @@ export const ProductProvider = ({ children }) => {
   // addProduct: POST to same API (keeps your previous behavior)
   const addProduct = useCallback(async (productData) => {
     const fd = buildFormData(productData);
-    // use the same origin you were using previously: Login_API_BASE/public/api/admin/products is expressed similarly in your earlier code.
-    // We'll keep the endpoint path unchanged relative to what you had before: the previous code referenced `${API_ORIGIN}/public/api/admin/products`
-    // but to avoid changing API surface, we keep using the Login_API_BASE host + expected path.
-    // Construct the add URL from Login_API_BASE by ensuring it does not double-add /public.
     const addUrl = `${LOGIN_BASE_CLEAN}/api/admin/products`;
     const res = await fetch(addUrl, {
       method: "POST",
@@ -413,7 +415,6 @@ export const ProductProvider = ({ children }) => {
   }, []);
 
   const updateProduct = useCallback(async (id, productData) => {
-    // When files present, send FormData (PUT)
     const hasFiles = (productData.imageFile && productData.imageFile instanceof File) || (Array.isArray(productData.imageFiles) && productData.imageFiles.length > 0);
     const updateUrl = `${LOGIN_BASE_CLEAN}/api/admin/products/${id}`;
 
@@ -421,12 +422,8 @@ export const ProductProvider = ({ children }) => {
       const fd = buildFormData(productData);
       const res = await fetch(updateUrl, {
         method: "POST", // some servers use POST with _method=PUT; if your backend expects PUT change accordingly
-        // include method override: many PHP backends expect _method=PUT in multipart forms
         body: fd,
       });
-
-      // If your backend expects method override, uncomment the following before sending:
-      // fd.append('_method', 'PUT');
 
       if (!res.ok) {
         const t = await res.text().catch(() => "");

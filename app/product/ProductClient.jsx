@@ -204,6 +204,7 @@
 //   );
 // }
 
+
 "use client";
 
 import React, { useCallback, useMemo, useState } from "react";
@@ -473,7 +474,6 @@ export default function ProductClient({ product }) {
               {isAdding ? "Adding..." : Number(product.stock ?? 0) > 0 ? "Add to Cart" : "Out of Stock"}
             </button>
           </div>
-
           <div className="mt-12 border-t pt-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Product Details</h2>
             <ul className="list-disc list-inside text-gray-700 space-y-2 text-base leading-relaxed">
@@ -488,6 +488,3 @@ export default function ProductClient({ product }) {
     </section>
   );
 }
-
-
-
