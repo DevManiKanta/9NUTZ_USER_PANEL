@@ -279,11 +279,8 @@ export default function ProductPageClient({ id }) {
       try {
         const headers = { "Content-Type": "application/json" };
         if (token) headers["Authorization"] = `Bearer ${token}`;
-
         const res = await apiAxios.get(url, { headers });
         const json = res?.data ?? res;
-
-        // Locate the product object in response (shapes vary)
         let apiProduct = null;
         if (json && typeof json === "object") {
           if (Array.isArray(json.data) && json.data.length === 1 && (json.data[0].id || json.data[0].product_id)) {
@@ -298,7 +295,6 @@ export default function ProductPageClient({ id }) {
             apiProduct = json;
           }
         }
-
         if (!apiProduct) {
           const fallback = findFromContext(productId);
           if (fallback) {
@@ -383,7 +379,6 @@ export default function ProductPageClient({ id }) {
     setError(null);
     void doFetchProduct(id);
   }, [id, doFetchProduct]);
-  console.log("Products",product)
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 w-full bg-white">

@@ -382,12 +382,10 @@ export default function Header({
   ];
 
   const [query, setQuery] = useState("");
-
   const [profileOpen, setProfileOpen] = useState(false);
   const profileBtnRef = useRef(null);
   const profileMenuRef = useRef(null);
   const [hasMounted, setHasMounted] = useState(false);
-
   useEffect(() => {
     const handleClick = (e) => {
       if (
@@ -435,7 +433,6 @@ export default function Header({
   useEffect(() => {
     setHasMounted(true);
   }, []);
-
   return (
     <header className="sticky top-0 left-0 right-0 w-medium bg-white z-50 shadow-sm border-b border-gray-100">
       {/* Full-width header */}
@@ -444,7 +441,7 @@ export default function Header({
           {/* LEFT: Logo + Nav */}
           <div className="flex items-center gap-4 sm:gap-6">
             <Link href="/" className="flex items-center" aria-label="Home">
-              <Image src={logoSrc} alt="9NUTZ" width={50} height={50} className="object-contain" priority />
+              <Image src={logoSrc} alt="9NUTZ" width={80} height={80} className="object-contain" priority />
             </Link>
             <nav className="hidden md:flex items-center space-x-2">
               {tabs.map((t) => (
@@ -569,8 +566,6 @@ export default function Header({
             ) : (
               <AccountDropdown onLoginClick={onLoginClick} />
             )}
-
-            {/* 🛒 Cart */}
             <button onClick={onCartClick} aria-label="Open cart" className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <ShoppingCart className="h-6 w-6 text-gray-700" />
               {hasMounted && cartItemCount > 0 && (

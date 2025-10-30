@@ -1,386 +1,11 @@
 
-
 // "use client";
 // import React, { useState, useEffect, useCallback, useMemo } from "react";
-// import { Plus, Minus, Star } from "lucide-react";
+// import { Plus, Minus, Star, Heart } from "lucide-react";
 // import { useProducts } from "@/contexts/ProductContext";
 // import { useCategoryDataContext } from "@/contexts/CategoryDataContext";
 // import { useRouter } from "next/navigation";
-// export default function FilterableProductGrid({ onAddToCart, selectedCategory, isAnimating = false }) {
-//   const [quantities, setQuantities] = useState({});
-//   const [displayedProducts, setDisplayedProducts] = useState([]);
-//   const [searchTerm, setSearchTerm] = useState("");
-
-//   const { products } = useProducts() || { products: [] };
-//   const { categories } = useCategoryDataContext() || { categories: [] };
-
-//   // Fallback product in case product array empty
-//   const staticFallbackProduct = {
-//     id: "static-001",
-//     name: "Sample Product (Static)",
-//     price: 499.0,
-//     discountPrice: 399.0,
-//     discountAmount: 100,
-//     stock: 10,
-//     imageUrl: "/placeholder.png",
-//   };
-   
-//   const router = useRouter();
-
-//   // Listen to global "siteSearch" events dispatched by Header
-//   useEffect(() => {
-//     const handleSearch = (e) => {
-//       // event may be a CustomEvent with detail string
-//       const detail = e && e.detail ? e.detail : "";
-//       const term = String(detail || "").toString().trim().toLowerCase();
-//       setSearchTerm(term);
-//     };
-//     window.addEventListener("siteSearch", handleSearch);
-//     return () => window.removeEventListener("siteSearch", handleSearch);
-//   }, []);
-
-//   // Helper: normalize product category to string id and string name
-//   const getProductCategoryIdAndName = useCallback((p) => {
-//     const cat = p && p.category;
-//     if (!cat && typeof cat !== "string") return { id: undefined, name: undefined };
-//     if (typeof cat === "string") {
-//       const s = String(cat);
-//       return { id: s, name: s };
-//     }
-//     const id = String(cat.id ?? cat._id ?? cat.category_id ?? cat.categoryId ?? "").trim() || undefined;
-//     const name = String(cat.name ?? cat.title ?? cat.category_name ?? "").trim() || undefined;
-//     return { id, name };
-//   }, []);
-
-//   // Determine which category ids correspond to the "cobopack" / "combopack"
-//   const combopackCategoryIds = useMemo(() => {
-//     if (!Array.isArray(categories)) return new Set();
-//     const set = new Set();
-//     categories.forEach((c) => {
-//       const nm = String((c && c.name) || "").toLowerCase();
-//       if (!nm) return;
-//       if (nm.includes("cobopack") || nm.includes("combopack")) {
-//         set.add(String(c.id));
-//       }
-//     });
-//     return set;
-//   }, [categories]);
-
-//   // Build filtered product list (search + category). Safeguards for missing fields.
-//   const filteredProducts = useMemo(() => {
-//     if (!products || (Array.isArray(products) && products.length === 0)) return [staticFallbackProduct];
-
-//     let result = Array.isArray(products) ? [...products] : [];
-
-//     // Category filter (if provided)
-//     if (selectedCategory && selectedCategory !== "all") {
-//       const catLower = String(selectedCategory).toLowerCase();
-//       result = result.filter((p) => {
-//         const { id, name } = getProductCategoryIdAndName(p || {});
-//         return (
-//           (id && String(id).toLowerCase().includes(catLower)) ||
-//           (name && String(name).toLowerCase().includes(catLower)) ||
-//           (typeof (p && p.category) === "string" && String(p.category).toLowerCase().includes(catLower))
-//         );
-//       });
-//     }
-
-//     // Search filter (name, description, category)
-//     if (searchTerm) {
-//       result = result.filter((p) => {
-//         const name = String((p && p.name) || "").toLowerCase();
-//         const desc = String((p && (p.description || p.short_description)) || "").toLowerCase();
-//         const catInfo = getProductCategoryIdAndName(p || {});
-//         const categoryStr = String(catInfo.name ?? catInfo.id ?? (p && p.category) ?? "").toLowerCase();
-
-//         return (
-//           name.includes(searchTerm) ||
-//           desc.includes(searchTerm) ||
-//           categoryStr.includes(searchTerm)
-//         );
-//       });
-//     }
-
-//     return result;
-//   }, [products, selectedCategory, searchTerm, getProductCategoryIdAndName]);
-
-//   // Update displayedProducts whenever filter changes
-//   useEffect(() => {
-//     setDisplayedProducts(filteredProducts);
-//   }, [filteredProducts]);
-
-//   const qtyOf = useCallback((id) => {
-//     const key = String(id ?? "");
-//     return Math.max(0, Math.trunc(quantities[key] ?? 0));
-//   }, [quantities]);
-
-//   const handleQuantityChange = useCallback((productId, newQuantity) => {
-//     if (newQuantity < 0) return;
-//     const key = String(productId);
-//     setQuantities((prev) => ({ ...prev, [key]: Math.trunc(newQuantity) }));
-//   }, []);
-
-//   const handleAddToCart = useCallback((product) => {
-//     // guard for stock: if stock is 0 or negative, do nothing
-//     const stockVal = Number(product && product.stock != null ? product.stock : Infinity);
-//     if (!isNaN(stockVal) && stockVal <= 0) return;
-
-//     const qty = Math.max(1, qtyOf(product && product.id));
-//     for (let i = 0; i < qty; i++) {
-//       onAddToCart(product);
-//     }
-//     // reset qty for that product back to 0
-//     setQuantities((prev) => {
-//       const copy = { ...prev };
-//       delete copy[String(product && product.id ? product.id : "")];
-//       return copy;
-//     });
-//   }, [onAddToCart, qtyOf]);
-
-//   const formatPrice = useCallback((n) => {
-//     const v = typeof n === "string" ? Number(n) : Number(n ?? 0);
-//     if (Number.isNaN(v)) return "0.00";
-//     return v.toFixed(2);
-//   }, []);
-
-//   const computeDisplayPrice = useCallback((p) => {
-//     const discountPrice = p && (p.discountPrice ?? p.discount_price);
-//     const discountAmount = p && (p.discountAmount ?? p.discount_amount);
-//     const original = Number(p && p.price ? p.price : 0);
-
-//     if (typeof discountPrice === "number" && discountPrice > 0) return discountPrice;
-//     if (typeof discountAmount === "number" && discountAmount > 0) return Math.max(0, original - discountAmount);
-//     return original;
-//   }, []);
-
-//   const computeDiscountPercent = useCallback((p) => {
-//     const original = Number(p && p.price ? p.price : 0);
-//     const shown = Number(computeDisplayPrice(p) || 0);
-//     if (!original || shown >= original) return 0;
-//     return Math.round(((original - shown) / original) * 100);
-//   }, [computeDisplayPrice]);
-
-//   // Split combopack products and others
-//   const { combopackProducts, otherProducts } = useMemo(() => {
-//     const combo = [];
-//     const others = [];
-
-//     const comboIds = combopackCategoryIds;
-
-//     for (const p of displayedProducts) {
-//       const catInfo = getProductCategoryIdAndName(p || {});
-//       const pCatId = catInfo.id;
-//       const pCatName = catInfo.name;
-//       const matchedById = pCatId ? comboIds.has(String(pCatId)) : false;
-//       const lowerName = String(pCatName || "").toLowerCase();
-//       const matchedByName = lowerName.includes("cobopack") || lowerName.includes("combopack");
-//       const matchedByFallbackString = typeof (p && p.category) === "string" && String(p.category).toLowerCase().includes("cobopack");
-
-//       if (matchedById || matchedByName || matchedByFallbackString) combo.push(p);
-//       else others.push(p);
-//     }
-//     return { combopackProducts: combo, otherProducts: others };
-//   }, [displayedProducts, combopackCategoryIds, getProductCategoryIdAndName]);
-
-//   // Render helpers
-//   const renderProductCard = (product, idx) => {
-//     const productId = String(product && product.id ? product.id : `tmp-${idx}`);
-//     const currentQuantity = qtyOf(productId);
-//     const displayPrice = computeDisplayPrice(product);
-//     const discountPercent = computeDiscountPercent(product);
-//     const outOfStock = Number(product && product.stock != null ? product.stock : Infinity) <= 0;
-
-//     const img = (product && product.imageUrl) ||
-//                 (Array.isArray(product && product.images) && product.images[0]) ||
-//                 (product && product.image) ||
-//                 "/placeholder.png";
-
-//     const descriptionText = String((product && (product.description || product.short_description)) || "").trim();
-//     return (
-//       <article
-//         key={productId}
-//         className="bg-white rounded-2xl shadow-[0_6px_18px_rgba(13,18,25,0.08)] border border-transparent hover:border-gray-100 overflow-hidden flex flex-col"
-//         style={{ animationDelay: `${idx * 40}ms`, animationFillMode: "both" }}
-//       >
-//         <div className="relative p-4">
-//           <div className="rounded-xl overflow-hidden bg-gray-50">
-//             <img
-//               src={img}
-//                  onClick={() => { if (productId && !productId.startsWith('tmp-')) router.push(`/product/${productId}`); }}
-//               alt={(product && product.name) || "product"}
-//               onError={(e) => {
-//                 try {
-//                   e.currentTarget.src = "/placeholder.png";
-//                 } catch (err) {
-//                   /* ignore */
-//                 }
-//               }}
-//               className="w-full h-56 object-cover block"
-//             />
-//           </div>
-//         </div>
-
-//         <div className="px-5 pb-5 flex-1 flex flex-col">
-//           <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2" title={(product && product.name) || ""}>
-//             {(product && product.name) || "Unnamed"}
-//           </h3>
-
-//           <div className="flex items-center gap-1 mb-3">
-//             {Array.from({ length: 5 }).map((_, i) => (
-//               <Star key={i} className="w-3 h-3 text-yellow-400" />
-//             ))}
-//           </div>
-
-//           <div className="mt-auto">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <div className="text-2xl font-bold text-gray-900">Rs.{formatPrice(Number(product && (product.price || 0)))}</div>
-//                 {discountPercent > 0 && (
-//                   <div className="text-xs text-gray-400 mt-1">Disc: Rs.{formatPrice(Number(displayPrice))} ({discountPercent}% off)</div>
-//                 )}
-//               </div>
-
-//               <div className="flex items-center space-x-2">
-//                 {outOfStock ? (
-//                   <div className="text-xs px-3 py-2 rounded-md bg-gray-100 text-gray-500">Out of stock</div>
-//                 ) : currentQuantity <= 0 ? (
-//                   <button
-//                     // onClick={() => handleAddToCart(product)}
-//                         onClick={() => { if (productId && !productId.startsWith('tmp-')) router.push(`/product/${productId}`); }}
-//                     className="inline-flex items-center justify-center px-4 py-2 border-2 border-green-600 text-green-600 rounded-lg font-medium hover:bg-green-50 transition"
-//                   >
-//                      View
-//                   </button>
-//                 ) : (
-//                   <div className="inline-flex items-center bg-green-600 text-white rounded-lg overflow-hidden">
-//                     <button onClick={() => handleQuantityChange(productId, Math.max(0, currentQuantity - 1))} className="p-2" aria-label="decrease quantity">
-//                       <Minus className="w-4 h-4" />
-//                     </button>
-//                     <span className="px-3 text-sm font-semibold">{currentQuantity}</span>
-//                     <button onClick={() => handleQuantityChange(productId, currentQuantity + 1)} className="p-2" aria-label="increase quantity">
-//                       <Plus className="w-4 h-4" />
-//                     </button>
-//                   </div>
-//                 )}
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </article>
-//     );
-//   };
-
-//   return (
-//     <div className="mb-12">
-//       <div className="flex items-center justify-between mb-4">
-//         <h2 className="text-2xl font-bold text-gray-900">Shop by Products</h2>
-//         {displayedProducts.length > 0 && <h3 className="text-sm text-gray-600">Searched results</h3>}
-//       </div>
-//       {/* Other products grid */}
-//       <div
-//         className={`grid gap-6 
-//           grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4
-//           transition-all duration-300 ease-in-out ${isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
-//       >
-//         {otherProducts.map((product, idx) => renderProductCard(product, idx))}
-//       </div>
-
-//       {displayedProducts.length === 0 && (
-//         <div className="text-center py-16">
-//           <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-//           <p className="text-gray-500">Try another keyword.</p>
-//         </div>
-//       )}
-//       <div style={{marginTop:"2rem"}}>
-//       {combopackProducts.length > 0 && (
-//         <section className="mb-8">
-//           <div className="flex items-center justify-between mb-4">
-//             <h3 className="text-xl font-semibold">Combopack</h3>
-//             <div className="text-sm text-gray-500">{combopackProducts.length} items</div>
-//           </div>
-//           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-//             {combopackProducts.map((product, idx) => {
-//               const productId = String(product && product.id ? product.id : `combo-${idx}`);
-//               return (
-//                 <div key={productId}>
-//                   <div className="bg-white rounded-2xl shadow-[0_6px_18px_rgba(13,18,25,0.08)] border border-transparent hover:border-gray-100 overflow-hidden flex flex-col">
-//                     <div className="relative p-4">
-//                       <div className="rounded-xl overflow-hidden bg-gray-50">
-//                         <img
-//                           src={(product && product.imageUrl) || (Array.isArray(product && product.images) && product.images[0]) || (product && product.image) || "/placeholder.png"}
-//                           alt={(product && product.name) || "product"}
-//                           // onError={(e) => { try { e.currentTarget.src = "/placeholder.png"; } catch {} }}
-//                           className="w-full h-56 object-cover block"
-//                         />
-//                       </div>
-//                     </div>
-//                     <div className="px-5 pb-5 flex-1 flex flex-col">
-//                       <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2" title={(product && product.name) || ""}>
-//                         {(product && product.name) || "Unnamed"}
-//                       </h3>
-
-//                       {/* DESCRIPTION for combopack products */}
-//                       {(product && (product.description || product.short_description)) ? (
-//                         <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-//                           {product.description || product.short_description}
-//                         </p>
-//                       ) : null}
-
-//                       <div className="flex items-center gap-1 mb-3">
-//                         {Array.from({ length: 5 }).map((_, i) => (
-//                           <Star key={i} className="w-3 h-3 text-yellow-400" />
-//                         ))}
-//                       </div>
-//                       <div className="mt-auto">
-//                         <div className="flex items-center justify-between">
-//                           <div>
-//                             <div className="text-2xl font-bold text-gray-900">Rs.{formatPrice(Number(product && (product.price || 0)))}</div>
-//                           </div>
-
-//                           <div className="flex items-center space-x-2">
-//                             {Number(product && product.stock != null ? product.stock : Infinity) <= 0 ? (
-//                               <div className="text-xs px-3 py-2 rounded-md bg-gray-100 text-gray-500">Out of stock</div>
-//                             ) : qtyOf(productId) <= 0 ? (
-//                               <button
-//                                 onClick={() => handleAddToCart(product)}
-//                                 className="inline-flex items-center justify-center px-4 py-2 border-2 border-green-600 text-green-600 rounded-lg font-medium hover:bg-green-50 transition"
-//                               >
-//                                 View
-//                               </button>
-//                             ) : (
-//                               <div className="inline-flex items-center bg-green-600 text-white rounded-lg overflow-hidden">
-//                                 <button onClick={() => handleQuantityChange(productId, Math.max(0, qtyOf(productId) - 1))} className="p-2" aria-label="decrease quantity">
-//                                   <Minus className="w-4 h-4" />
-//                                 </button>
-//                                 <span className="px-3 text-sm font-semibold">{qtyOf(productId)}</span>
-//                                 <button onClick={() => handleQuantityChange(productId, qtyOf(productId) + 1)} className="p-2" aria-label="increase quantity">
-//                                   <Plus className="w-4 h-4" />
-//                                 </button>
-//                               </div>
-//                             )}
-//                           </div>
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               );
-//             })}
-//           </div>
-//         </section>
-//       )}
-//       </div>
-//     </div>
-//   );
-// }
-
-// "use client";
-// import React, { useState, useEffect, useCallback, useMemo } from "react";
-// import { Plus, Minus, Star } from "lucide-react";
-// import { useProducts } from "@/contexts/ProductContext";
-// import { useCategoryDataContext } from "@/contexts/CategoryDataContext";
-// import { useRouter } from "next/navigation";
-// import {useWishlist}from "@/contexts/WishlistContext"
+// import { useWishlist } from "@/contexts/WishlistContext";
 // import Viewband from "@/components/ViewBand";
 
 // export default function FilterableProductGrid({ onAddToCart, selectedCategory, isAnimating = false }) {
@@ -398,10 +23,23 @@
 //     discountPrice: 399.0,
 //     discountAmount: 100,
 //     stock: 10,
-//     // imageUrl: "/placeholder.png",
 //   };
 
 //   const router = useRouter();
+
+//   // wishlist
+//   const { favorites = [], loading: wishlistLoading = false, addFavorite } = useWishlist() || {};
+
+//   // keep a set for quick lookup
+//   const [favSet, setFavSet] = useState(() => new Set());
+//   useEffect(() => {
+//     try {
+//       const s = new Set((favorites || []).map((f) => String(f?.product_id ?? f?.id ?? f?.productId ?? f?.product_id)));
+//       setFavSet(s);
+//     } catch (e) {
+//       setFavSet(new Set());
+//     }
+//   }, [favorites]);
 
 //   useEffect(() => {
 //     const handleSearch = (e) => {
@@ -416,17 +54,11 @@
 //   // ===== FIXED: more robust category id/name extraction =====
 //   const getProductCategoryIdAndName = useCallback((p) => {
 //     const cat = p && p.category;
-
-//     // no category provided
 //     if (cat == null) return { id: undefined, name: undefined };
-
-//     // category provided as a primitive id (string or number)
 //     if (typeof cat === "string" || typeof cat === "number") {
 //       const id = String(cat).trim() || undefined;
 //       return { id, name: undefined };
 //     }
-
-//     // category provided as an object -> try common keys
 //     const id = String(cat.id ?? cat._id ?? cat.category_id ?? cat.categoryId ?? "").trim() || undefined;
 //     const name = String(cat.name ?? cat.title ?? cat.category_name ?? cat.categoryName ?? "").trim() || undefined;
 //     return { id, name };
@@ -521,12 +153,37 @@
 //     displayedProducts.forEach((p) => {
 //       const { id, name } = getProductCategoryIdAndName(p);
 //       const lower = (name || "").toLowerCase();
-//       // compare id as string to match combopackCategoryIds entries
 //       if (id && combopackCategoryIds.has(String(id)) || lower.includes("combopack") || lower.includes("cobopack")) combo.push(p);
 //       else others.push(p);
 //     });
 //     return { combopackProducts: combo, otherProducts: others };
 //   }, [displayedProducts, combopackCategoryIds, getProductCategoryIdAndName]);
+
+//   // helper when clicking heart
+//   const handleAddToWishlist = useCallback(
+//     async (e, product) => {
+//       e.stopPropagation();
+//       e.preventDefault();
+
+//       const productId = String(product?.id ?? product?.product_id ?? product?._id ?? "");
+//       if (!productId) return;
+
+//       // if already favourited, do nothing (no remove endpoint available)
+//       if (favSet.has(productId)) {
+//         // optionally show UI feedback; simple alert for now
+//         // You can replace this with a toast.
+//         return;
+//       }
+
+//       try {
+//         await addFavorite(productId);
+//         // optimistic state update is handled by context; local favSet will update via effect when favorites change
+//       } catch (err) {
+//         // optionally show UI feedback here
+//       }
+//     },
+//     [addFavorite, favSet]
+//   );
 
 //   const renderProductCard = (product, idx) => {
 //     const productId = String(product?.id || `tmp-${idx}`);
@@ -537,6 +194,8 @@
 //     const img =
 //       product?.imageUrl || (Array.isArray(product?.images) && product.images[0]) || product?.image || "/placeholder.png";
 
+//     const isFavourited = favSet.has(String(productId));
+
 //     return (
 //       <article
 //         key={productId}
@@ -546,6 +205,26 @@
 //           <div className="rounded-xl overflow-hidden bg-gray-50">
 //             <img src={img} alt={product?.name || "product"} className="w-full h-56 object-cover" />
 //           </div>
+
+//           {/* Favourite icon - top right */}
+//           <button
+//             onClick={(e) => handleAddToWishlist(e, product)}
+//             disabled={isFavourited || wishlistLoading}
+//             aria-pressed={isFavourited}
+//             aria-label={isFavourited ? "Added to wishlist" : "Add to wishlist"}
+//             className={`absolute top-4 right-4 z-20 p-2 rounded-full shadow-md transition transform scale-100
+//               ${isFavourited ? "bg-red-50" : "bg-white/90 hover:scale-105"}
+//               ${isFavourited ? "cursor-default" : "cursor-pointer"}`}
+//             title={isFavourited ? "Already in wishlist" : "Add to wishlist"}
+//             onMouseDown={(e) => e.stopPropagation()}
+//             onMouseUp={(e) => e.stopPropagation()}
+//           >
+//             <Heart
+//               className={`w-5 h-5 ${isFavourited ? "text-red-600" : "text-gray-500"}`}
+//               fill={isFavourited ? "currentColor" : "none"}
+//             />
+//           </button>
+
 //           {discountPercent > 0 && (
 //             <span className="absolute top-5 left-5 bg-green-600 text-white text-xs font-semibold px-2 py-1 rounded-md shadow">
 //               {discountPercent}% OFF
@@ -574,10 +253,14 @@
 //                   <div className="text-xs  rounded-md bg-gray-100 text-black-500">Out of stock</div>
 //                 ) : (
 //                   <button
-//                     onClick={() => router.push(`/product/${productId}`)}
+//                     onClick={(e) => {
+//                       e.stopPropagation();
+//                       e.preventDefault();
+//                       handleAddToCart(product);
+//                     }}
 //                     className="px-2 py-2 border-2 border-green-600 text-green-600 rounded-lg font-medium hover:bg-green-50 transition"
 //                   >
-//                     View
+//                     Add to cart
 //                   </button>
 //                 )}
 //               </div>
@@ -625,6 +308,26 @@
 //                     alt={p?.name || "product"}
 //                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
 //                   />
+
+//                   {/* Heart icon for this larger card too */}
+//                   <button
+//                     onClick={(e) => handleAddToWishlist(e, p)}
+//                     disabled={favSet.has(String(p.id)) || wishlistLoading}
+//                     aria-pressed={favSet.has(String(p.id))}
+//                     aria-label={favSet.has(String(p.id)) ? "Added to wishlist" : "Add to wishlist"}
+//                     className={`absolute top-4 right-4 z-20 p-2 rounded-full shadow-md transition transform
+//                       ${favSet.has(String(p.id)) ? "bg-red-50" : "bg-white/90 hover:scale-105"}
+//                       ${favSet.has(String(p.id)) ? "cursor-default" : "cursor-pointer"}`}
+//                     title={favSet.has(String(p.id)) ? "Already in wishlist" : "Add to wishlist"}
+//                     onMouseDown={(e) => e.stopPropagation()}
+//                     onMouseUp={(e) => e.stopPropagation()}
+//                   >
+//                     <Heart
+//                       className={`w-5 h-5 ${favSet.has(String(p.id)) ? "text-red-600" : "text-gray-500"}`}
+//                       fill={favSet.has(String(p.id)) ? "currentColor" : "none"}
+//                     />
+//                   </button>
+
 //                   {p.discountAmount > 0 && (
 //                     <span className="absolute top-4 left-4 bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded-md shadow">
 //                       {Math.round(((p.price - (p.discountPrice || p.price - p.discountAmount)) / p.price) * 100)}% OFF
@@ -699,8 +402,6 @@
 //     </div>
 //   );
 // }
-
-
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Plus, Minus, Star, Heart } from "lucide-react";
@@ -753,7 +454,7 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     return () => window.removeEventListener("siteSearch", handleSearch);
   }, []);
 
-  // ===== FIXED: more robust category id/name extraction =====
+  // ====== category id/name extraction helper ======
   const getProductCategoryIdAndName = useCallback((p) => {
     const cat = p && p.category;
     if (cat == null) return { id: undefined, name: undefined };
@@ -765,7 +466,7 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     const name = String(cat.name ?? cat.title ?? cat.category_name ?? cat.categoryName ?? "").trim() || undefined;
     return { id, name };
   }, []);
-  // ===========================================================
+  // =================================================
 
   const combopackCategoryIds = useMemo(() => {
     if (!Array.isArray(categories)) return new Set();
@@ -815,20 +516,93 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     setQuantities((prev) => ({ ...prev, [String(productId)]: Math.trunc(newQuantity) }));
   }, []);
 
+  // ------------------ NEW: normalized add-to-cart ------------------
+  const normalizeForCart = useCallback((raw) => {
+    if (!raw) return raw;
+    const id = raw.id ?? raw.product_id ?? raw._id ?? raw.slug ?? null;
+    const product_id = raw.product_id ?? raw.id ?? raw._id ?? null;
+    const price = typeof raw.price !== "undefined" ? raw.price : raw.cost ?? raw.amount ?? 0;
+    const discountPrice = raw.discountPrice ?? raw.discount_price ?? raw.discount ?? null;
+    const name = raw.name ?? raw.title ?? "Untitled";
+    const stock = typeof raw.stock !== "undefined" ? raw.stock : raw.qty ?? raw.quantity ?? 0;
+
+    // Keep all original fields but ensure stable id/product_id and price fields exist
+    return {
+      ...raw,
+      id,
+      product_id,
+      price,
+      discountPrice,
+      name,
+      stock,
+    };
+  }, []);
+
   const handleAddToCart = useCallback(
     (product) => {
-      const stockVal = Number(product?.stock ?? Infinity);
-      if (stockVal <= 0) return;
-      const qty = Math.max(1, qtyOf(product.id));
-      for (let i = 0; i < qty; i++) onAddToCart(product);
-      setQuantities((prev) => {
-        const copy = { ...prev };
-        delete copy[String(product.id)];
-        return copy;
-      });
+      try {
+        if (!product) {
+          console.warn("handleAddToCart called with falsy product");
+          return;
+        }
+
+        const normalized = normalizeForCart(product);
+
+        // ensure id exists (cart implementations often reject without id)
+        const idToCheck = normalized.id ?? normalized.product_id ?? null;
+        if (!idToCheck) {
+          console.warn("Product missing id/product_id — not adding to cart:", normalized);
+          return;
+        }
+
+        const stockVal = Number(normalized?.stock ?? Infinity);
+        if (!Number.isFinite(stockVal) || stockVal <= 0) {
+          console.warn("addToCart prevented — out of stock:", normalized);
+          return;
+        }
+
+        const qty = Math.max(1, qtyOf(idToCheck));
+
+        console.debug("Adding to cart:", { id: idToCheck, qty, normalized });
+
+        // call onAddToCart the requested number of times to keep compatibility with current app behavior
+        for (let i = 0; i < qty; i++) {
+          try {
+            // pass normalized product so cart always receives consistent shape
+            if (typeof onAddToCart === "function") {
+              onAddToCart(normalized);
+            } else {
+              console.warn("onAddToCart is not a function — cannot add to cart", onAddToCart);
+            }
+            console.debug("onAddToCart invoked for", idToCheck, "iteration", i + 1);
+          } catch (err) {
+            console.error("onAddToCart threw:", err);
+          }
+        }
+
+        // clear quantity input for this product
+        setQuantities((prev) => {
+          const copy = { ...prev };
+          delete copy[String(idToCheck)];
+          return copy;
+        });
+
+        // Signal cart UI to open (matches your app's openCart event approach)
+        // small delay ensures the cart state has a chance to update in many setups
+        try {
+          // Fire event immediately; most drawers will re-render on store change anyway.
+          window.dispatchEvent(new CustomEvent("openCart"));
+          console.debug("Dispatched openCart event");
+        } catch (err) {
+          console.warn("Failed to dispatch openCart event", err);
+        }
+      } catch (err) {
+        console.error("handleAddToCart unexpected error:", err);
+      }
     },
-    [onAddToCart, qtyOf]
+    [normalizeForCart, onAddToCart, qtyOf]
   );
+  // ---------------------------------------------------------------
 
   const formatPrice = useCallback((n) => (Number.isNaN(Number(n)) ? "0.00" : Number(n).toFixed(2)), []);
   const computeDisplayPrice = useCallback((p) => {
@@ -870,18 +644,12 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
       const productId = String(product?.id ?? product?.product_id ?? product?._id ?? "");
       if (!productId) return;
 
-      // if already favourited, do nothing (no remove endpoint available)
-      if (favSet.has(productId)) {
-        // optionally show UI feedback; simple alert for now
-        // You can replace this with a toast.
-        return;
-      }
+      if (favSet.has(productId)) return;
 
       try {
         await addFavorite(productId);
-        // optimistic state update is handled by context; local favSet will update via effect when favorites change
       } catch (err) {
-        // optionally show UI feedback here
+        // ignore or show toast
       }
     },
     [addFavorite, favSet]
@@ -1013,7 +781,10 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
 
                   {/* Heart icon for this larger card too */}
                   <button
-                    onClick={(e) => handleAddToWishlist(e, p)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToWishlist(e, p);
+                    }}
                     disabled={favSet.has(String(p.id)) || wishlistLoading}
                     aria-pressed={favSet.has(String(p.id))}
                     aria-label={favSet.has(String(p.id)) ? "Added to wishlist" : "Add to wishlist"}
@@ -1021,8 +792,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
                       ${favSet.has(String(p.id)) ? "bg-red-50" : "bg-white/90 hover:scale-105"}
                       ${favSet.has(String(p.id)) ? "cursor-default" : "cursor-pointer"}`}
                     title={favSet.has(String(p.id)) ? "Already in wishlist" : "Add to wishlist"}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onMouseUp={(e) => e.stopPropagation()}
                   >
                     <Heart
                       className={`w-5 h-5 ${favSet.has(String(p.id)) ? "text-red-600" : "text-gray-500"}`}
