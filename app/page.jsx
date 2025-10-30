@@ -180,13 +180,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
           <Hero />
           <CategoryFilter
             onCategoryChange={handleCategoryChange}
             selectedCategory={selectedCategory}
           />
-
+                  <FeatureStrip />
           <FilterableProductGrid
             onAddToCart={addToCart}
             onProductSelect={openProductModal}    // <- ensure grid calls this
@@ -196,7 +196,6 @@ export default function Home() {
         </div>
       </main>
         <TopSelling/>
-          <FeatureStrip />
           <HeroTestimonials/>
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
       <LocationModal isOpen={isLocationModalOpen} onClose={() => setIsLocationModalOpen(false)} />

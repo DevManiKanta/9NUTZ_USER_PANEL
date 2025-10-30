@@ -744,14 +744,12 @@ function CategoryCarousel({ categories = [], loading, error }) {
     1280: { slidesPerView: 5.2, spaceBetween: 26 },
     1536: { slidesPerView: 6, spaceBetween: 28 },
   };
-
   return (
     <div className="relative w-full">
       <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Shop by Categories</h2>
         </div>
-
         {/* Wrapper for Swiper and bullets */}
         <div className="relative">
           <Swiper
@@ -768,25 +766,26 @@ function CategoryCarousel({ categories = [], loading, error }) {
               return (
                 <SwiperSlide key={category.id}>
                   <Link 
-                    href={`/category/${category.id}`}
-                    className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-200"
-                  >
-                    <div className="rounded-full bg-white p-4 flex items-center justify-center w-[130px] h-[130px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                      <img
-                        src={src}
-                        alt={category.name}
-                        className="w-full h-full object-cover object-center rounded-full"
-                      />
-                    </div>
-                    <div className="mt-4 text-center">
-                      <span className="block text-sm md:text-base tracking-widest font-semibold text-emerald-800 uppercase">
-                        {category.name}
-                      </span>
-                      <span className="block text-xs text-gray-500 mt-1">
-                        {category.products_count ?? 0} Products
-                      </span>
-                    </div>
-                  </Link>
+  href={`/category/${category.id}`}
+  className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-200"
+>
+  <div className="w-[130px] h-[130px] rounded-full overflow-hidden shadow-sm hover:shadow-md transition-shadow flex items-center justify-center bg-white ring-4 ring-white">
+    <img
+      src={src}
+      alt={category.name}
+      className="w-full h-full object-cover object-center block"
+    />
+  </div>
+  <div className="mt-4 text-center">
+    <span className="block text-sm md:text-base tracking-widest font-semibold text-emerald-800 uppercase">
+      {category.name}
+    </span>
+    <span className="block text-xs text-gray-500 mt-1">
+      {category.products_count ?? 0} Products
+    </span>
+  </div>
+</Link>
+
                 </SwiperSlide>
               );
             })}

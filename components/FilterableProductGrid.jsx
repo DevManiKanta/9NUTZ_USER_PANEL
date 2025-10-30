@@ -712,14 +712,13 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
   };
 
   return (
-    <div className="mb-16 w-full">
+    <div className="mb-16 w-full py-10">
       <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 mb-6">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Shop by Products</h2>
           {displayedProducts.length > 0 && <span className="text-sm text-gray-500 hidden sm:block">Searched results</span>}
         </div>
       </div>
-
       <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
         <div
           className={`grid gap-8 sm:gap-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4
@@ -731,22 +730,20 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
                 onClick={() => router.push(`/product/${p.id}`)}
                 className="bg-white rounded-2xl shadow-md hover:shadow-2xl overflow-hidden border border-gray-100 flex flex-col h-full"
                 style={{
-                  height: "480px",
+                  height: "400px",
                   minWidth: "280px",
                 }}
               >
-                <div className="relative w-full h-[260px] sm:h-[280px] md:h-[300px] overflow-hidden">
+                <div className="relative w-full h-[260px] sm:h-[250px] md:h-[300px] overflow-hidden">
                   <img
                     src={
                       p?.imageUrl ||
                       (Array.isArray(p?.images) && p.images[0]) ||
-                      p?.image ||
-                      "/placeholder.png"
+                      p?.image 
                     }
                     alt={p?.name || "product"}
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   />
-
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -765,26 +762,17 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
                       fill={favSet.has(String(p.id)) ? "currentColor" : "none"}
                     />
                   </button>
-
                   {p.discountAmount > 0 && (
                     <span className="absolute top-4 left-4 bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded-md shadow">
                       {Math.round(((p.price - (p.discountPrice || p.price - p.discountAmount)) / p.price) * 100)}% OFF
                     </span>
                   )}
                 </div>
-
                 <div className="flex-1 flex flex-col px-6 py-4">
                   <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
                     {p?.name || "Unnamed"}
                   </h3>
-
-                  <div className="flex items-center gap-1 mb-3">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-yellow-400" />
-                    ))}
-                  </div>
-
-                  <div className="mt-auto flex items-center justify-between">
+                  <div className="flex items-center justify-between">
                     <div>
                       <div className="text-xl font-bold text-gray-900">Rs.{p?.discountPrice || p?.price}</div>
                       {p?.discountPrice && (
@@ -821,7 +809,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
           <p className="text-gray-500">Try another keyword.</p>
         </div>
       )}
-
       {combopackProducts.length > 0 && (
         <section className="mt-12">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">

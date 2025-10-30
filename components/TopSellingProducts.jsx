@@ -185,7 +185,7 @@ export default function TopSellingProducts() {
   }, [categories]);
 
   return (
-    <section className="w-full bg-[#fff] py-8">
+    <section className="w-full py-8">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {categoriesLoading ? (
           <div className="py-20 flex items-center justify-center">
