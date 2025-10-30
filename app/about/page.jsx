@@ -9,14 +9,6 @@ import AboutImage from "../../assests/9nutz_about.jpg";
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header
-        onLoginClick={() => {}}
-        onLocationClick={() => {}}
-        onCartClick={() => {}}
-        cartItemCount={0}
-        cartTotal={0}
-      />
-
       <main className="pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero / top section */}
@@ -192,7 +184,6 @@ export default function AboutPage() {
           </section>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

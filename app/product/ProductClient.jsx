@@ -204,7 +204,6 @@
 //   );
 // }
 
-
 "use client";
 
 import React, { useCallback, useMemo, useState } from "react";
@@ -213,13 +212,47 @@ import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
 import { useProducts } from "@/contexts/ProductContext";
 
+/**
+ * ProductClient
+ * - shows main image
+ * - thumbnails row
+ * - video embedded (YouTube) shown to the right of thumbnails
+ *
+ * NOTE: We intentionally keep your existing add-to-cart / openCart behavior unchanged.
+ */
+
+function extractYouTubeId(url) {
+  if (!url || typeof url !== "string") return null;
+  // common YouTube URL patterns: youtu.be/ID, youtube.com/watch?v=ID, youtube.com/shorts/ID, ...with params
+  try {
+    const s = url.trim();
+    // quick checks
+    const patterns = [
+      /(?:youtube\.com\/shorts\/)([A-Za-z0-9_-]{4,})/,
+      /(?:youtube\.com\/watch\?v=)([A-Za-z0-9_-]{4,})/,
+      /(?:youtu\.be\/)([A-Za-z0-9_-]{4,})/,
+      /(?:youtube\.com\/embed\/)([A-Za-z0-9_-]{4,})/,
+      /v=([A-Za-z0-9_-]{4,})/,
+    ];
+    for (const re of patterns) {
+      const m = s.match(re);
+      if (m && m[1]) return m[1];
+    }
+    // fallback: try last path segment
+    const u = new URL(s.startsWith("http") ? s : `https://${s}`);
+    const seg = (u.pathname || "").split("/").filter(Boolean).pop();
+    if (seg && /^[A-Za-z0-9_-]{4,}$/.test(seg)) return seg;
+  } catch (e) {
+    // ignore
+  }
+  return null;
+}
+
 export default function ProductClient({ product }) {
   const { addItem, openCart } = useCart() || {};
   const [isAdding, setIsAdding] = useState(false);
   const router = useRouter();
   const { products } = useProducts() || { products: [] };
-
-  console.log("Products", products);
 
   if (!product) return null;
 
@@ -234,14 +267,12 @@ export default function ProductClient({ product }) {
         if (typeof it === "string") {
           if (!out.includes(it)) out.push(it);
         } else if (typeof it === "object") {
-          // prefer image_url field inside object
           const url = it.image_url ?? it.url ?? it.image ?? null;
           if (url && !out.includes(url)) out.push(String(url));
         }
       });
     }
 
-    // fallback to product.image/product.image_url if still empty
     if (out.length === 0) {
       const fallback = product.image_url ?? product.image ?? null;
       if (fallback) out.push(String(fallback));
@@ -250,22 +281,25 @@ export default function ProductClient({ product }) {
     return out;
   }, [product]);
 
-  // Video source: prefer product-provided video fields, otherwise use a static sample video.
-  const videoSrc = useMemo(() => {
-    // try common product fields
+  // Determine YouTube embed URL
+  const videoEmbedUrl = useMemo(() => {
+    // product may provide video fields (video_url, video)
     const candidate =
       product.video_url ??
       product.video ??
       (Array.isArray(product.videos) && product.videos.length ? product.videos[0] : null);
 
-    // Ensure candidate is a string and non-empty
-    if (candidate && typeof candidate === "string" && candidate.trim()) {
-      return candidate.trim();
+    // If candidate exists and is a YouTube URL, extract id
+    const youtubeId = extractYouTubeId(candidate);
+    if (youtubeId) {
+      // use modest branding and allow fullscreen; do not autoplay by default
+      return `https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`;
     }
 
-    // fallback static sample (public sample from MDN — reliable small clip)
-    return "https://www.youtube.com/shorts/G--NLgSNCmE?feature=share.mp4"
-    // "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
+    // If product didn't provide a YouTube link, as requested: use the specific YouTube Shorts URL you provided.
+    // NOTE: we embed the ID below (G--NLgSNCmE).
+    const fallbackId = "G--NLgSNCmE";
+    return `https://www.youtube.com/embed/${fallbackId}?rel=0&modestbranding=1`;
   }, [product]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -278,7 +312,7 @@ export default function ProductClient({ product }) {
     if (currentIndex >= images.length) setCurrentIndex(0);
   }, [images, currentIndex]);
 
-  const currentImage = images && images.length ? images[currentIndex] : "";
+  const currentImage = images && images.length ? images[currentIndex] : product.image_url || "/placeholder.png";
 
   const discountPercent =
     product.discountPrice && product.price
@@ -296,7 +330,11 @@ export default function ProductClient({ product }) {
         if (typeof addItem === "function") {
           addItem({ ...productToAdd, quantity: 1 });
         } else {
-          window.dispatchEvent(new CustomEvent("productAddToCart", { detail: { product: productToAdd, quantity: 1 } }));
+          window.dispatchEvent(
+            new CustomEvent("productAddToCart", {
+              detail: { product: productToAdd, quantity: 1 },
+            })
+          );
         }
 
         if (typeof openCart === "function") openCart();
@@ -334,7 +372,7 @@ export default function ProductClient({ product }) {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start mt-6">
-        {/* Left: main image + thumbnails */}
+        {/* Left: main image + thumbnails + video (video to the right of thumbnails) */}
         <div className="w-full flex flex-col items-center">
           <div className="relative w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-lg bg-gray-50">
             <img
@@ -349,47 +387,50 @@ export default function ProductClient({ product }) {
             )}
           </div>
 
-          {images.length > 0 && (
+          {/* thumbnails + video row */}
+          {((images && images.length > 0) || videoEmbedUrl) && (
             <div className="mt-4 w-full max-w-md">
-              <div className="flex items-center gap-3 overflow-x-auto py-2 px-1">
-                {images.map((src, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentIndex(idx)}
-                    onKeyDown={(e) => handleThumbKey(e, idx)}
-                    aria-label={`View image ${idx + 1}`}
-                    className={`flex-shrink-0 rounded-lg overflow-hidden border-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
-                      idx === currentIndex ? "ring-2 ring-emerald-600 border-white-600" : "border-gray-200"
-                    }`}
-                    style={{ width: 84, height: 84, borderRadius: 10 }}
-                    title={`Image ${idx + 1}`}
-                  >
-                    <img
-                      src={src}
-                      alt={`${product.name} ${idx + 1}`}
-                      className="w-full h-full object-cover"
-                      loading={idx === 0 ? "eager" : "lazy"}
+              <div className="flex items-start gap-3 py-2 px-1">
+                {/* thumbnails horizontally scrollable */}
+                <div className="flex items-center gap-3 overflow-x-auto py-1 px-1" style={{ flex: 1 }}>
+                  {images.map((src, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentIndex(idx)}
+                      onKeyDown={(e) => handleThumbKey(e, idx)}
+                      aria-label={`View image ${idx + 1}`}
+                      className={`flex-shrink-0 rounded-lg overflow-hidden border-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                        idx === currentIndex ? "ring-2 ring-emerald-600 border-white-600" : "border-gray-200"
+                      }`}
+                      style={{ width: 84, height: 84, borderRadius: 10 }}
+                      title={`Image ${idx + 1}`}
+                    >
+                      <img
+                        src={src}
+                        alt={`${product.name} ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        loading={idx === 0 ? "eager" : "lazy"}
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                {/* video box to the right of thumbnails */}
+                {videoEmbedUrl && (
+                  <div className="ml-2 rounded-md overflow-hidden border bg-black/5 flex-shrink-0" style={{ width: 160, height: 90 }}>
+                    <iframe
+                      src={videoEmbedUrl}
+                      title={`${product.name} video`}
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
                     />
-                  </button>
-                ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
-
-          {/* --- NEW: Video block below images (static fallback if product has no video) --- */}
-          <div className="mt-4 w-full max-w-md">
-            <div className="rounded-md overflow-hidden border bg-black/5">
-              <video
-                src={videoSrc}
-                controls
-                poster={currentImage}
-                className="w-full h-48 object-cover bg-black"
-              >
-                {/* fallback text */}
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
         </div>
 
         {/* Right: product info */}
@@ -447,5 +488,6 @@ export default function ProductClient({ product }) {
     </section>
   );
 }
+
 
 

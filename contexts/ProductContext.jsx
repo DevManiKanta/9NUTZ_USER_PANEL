@@ -202,20 +202,13 @@
 //   return <ProductContext.Provider value={ctxValue}>{children}</ProductContext.Provider>;
 // };
 
-
-
-
-
 "use client";
-
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import apiAxios from "@/lib/api";
 import { Login_API_BASE } from "@/lib/api";
 import axios from "axios";
-
 const ProductContext = createContext(undefined);
-
 export const useProducts = () => {
   const ctx = useContext(ProductContext);
   if (!ctx) throw new Error("useProducts must be used within a ProductProvider");

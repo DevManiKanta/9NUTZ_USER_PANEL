@@ -23,7 +23,6 @@ const FREE_IMAGE_LARGE = "https://images.unsplash.com/photo-1521737604893-d14cc2
 export default function Page() {
   return (
     <>
-    <Header/>
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <section className="bg-white rounded-2xl shadow-sm border overflow-hidden">
@@ -140,7 +139,6 @@ export default function Page() {
         </section>
       </div>
     </main>
-    <Footer/>
     </>
   );
 }

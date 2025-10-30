@@ -454,7 +454,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     return () => window.removeEventListener("siteSearch", handleSearch);
   }, []);
 
-  // ====== category id/name extraction helper ======
   const getProductCategoryIdAndName = useCallback((p) => {
     const cat = p && p.category;
     if (cat == null) return { id: undefined, name: undefined };
@@ -466,7 +465,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     const name = String(cat.name ?? cat.title ?? cat.category_name ?? cat.categoryName ?? "").trim() || undefined;
     return { id, name };
   }, []);
-  // =================================================
 
   const combopackCategoryIds = useMemo(() => {
     if (!Array.isArray(categories)) return new Set();
@@ -516,7 +514,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     setQuantities((prev) => ({ ...prev, [String(productId)]: Math.trunc(newQuantity) }));
   }, []);
 
-  // ------------------ NEW: normalized add-to-cart ------------------
   const normalizeForCart = useCallback((raw) => {
     if (!raw) return raw;
     const id = raw.id ?? raw.product_id ?? raw._id ?? raw.slug ?? null;
@@ -526,7 +523,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     const name = raw.name ?? raw.title ?? "Untitled";
     const stock = typeof raw.stock !== "undefined" ? raw.stock : raw.qty ?? raw.quantity ?? 0;
 
-    // Keep all original fields but ensure stable id/product_id and price fields exist
     return {
       ...raw,
       id,
@@ -548,7 +544,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
 
         const normalized = normalizeForCart(product);
 
-        // ensure id exists (cart implementations often reject without id)
         const idToCheck = normalized.id ?? normalized.product_id ?? null;
         if (!idToCheck) {
           console.warn("Product missing id/product_id — not adding to cart:", normalized);
@@ -563,46 +558,24 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
 
         const qty = Math.max(1, qtyOf(idToCheck));
 
-        console.debug("Adding to cart:", { id: idToCheck, qty, normalized });
-
-        // call onAddToCart the requested number of times to keep compatibility with current app behavior
+        // call parent's onAddToCart (do NOT dispatch openCart here)
         for (let i = 0; i < qty; i++) {
-          try {
-            // pass normalized product so cart always receives consistent shape
-            if (typeof onAddToCart === "function") {
-              onAddToCart(normalized);
-            } else {
-              console.warn("onAddToCart is not a function — cannot add to cart", onAddToCart);
-            }
-            console.debug("onAddToCart invoked for", idToCheck, "iteration", i + 1);
-          } catch (err) {
-            console.error("onAddToCart threw:", err);
-          }
+          if (typeof onAddToCart === "function") onAddToCart(normalized);
         }
 
-        // clear quantity input for this product
         setQuantities((prev) => {
           const copy = { ...prev };
           delete copy[String(idToCheck)];
           return copy;
         });
 
-        // Signal cart UI to open (matches your app's openCart event approach)
-        // small delay ensures the cart state has a chance to update in many setups
-        try {
-          // Fire event immediately; most drawers will re-render on store change anyway.
-          window.dispatchEvent(new CustomEvent("openCart"));
-          console.debug("Dispatched openCart event");
-        } catch (err) {
-          console.warn("Failed to dispatch openCart event", err);
-        }
+        // IMPORTANT: DO NOT dispatch openCart here. Parent controls opening the cart.
       } catch (err) {
         console.error("handleAddToCart unexpected error:", err);
       }
     },
     [normalizeForCart, onAddToCart, qtyOf]
   );
-  // ---------------------------------------------------------------
 
   const formatPrice = useCallback((n) => (Number.isNaN(Number(n)) ? "0.00" : Number(n).toFixed(2)), []);
   const computeDisplayPrice = useCallback((p) => {
@@ -635,7 +608,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     return { combopackProducts: combo, otherProducts: others };
   }, [displayedProducts, combopackCategoryIds, getProductCategoryIdAndName]);
 
-  // helper when clicking heart
   const handleAddToWishlist = useCallback(
     async (e, product) => {
       e.stopPropagation();
@@ -657,7 +629,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
 
   const renderProductCard = (product, idx) => {
     const productId = String(product?.id || `tmp-${idx}`);
-    const currentQuantity = qtyOf(productId);
     const displayPrice = computeDisplayPrice(product);
     const discountPercent = computeDiscountPercent(product);
     const outOfStock = Number(product?.stock ?? Infinity) <= 0;
@@ -676,7 +647,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
             <img src={img} alt={product?.name || "product"} className="w-full h-56 object-cover" />
           </div>
 
-          {/* Favourite icon - top right */}
           <button
             onClick={(e) => handleAddToWishlist(e, product)}
             disabled={isFavourited || wishlistLoading}
@@ -743,7 +713,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
 
   return (
     <div className="mb-16 w-full">
-      {/* Put header inside the same centered container so it aligns with categories */}
       <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 mb-6">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">Shop by Products</h2>
@@ -751,7 +720,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
         </div>
       </div>
 
-      {/* Centered product grid container with slightly larger cards */}
       <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
         <div
           className={`grid gap-8 sm:gap-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4
@@ -779,7 +747,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   />
 
-                  {/* Heart icon for this larger card too */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -855,7 +822,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
         </div>
       )}
 
-      {/* Combopack section */}
       {combopackProducts.length > 0 && (
         <section className="mt-12">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
@@ -873,3 +839,4 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
     </div>
   );
 }
+

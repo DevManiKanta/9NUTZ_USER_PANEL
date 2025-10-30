@@ -43,7 +43,31 @@ export default function Home() {
   }, []);
 
   // Stable addToCart so event listeners can include it in deps
-  const addToCart = useCallback((product, incomingQty = 1) => {
+  // const addToCart = useCallback((product, incomingQty = 1) => {
+  //   if (!product) return;
+  //   const qtyToAdd = Math.max(
+  //     1,
+  //     Number.isFinite(Number(incomingQty)) ? Math.trunc(incomingQty) : 1
+  //   );
+
+  //   setCartItems((prev) => {
+  //     const existing = prev.find((p) => String(p.id) === String(product.id));
+  //     if (existing) {
+  //       return prev.map((p) =>
+  //         String(p.id) === String(product.id)
+  //           ? { ...p, quantity: (p.quantity || 0) + qtyToAdd }
+  //           : p
+  //       );
+  //     }
+  //     return [...prev, { ...product, quantity: qtyToAdd }];
+  //   });
+  //   setIsCartOpen(true);
+  //   try { window.dispatchEvent(new Event("openCart")); } catch {}
+  // }, []);
+
+
+
+    const addToCart = useCallback((product, incomingQty = 1) => {
     if (!product) return;
     const qtyToAdd = Math.max(
       1,
@@ -61,8 +85,10 @@ export default function Home() {
       }
       return [...prev, { ...product, quantity: qtyToAdd }];
     });
+    // Parent opens the cart UI by state — keep this
     setIsCartOpen(true);
-    try { window.dispatchEvent(new Event("openCart")); } catch {}
+    // REMOVE this dispatch (was causing duplicate open)
+    // try { window.dispatchEvent(new Event("openCart")); } catch {}
   }, []);
 
   // Handler for productAddToCart window event — stable with useCallback

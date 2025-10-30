@@ -15,7 +15,6 @@ export const metadata = {
 export default function ShippingMethods() {
   return (
     <>
-    <Header/>
     <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <header className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Shipping Methods</h1>
@@ -120,8 +119,7 @@ export default function ShippingMethods() {
           <a href="mailto:support@9nutz.example" className="text-rose-600 hover:underline">support@9nutz.example</a>.
         </p>
       </footer>
-    </main>
-    <Footer/>   
+    </main> 
     </>
   );
 }
