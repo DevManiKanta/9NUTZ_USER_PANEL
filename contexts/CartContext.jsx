@@ -12,7 +12,7 @@ export function CartProvider({ children }) {
       const raw = localStorage.getItem("cart_v1");
       return raw ? JSON.parse(raw) : [];
     } catch (e) {
-      console.warn("Cart load error:", e);
+      
       return [];
     }
   });
@@ -22,7 +22,7 @@ export function CartProvider({ children }) {
     try {
       localStorage.setItem("cart_v1", JSON.stringify(items));
     } catch (e) {
-      console.warn("Cart save failed:", e);
+      
     }
   }, [items]);
 

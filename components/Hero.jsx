@@ -464,7 +464,7 @@ export async function getCategoriesPublicAPI() {
     const res = await axios.get(`${Login_API_BASE}/category/show`, { headers: { "Content-Type": "application/json" } });
     return Array.isArray(res.data?.data) ? res.data.data : [];
   } catch (err) {
-    console.error("getCategoriesPublicAPI error:", err?.response?.data ?? err?.message ?? err);
+    
     throw err;
   }
 }
@@ -490,7 +490,8 @@ export default function Hero() {
 
     const fetchBanners = async () => {
       try {
-        const res = await apiAxios.get("list-banners");
+        // Use explicit base to match other public endpoints
+        const res = await axios.get(`${Login_API_BASE}/list-banners`, { headers: { "Content-Type": "application/json" } });
         if (cancelled) return;
 
         const payload = res?.data ?? null;
@@ -526,7 +527,7 @@ export default function Hero() {
 
         setBanners(mapped);
       } catch (err) {
-        console.error("Hero: failed to load banners:", err?.response?.data ?? err?.message ?? err);
+        
         if (!cancelled) {
           setError("Failed to load banners.");
           setBanners([]);
@@ -627,7 +628,7 @@ export default function Hero() {
               style={{ transform: `translateX(-${currentBanner * 100}%)`, width: `${Math.max(1, banners.length) * 100}%` }}
             >
               {banners.map((b) => {
-                console.log("Banner data:", { id: b.id, image_url: b.image_url, title: b.title });
+                
                 return (
                 <div key={b.id} className="relative flex-shrink-0 w-full h-full">
                   {/* Clear background image (no blur, no scaling) */}
@@ -645,7 +646,7 @@ export default function Hero() {
                       WebkitTransform: 'none !important'
                     }}
                     onError={(e) => {
-                      console.log("Image error for banner:", b.id, e);
+                      
                       try { e.currentTarget.src = PLACEHOLDER; } catch (err) {}
                     }}
                   />

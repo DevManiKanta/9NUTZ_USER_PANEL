@@ -51,7 +51,7 @@ export const CategoryProvider = ({ children }) => {
         setCategories(normalized);
         localStorage.setItem('categories', JSON.stringify(normalized));
       } catch (err) {
-        console.warn('Failed to fetch categories from API, falling back to localStorage', err);
+        
         const saved = localStorage.getItem('categories');
         if (saved) {
           try {
@@ -117,7 +117,7 @@ export const CategoryProvider = ({ children }) => {
       const updated = [...categories, newCategory];
       saveAndNotify(updated);
     } catch (err) {
-      console.error('addCategory error:', err);
+      
       throw err;
     }
   }
@@ -148,7 +148,7 @@ export const CategoryProvider = ({ children }) => {
         saveAndNotify(updatedList);
       }
     } catch (err) {
-      console.error('updateCategory error:', err);
+      
       throw err;
     }
   }
@@ -162,7 +162,7 @@ export const CategoryProvider = ({ children }) => {
       const updated = categories.filter((c) => c.id !== id);
       saveAndNotify(updated);
     } catch (err) {
-      console.error('deleteCategory error:', err);
+      
       throw err;
     }
   }

@@ -83,7 +83,7 @@ const reload = useCallback(async () => {
     const normalized = rows.map((r) => normalizeServerProduct(r));
     setProducts(normalized);
   } catch (err) {
-    console.error("Reload products failed:", err.response?.data || err.message);
+    
     setProducts([]);
   }
 }, []);

@@ -157,7 +157,7 @@ export default function LoginModal({ isOpen, onClose }) {
       setNewPassword("");
     } catch (err) {
       setLoading(false);
-      console.error("reset error:", err);
+      
       setError("Network error while resetting password.");
     }
   };

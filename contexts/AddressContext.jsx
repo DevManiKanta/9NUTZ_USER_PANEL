@@ -42,7 +42,7 @@ export const AddressProvider = ({ children }) => {
         const parsedAddresses = JSON.parse(savedAddresses);
         setAddresses([...mockAddresses, ...parsedAddresses]);
       } catch (err) {
-        console.error("Failed to parse saved addresses:", err);
+    
       }
     }
   }, []);

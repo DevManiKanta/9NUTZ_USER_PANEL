@@ -881,7 +881,6 @@ export default function FilterableProductGrid({ onAddToCart, selectedCategory, i
         await addFavorite(productId);
         // optimistic state update is handled by context; local favSet will update via effect when favorites change
       } catch (err) {
-        console.error("Failed to add favourite:", err);
         // optionally show UI feedback here
       }
     },

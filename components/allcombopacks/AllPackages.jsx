@@ -413,7 +413,7 @@ export default function AllPackages({ onAddToCart: onAddToCartProp }) {
     }
 
     // fallback: console warn (no crash)
-    console.warn("Add to cart called but no handler found. Pass onAddToCart prop or wrap with CartProvider.");
+    
   };
 
   const openDetails = (pkg) => setSelected(pkg);

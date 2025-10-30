@@ -386,6 +386,7 @@ export default function Header({
   const [profileOpen, setProfileOpen] = useState(false);
   const profileBtnRef = useRef(null);
   const profileMenuRef = useRef(null);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -430,6 +431,10 @@ export default function Header({
       searchInputRef.current.blur();
     }
   };
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 left-0 right-0 w-medium bg-white z-50 shadow-sm border-b border-gray-100">
@@ -519,7 +524,7 @@ export default function Header({
               className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors inline-flex items-center justify-center"
             >
               <HeartIcon className="h-5 w-5 text-gray-700" />
-              {favCount > 0 && (
+              {hasMounted && favCount > 0 && (
                 <span
                   className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center"
                   aria-label={`${favCount} items in wishlist`}
@@ -549,7 +554,6 @@ export default function Header({
                         try {
                           if (typeof logout === "function") await logout();
                         } catch (err) {
-                          console.warn("Logout failed:", err);
                         } finally {
                           setProfileOpen(false);
                           handlePaymentComplete?.();
@@ -569,7 +573,7 @@ export default function Header({
             {/* 🛒 Cart */}
             <button onClick={onCartClick} aria-label="Open cart" className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <ShoppingCart className="h-6 w-6 text-gray-700" />
-              {cartItemCount > 0 && (
+              {hasMounted && cartItemCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center" aria-label={`${cartItemCount} items in cart`}>
                   {cartItemCount > 9 ? "9+" : cartItemCount}
                 </span>

@@ -46,7 +46,7 @@ export default function AdminLoginPage() {
       }
     } catch (err) {
       setError("Login failed. Please try again.");
-      console.error(err);
+      
     } finally {
       setLocalLoading(false);
     }

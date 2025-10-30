@@ -269,7 +269,7 @@ export default function OrdersTablePage({ initialOrders = [] }) {
       toast.dismiss(loadingId);
       toast.success(json?.message ?? "Orders loaded");
     } catch (err) {
-      console.error("fetchOrders error:", err);
+      
       toast.dismiss();
       toast.error(err?.message || "Failed to load orders");
     } finally {
@@ -294,7 +294,7 @@ export default function OrdersTablePage({ initialOrders = [] }) {
       }
       if (Array.isArray(itemsField)) return itemsField;
     } catch (err) {
-      console.warn("Failed to parse items JSON", err);
+      
       return [];
     }
     return [];

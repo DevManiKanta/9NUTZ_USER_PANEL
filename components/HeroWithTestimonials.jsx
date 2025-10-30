@@ -180,13 +180,14 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Star } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
+import { Login_API_BASE } from "@/lib/api";
 
 export default function HeroWithTestimonials() {
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const ASSET_BASE = (process.env.NEXT_PUBLIC_API_BASE || "https://9nutsapi.nearbydoctors.in/public").replace(/\/+$/, "");
-  const API_BASE = (process.env.NEXT_PUBLIC_LOGIN_API_BASE || "https://9nutsapi.nearbydoctors.in/public/api").replace(/\/+$/, "");
+  const API_BASE = (Login_API_BASE || "https://9nutsapi.nearbydoctors.in/public/api").replace(/\/+$/, "");
 
   useEffect(() => {
     let cancelled = false;

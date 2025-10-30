@@ -347,7 +347,7 @@ export default function Footer() {
       }
       return parsed.data;
     } catch (e) {
-      console.warn("Footer: failed to read cache", e);
+      
       return null;
     }
   };
@@ -358,7 +358,7 @@ export default function Footer() {
       if (typeof window === "undefined") return;
       localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), ttl: CACHE_TTL_MS, data }));
     } catch (e) {
-      console.warn("Footer: failed to write cache", e);
+      
     }
   };
 
@@ -452,7 +452,7 @@ export default function Footer() {
         });
       } catch (err) {
         // If background fetch fails, keep stale/default data visible. Do not override.
-        console.error("Footer: background settings fetch failed:", err?.message ?? err);
+        
         setError("Failed to refresh site settings");
         // don't set loading true — we already displayed cached/default
       } finally {

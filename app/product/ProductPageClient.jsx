@@ -1,69 +1,9 @@
-// "use client";
-
-// import React, { useCallback, useEffect, useState } from "react";
-// import Header from "@/components/Header";
-// import Footer from "@/components/Footer";
-// import CartSidebar from "@/components/CartSidebar";
-// import { useCart } from "@/contexts/CartContext";
-// import ProductClient from "@/app/product/ProductClient";
-
-// export default function ProductPageClient({ id }) {
-//   const [isCartOpen, setIsCartOpen] = useState(false);
-//   const { items, updateQuantity, clearCart, cartCount, cartTotal } = useCart();
-
-//   useEffect(() => {
-//     const openHandler = () => setIsCartOpen(true);
-//     window.addEventListener("openCart", openHandler);
-//     return () => window.removeEventListener("openCart", openHandler);
-//   }, []);
-
-//   const handlePaymentComplete = useCallback(() => {
-//     clearCart();
-//     setIsCartOpen(false);
-//   }, [clearCart]);
-
-//   const handleProceedToPay = () => {
-//     // Integrate payment flow here if needed
-//     // Keeping console for traceability during development
-//     // eslint-disable-next-line no-console
-//     console.log("Proceed to payment");
-//   };
-
-//   return (
-//     <div className="min-h-screen flex flex-col">
-//       <Header
-//         onCartClick={() => setIsCartOpen(true)}
-//         cartItemCount={cartCount}
-//         cartTotal={cartTotal}
-//       />
-//       <main className="flex-1 w-full bg-white">
-//         <section className="w-full bg-gray-50">
-//           <div className="max-w-6xl mx-auto px-4 py-12">
-//             <ProductClient id={String(id || "")} />
-//           </div>
-//         </section>
-//       </main>
-//       <Footer />
-
-//       <CartSidebar
-//         isOpen={isCartOpen}
-//         onClose={() => setIsCartOpen(false)}
-//         items={items}
-//         onUpdateQuantity={updateQuantity}
-//         onProceedToPay={handleProceedToPay}
-//         handlePaymentComplete={handlePaymentComplete}
-//         onClearCart={clearCart}
-//       />
-//     </div>
-//   );
-// }
-
-
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useProducts } from "@/contexts/ProductContext";
+import apiAxios from "@/lib/api"; // Use the centralized axios instance
 import ProductClient from "@/app/product/ProductClient";
 import { LOGIN_API_BASE } from "@/lib/api";
 
@@ -130,44 +70,14 @@ export default function ProductPageClient({ id }) {
         token = null;
       }
 
-      const url = `${base}/admin/products/show/${encodeURIComponent(String(productId))}`;
+      const url = `/admin/products/show/${encodeURIComponent(String(productId))}`;
 
       try {
         const headers = { "Content-Type": "application/json" };
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const res = await fetch(url, { method: "GET", headers });
-        const text = await res.text();
-         console.log("Test",text)
-        // parse JSON safely
-        let json = null;
-        try {
-          json = text ? JSON.parse(text) : null;
-        } catch (parseErr) {
-          throw new Error("Invalid JSON response from product API");
-        }
-
-        if (!res.ok) {
-          const message = json?.message || json?.error || `API error ${res.status}`;
-          // If unauthorized (401) or forbidden (403), fall back to context instead of hard error
-          if (res.status === 401 || res.status === 403) {
-            const fallback = findFromContext(productId);
-            if (fallback) {
-              setProduct(fallback);
-              setLoading(false);
-              return;
-            }
-            throw new Error(message || "Unauthorized access to product API");
-          }
-          // other non-ok statuses: try fallback, else show error
-          const fallback = findFromContext(productId);
-          if (fallback) {
-            setProduct(fallback);
-            setLoading(false);
-            return;
-          }
-          throw new Error(message || `API error ${res.status}`);
-        }
+        const res = await apiAxios.get(url, { headers });
+        const json = res.data;
 
         // At this point we have ok response; the API returns data shape you showed
         // Example: { status: true, data: { ...product fields... } }
@@ -181,6 +91,7 @@ export default function ProductPageClient({ id }) {
             return;
           }
           // throw new Error("Product data missing in API response");
+          throw new Error("Product data missing in API response");
         }
         const normalized = {
           // prefer camelCase keys used in ProductClient if available; fallback to snake_case from API
@@ -202,6 +113,10 @@ export default function ProductPageClient({ id }) {
         setLoading(false);
       } catch (err) {
         // Network or parse error: try fallback to context
+        // Axios wraps errors, so we check err.response for API errors
+        const isAuthError = err.response?.status === 401 || err.response?.status === 403;
+
+        // For any error, try to fall back to the context
         const fallback = findFromContext(productId);
         if (fallback) {
           setProduct(fallback);
@@ -209,6 +124,12 @@ export default function ProductPageClient({ id }) {
           return;
         }
         setError(err?.message || String(err));
+
+        // If fallback fails, show the error
+        const errorMessage =
+          err.response?.data?.message || err.message || "Failed to fetch product.";
+
+        setError(errorMessage);
         setLoading(false);
       }
     },
@@ -264,6 +185,3 @@ export default function ProductPageClient({ id }) {
     </div>
   );
 }
-
-
-

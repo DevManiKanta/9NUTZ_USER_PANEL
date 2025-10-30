@@ -74,7 +74,6 @@ export default function ProductDetailContent({ product }) {
     try {
       window.dispatchEvent(new CustomEvent("openCart"));
     } catch (err) {
-      console.warn("Failed to dispatch openCart event:", err);
     }
   };
 

@@ -51,7 +51,7 @@ const router = useRouter();
           setToken(storedToken);
         }
       } catch (err) {
-        console.error("Auth init error:", err);
+        
       } finally {
         setIsLoading(false);
       }
@@ -70,7 +70,7 @@ const router = useRouter();
       const data = await res.json();
 
       if (!res.ok || !data) {
-        console.error("Login failed:", data);
+        
         toast.error(String(data?.message || "Login failed"));
         return false;
       }
@@ -89,7 +89,7 @@ const router = useRouter();
       toast.success("Logged in successfully");
       return true;
     } catch (err) {
-      console.error("Login error:", err);
+      
       toast.error("Login error");
       return false;
     } finally {
@@ -114,7 +114,7 @@ const router = useRouter();
       const data = await res.json();
 
       if (!res.ok || (typeof data.status !== 'undefined' && !data.status)) {
-        console.error("Signup failed:", data);
+        
         toast.error(String(data?.message || "Signup failed"));
         return false;
       }
@@ -123,7 +123,7 @@ const router = useRouter();
       if (ok) toast.success("Account created & logged in");
       return ok;
     } catch (err) {
-      console.error("Signup error:", err);
+      
       toast.error("Signup error");
       return false;
     } finally {
@@ -142,7 +142,7 @@ const router = useRouter();
       await new Promise((resolve) => setTimeout(resolve, 800));
       return true;
     } catch (err) {
-      console.error("Password reset error:", err);
+      
       return false;
     }
   };
@@ -163,7 +163,7 @@ const router = useRouter();
       };
       setUser(normalized);
     } catch (err) {
-      console.warn("refreshMe failed:", err);
+      
     }
   };
 

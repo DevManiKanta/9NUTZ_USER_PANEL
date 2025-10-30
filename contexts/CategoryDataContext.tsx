@@ -32,7 +32,7 @@ async function fetchCategoriesFromApi(): Promise<any[]> {
 
     return rows;
   } catch (err) {
-    console.error("CategoryDataContext.fetchCategoriesFromApi error:", err);
+    
     throw err;
   }
 }

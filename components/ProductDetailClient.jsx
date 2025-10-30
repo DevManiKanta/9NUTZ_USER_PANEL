@@ -48,14 +48,14 @@ export default function ProductDetailClient({
   const performAddToCart = useCallback(
     (prod, quantity = 1) => {
       if (!prod) {
-        console.warn("performAddToCart: no product provided");
+        
         return;
       }
 
       // stock guard
       const stockVal = Number(prod.stock != null ? prod.stock : Infinity);
       if (!Number.isNaN(stockVal) && stockVal <= 0) {
-        console.warn("performAddToCart: product out of stock", prod);
+        
         return;
       }
 
@@ -69,11 +69,11 @@ export default function ProductDetailClient({
             // fallback to (product)
             onAddToCart(prod);
           } catch (err2) {
-            console.warn("onAddToCart threw errors; falling back to event dispatch", err1, err2);
+            
             try {
               window.dispatchEvent(new CustomEvent("productAddToCart", { detail: { product: prod, quantity } }));
             } catch (err3) {
-              console.warn("productAddToCart dispatch failed", err3);
+              
             }
           }
         }
@@ -82,7 +82,7 @@ export default function ProductDetailClient({
         try {
           window.dispatchEvent(new CustomEvent("productAddToCart", { detail: { product: prod, quantity } }));
         } catch (err) {
-          console.warn("productAddToCart dispatch failed", err);
+          
         }
       }
 

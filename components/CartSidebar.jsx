@@ -213,7 +213,7 @@ export default function CartSidebar({
         setSelectedAddress(def);
       }
     } catch (e) {
-      console.warn("Address fetch failed:", e);
+      
       setAddresses([]);
       setSelectedAddress(null);
     } finally {
@@ -298,7 +298,7 @@ export default function CartSidebar({
       setEditId(null);
       await fetchAddresses();
     } catch (err) {
-      console.error("Update address error:", err);
+      
       toast.error(err?.message || "Failed to update address");
     } finally {
       setEditSaving(false);
@@ -373,7 +373,7 @@ export default function CartSidebar({
 
       setAddOpen(false);
     } catch (err) {
-      console.error("Add address error:", err);
+      
       toast.dismiss(loadingId);
       toast.error(err?.message || "Failed to add address.");
     } finally {
@@ -405,7 +405,7 @@ export default function CartSidebar({
       toast.success("Address deleted");
       await fetchAddresses();
     } catch (e) {
-      console.error("Delete address error:", e);
+      
       toast.error(e?.message || "Failed to delete address");
     } finally {
       setDeletingId(null);
@@ -571,7 +571,7 @@ export default function CartSidebar({
       if (typeof onClearCart === "function") onClearCart();
       else if (typeof window !== "undefined") localStorage.removeItem("cart");
     } catch (e) {
-      console.warn("Failed to clear cart via onClearCart/localStorage:", e);
+      
     }
   };
 
@@ -712,13 +712,13 @@ export default function CartSidebar({
                   address_id: selectedAddress?.id,
                 });
               } catch (e) {
-                console.warn("submitOrderToServer fallback failed:", e);
+                
               }
 
               try {
                 clearCartSafely();
               } catch (e) {
-                console.warn("Error clearing cart after payment:", e);
+                
               }
 
               if (mountedRef.current) setLoadingPayment(false);
@@ -731,7 +731,7 @@ export default function CartSidebar({
               if (mountedRef.current) setLoadingPayment(false);
             }
           } catch (err) {
-            console.error("Error verifying payment:", err);
+            
             toast.dismiss();
             toast.error("Verification failed: " + (err?.message || "unknown"));
             if (mountedRef.current) setLoadingPayment(false);
@@ -761,7 +761,7 @@ export default function CartSidebar({
     } catch (err) {
       toast.dismiss();
       const msg = err?.message ?? String(err) ?? "Payment failed to start.";
-      console.error("Payment start failed:", err);
+      
       toast.error(msg);
       if (mountedRef.current) setLoadingPayment(false);
     }

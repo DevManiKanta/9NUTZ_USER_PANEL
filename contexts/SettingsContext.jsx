@@ -53,7 +53,7 @@ const readCache = (allowExpired = false) => {
     }
     return parsed.data;
   } catch (e) {
-    console.warn("SettingsContext: readCache failed", e);
+    
     return null;
   }
 };
@@ -63,7 +63,7 @@ const writeCache = (data) => {
     if (typeof window === "undefined") return;
     localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), ttl: CACHE_TTL_MS, data }));
   } catch (e) {
-    console.warn("SettingsContext: writeCache failed", e);
+    
   }
 };
 
@@ -121,7 +121,7 @@ export function SettingsProvider({ children }) {
       writeCache(normalized);
       setSettings((prev) => ({ ...prev, ...normalized }));
     } catch (err) {
-      console.warn("SettingsProvider.refresh failed", err?.message ?? err);
+      
     } finally {
       setLoading(false);
     }

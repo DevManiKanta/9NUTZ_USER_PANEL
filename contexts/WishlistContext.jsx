@@ -47,7 +47,6 @@ export const WishListProvider = ({ children }) => {
       }
 
       const data = await res.json();
-      console.log("Raw favorites response:", data);
 
       // --- Robust extraction of the favorites list ---
       // The backend may return:
@@ -140,7 +139,6 @@ export const WishListProvider = ({ children }) => {
     } catch (err) {
       setError(err);
       setFavorites([]);
-      console.error("fetchFavorites error:", err);
     } finally {
       setLoading(false);
     }
@@ -213,7 +211,6 @@ export const WishListProvider = ({ children }) => {
         // Rollback & show error toast
         setFavorites(prevSnapshot);
         setError(err);
-        console.error("addFavorite error:", err);
         toast.error("Failed to add favorite", {
           style: { background: "#fee2e2", color: "#7f1d1d", fontWeight: "600" },
         });

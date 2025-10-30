@@ -676,13 +676,13 @@ export default function ProfilePage({ initialUser = null, initialOrders = [] }) 
         }
       } catch (err) {
         // non-fatal
-        console.warn("Failed to update localStorage user on fetch:", err);
+        
       }
 
       toast.dismiss(loadingId);
       toast.success("Profile loaded");
     } catch (err) {
-      console.error("fetchProfile error:", err);
+      
       toast.dismiss();
       // If toast already shown above, don't double toast; but ensure user sees something
     } finally {
@@ -904,14 +904,14 @@ export default function ProfilePage({ initialUser = null, initialOrders = [] }) 
           localStorage.setItem("user", JSON.stringify({ ...u, ...updatedUser }));
         }
       } catch (err) {
-        console.warn("Could not update localStorage user cache:", err);
+        
       }
 
       toast.dismiss(loadingId);
       toast.success("Profile updated successfully");
       setShowDetailsModal(false);
     } catch (err) {
-      console.error("handleSubmitDetails error:", err);
+      
       toast.dismiss();
       if (!toast.isActive?.(err?.message)) {
         toast.error(err?.message || "Failed to update profile");

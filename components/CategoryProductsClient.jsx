@@ -229,7 +229,6 @@ export default function CategoryProductsClient({ identifier }) {
         if (typeof openCart === "function") openCart();
         else window.dispatchEvent(new CustomEvent("openCart"));
       } catch (err) {
-        console.error("Error adding product:", err);
       } finally {
         setTimeout(() => setIsAdding(false), 600);
       }
