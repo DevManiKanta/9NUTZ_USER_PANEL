@@ -267,7 +267,7 @@ export default function OrdersTablePage({ initialOrders = [] }) {
       setPage(p);
 
       toast.dismiss(loadingId);
-      toast.success(json?.message ?? "Orders loaded");
+      // toast.success(json?.message ?? "Orders loaded");
     } catch (err) {
       
       toast.dismiss();

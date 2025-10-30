@@ -3,6 +3,8 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import apiAxios, { API_BASE } from "@/lib/api";
+import axios from "axios";
+
 
 export type CategoryItem = { id: string; name: string };
 
@@ -17,7 +19,7 @@ const CategoryDataContext = createContext<CategoryDataContextState | undefined>(
 
 async function fetchCategoriesFromApi(): Promise<any[]> {
   try {
-    const res = await apiAxios.get("category/show");
+    const res = await axios.get("https://9nutsapi.nearbydoctors.in/public/api/category/show");
     const body = res?.data?.data ?? res?.data ?? res;
     let rows: any[] = [];
 
@@ -36,7 +38,6 @@ async function fetchCategoriesFromApi(): Promise<any[]> {
     throw err;
   }
 }
-
 export function CategoryDataProvider({ children }: { children: ReactNode }) {
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);

@@ -606,7 +606,7 @@ export default function Hero() {
   const prevBanner = () => setCurrentBanner((p) => (banners.length ? (p - 1 + banners.length) % banners.length : 0));
 
   return (
-    <div className="mb-4 mt-1">
+    <div className="mb-4">
       {/* Top hero/banner wrapper: use w-full to avoid viewport overflow from w-screen + translate */}
       <div
         className="relative overflow-hidden w-full rounded-2xl shadow-lg"
@@ -628,7 +628,6 @@ export default function Hero() {
               style={{ transform: `translateX(-${currentBanner * 100}%)`, width: `${Math.max(1, banners.length) * 100}%` }}
             >
               {banners.map((b) => {
-                
                 return (
                 <div key={b.id} className="relative flex-shrink-0 w-full h-full">
                   {/* Clear background image (no blur, no scaling) */}
@@ -646,7 +645,6 @@ export default function Hero() {
                       WebkitTransform: 'none !important'
                     }}
                     onError={(e) => {
-                      
                       try { e.currentTarget.src = PLACEHOLDER; } catch (err) {}
                     }}
                   />

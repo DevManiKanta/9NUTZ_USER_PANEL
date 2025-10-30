@@ -680,7 +680,7 @@ export default function ProfilePage({ initialUser = null, initialOrders = [] }) 
       }
 
       toast.dismiss(loadingId);
-      toast.success("Profile loaded");
+      // toast.success("Profile loaded");
     } catch (err) {
       
       toast.dismiss();
@@ -908,7 +908,7 @@ export default function ProfilePage({ initialUser = null, initialOrders = [] }) 
       }
 
       toast.dismiss(loadingId);
-      toast.success("Profile updated successfully");
+      // toast.success("Profile updated successfully");
       setShowDetailsModal(false);
     } catch (err) {
       

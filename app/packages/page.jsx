@@ -358,7 +358,6 @@ export default function Packages() {
   const handleChoose = (pkg) => setChosen(pkg.id);
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <header className="mb-8 text-left">
           <h1 className="text-3xl sm:text-2xl font-extrabold text-gray-900">
@@ -573,8 +572,6 @@ export default function Packages() {
           </div>
         )}
       </main>
-
-      <Footer />
     </div>
   );
 }

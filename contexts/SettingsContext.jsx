@@ -82,7 +82,7 @@ const fetchWithTimeout = async (url, axiosInstance, timeoutMs = 3500) => {
   try {
     const base = (API_BASE || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/+$/, "");
     const fullUrl = base ? `${base}/${url.replace(/^\/+/, "")}` : url;
-    const r = await fetch(fullUrl, { signal, credentials: "include" });
+    // const r = await fetch(fullUrl, { signal, credentials: "include" });
     clearTimeout(timeout);
     const data = await r.json().catch(() => null);
     return { data, status: r.status, ok: r.ok };

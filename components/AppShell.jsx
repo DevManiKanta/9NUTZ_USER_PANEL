@@ -20,7 +20,6 @@ export default function AppShell({ children }) {
     window.addEventListener("openCart", handler);
     return () => window.removeEventListener("openCart", handler);
   }, []);
-
   return (
     <>
       <Header
@@ -29,9 +28,8 @@ export default function AppShell({ children }) {
         cartItemCount={cartCount}
         cartTotal={cartTotal}
       />
-      <main className="min-h-screen pt-16">{children}</main>
+      <main className="min-h-screen">{children}</main>
       <Footer />
-
       <CartSidebar
         isOpen={cartOpen}
         onClose={closeCart}
@@ -39,7 +37,6 @@ export default function AppShell({ children }) {
         onUpdateQuantity={updateQuantity}
         onClearCart={clearCart}
       />
-
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );

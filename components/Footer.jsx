@@ -372,7 +372,7 @@ export default function Footer() {
       try {
         if (axiosInstance && typeof axiosInstance.get === "function") {
           // axios get with timeout should reject if slow
-          const res = await axiosInstance.get(url, { timeout: timeoutMs });
+          // const res = await axiosInstance.get(url, { timeout: timeoutMs });
           return res;
         }
       } catch (axErr) {
@@ -388,7 +388,7 @@ export default function Footer() {
       try {
         const base = (API_BASE || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/+$/, "");
         const fullUrl = base ? `${base}/${url.replace(/^\/+/, "")}` : url;
-        const r = await fetch(fullUrl, { signal, credentials: "include" });
+        // const r = await fetch(fullUrl, { signal, credentials: "include" });
         clearTimeout(timeout);
         // mimic axios response shape minimally
         const data = await r.json().catch(() => null);

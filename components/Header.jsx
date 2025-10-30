@@ -518,7 +518,7 @@ export default function Header({
               <Bell className="h-5 w-5 text-gray-700" />
               <span className="absolute top-1.5 right-1.5 bg-red-500 rounded-full w-2 h-2" />
             </Link>
-            <Link
+            {hasToken&&<Link
               href="/dashboard?tab=favourites"
               aria-label="Favourites"
               className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors inline-flex items-center justify-center"
@@ -532,7 +532,7 @@ export default function Header({
                   {favCount > 9 ? "9+" : favCount}
                 </span>
               )}
-            </Link>
+            </Link>}
             {hasToken ? (
               <div className="relative">
                 <button

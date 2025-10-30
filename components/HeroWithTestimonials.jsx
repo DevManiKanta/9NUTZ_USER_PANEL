@@ -168,7 +168,6 @@
 //   );
 // }
 
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -207,22 +206,26 @@ export default function HeroWithTestimonials() {
 
         const rows = Array.isArray(json?.data) ? json.data : [];
         const mapped = rows.map((r) => {
-          const img = r.image_url || r.image || "";
-          const full = /^https?:\/\//.test(img)
-            ? img
-            : `${ASSET_BASE}/${img.replace(/^\/+/, "")}`;
+          // Prefer full `url` from API; fallback to image_url/image; ensure it's an absolute URL
+          const maybeFull = r.url || r.image_url || r.image || "";
+          const image_url = /^https?:\/\//.test(maybeFull)
+            ? maybeFull
+            : maybeFull
+            ? `${ASSET_BASE}/${maybeFull.replace(/^\/+/, "")}`
+            : "";
+
           return {
             id: r.id,
             title: r.title,
             subtitle: r.subtitle,
             link: r.link,
-            image_url: full,
+            image_url,
           };
         });
 
         if (!cancelled) {
           setBanners(mapped);
-          toast.success(`Loaded ${mapped.length} hero banner(s)`);
+          // toast.success(`Loaded ${mapped.length} hero banner(s)`);
           setLoading(false);
         }
       } catch (err) {
@@ -286,14 +289,21 @@ export default function HeroWithTestimonials() {
               {(banners.length > 0 ? banners : []).map((b) => (
                 <SwiperSlide key={b.id}>
                   <div className="relative w-full h-[320px] md:h-[420px] lg:h-[520px]">
-                    <Image
-                      src={b.image_url}
-                      alt={b.title || "Sale banner"}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      sizes="(max-width: 768px) 640px, (max-width: 1200px) 1200px, 1400px"
-                      priority
-                    />
+                    {b.image_url ? (
+                      <Image
+                        src={b.image_url}
+                        alt={b.title || "Sale banner"}
+                        fill
+                        style={{ objectFit: "cover" }}
+                        sizes="(max-width: 768px) 640px, (max-width: 1200px) 1200px, 1400px"
+                        priority
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <span className="text-gray-500">No banner image</span>
+                      </div>
+                    )}
+
                     <div className="absolute inset-0 bg-black/30" />
                     <div className="absolute inset-0 flex items-center justify-center px-6 text-center text-white">
                       <motion.div
@@ -312,7 +322,7 @@ export default function HeroWithTestimonials() {
                             {b.subtitle}
                           </p>
                         )}
-                        {b.link && (
+                        {/* {b.link && (
                           <a
                             href={b.link}
                             target="_blank"
@@ -321,7 +331,7 @@ export default function HeroWithTestimonials() {
                           >
                             Shop Now
                           </a>
-                        )}
+                        )} */}
                       </motion.div>
                     </div>
                   </div>
@@ -345,7 +355,6 @@ export default function HeroWithTestimonials() {
               GREAT QUALITY!
             </h2>
           </div>
-
           <Swiper
             modules={[Autoplay, Pagination]}
             slidesPerView={1}
@@ -370,7 +379,6 @@ export default function HeroWithTestimonials() {
               </SwiperSlide>
             ))}
           </Swiper>
-
           {/* styles for dots */}
           <style jsx>{`
             :global(.hero-swiper .swiper-pagination-bullet),
